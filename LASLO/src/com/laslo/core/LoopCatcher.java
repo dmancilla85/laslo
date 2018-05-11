@@ -2,6 +2,7 @@
  *
  */
 package com.laslo.core;
+
 import static com.laslo.core.PairmentAnalizer.*;
 import com.tools.fasta.InputSequence;
 import static java.lang.System.out;
@@ -27,7 +28,7 @@ import rnafold4j.RNAFoldAPI;
  * @author David
  *
  */
-public class LoopCatcher implements Runnable{
+public class LoopCatcher implements Runnable {
 
     protected String pathOut;
     protected ArrayList<String> loopPatterns;
@@ -45,9 +46,9 @@ public class LoopCatcher implements Runnable{
     // Create a new instance of RNAFold4J
     protected RNAFoldAPI rfa;
 
-    public LoopCatcher(String pathOut, String pathIn, 
-            ArrayList<String> loopPatterns, InputSequence inputType, 
-            int minLength, int maxLength, 
+    public LoopCatcher(String pathOut, String pathIn,
+            ArrayList<String> loopPatterns, InputSequence inputType,
+            int minLength, int maxLength,
             int maxWooble, int maxMismatch) {
         this.pathOut = pathOut;
         this.loopPatterns = loopPatterns;
@@ -79,15 +80,15 @@ public class LoopCatcher implements Runnable{
     public void setFileList(File[] fileList) {
         this.fileList = fileList;
     }
-    
-    public void setIsExtendedMode(boolean mode){
+
+    public void setIsExtendedMode(boolean mode) {
         this.extendedMode = mode;
     }
-    
-    public boolean getIsExtendedMode(){
+
+    public boolean getIsExtendedMode() {
         return this.extendedMode;
     }
-    
+
     public String getPathOut() {
         return pathOut;
     }
@@ -272,11 +273,11 @@ public class LoopCatcher implements Runnable{
                                 // the border
 
                                 if (isComplementaryRNAWooble(rnaSequence.charAt(pos1),
-                                        rnaSequence.charAt(pos2)) 
+                                        rnaSequence.charAt(pos2))
                                         && woobleCount < this.maxWooble) {
                                     woobleCount++;
 
-                                } else if (lengthIR > 0 && mismatchCount 
+                                } else if (lengthIR > 0 && mismatchCount
                                         < this.maxMismatch) {
                                     mismatchCount++;
                                     mismatchs.add(lengthIR + 1);
@@ -292,7 +293,7 @@ public class LoopCatcher implements Runnable{
                         }
 
                     } catch (IndexOutOfBoundsException e) {
-                        out.println("Error: " + dnaSequence + " - i: " 
+                        out.println("Error: " + dnaSequence + " - i: "
                                 + (loopPos - lengthIR) + " - i2: " //$NON-NLS-3$ //$NON-NLS-2$
                                 // //$NON-NLS-3$
                                 + (loopPos + loopLength + lengthIR)); // $NON-NLS-1$
@@ -356,8 +357,9 @@ public class LoopCatcher implements Runnable{
                 slr.setLoop(rnaSequence.substring(loopPos, loopPos + loopLength));
                 hairpinModel = slr.drawHairpinViennaStructure();
 
-               if(mfe.mfe == 0 || !hairpinModel.equals(new String(mfe.structure).trim()))
+                if (mfe.mfe == 0 || !hairpinModel.equals(new String(mfe.structure).trim())) {
                     isValidHairpin = false;
+                }
             }
 
             if (isValidHairpin) {
@@ -377,16 +379,16 @@ public class LoopCatcher implements Runnable{
                 slr.setEndsAt(loopFinder.end() + lengthIR + 1);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
                 slr.setPercG_sequence(
                         (rnaSequence.length() - rnaSequence.replace("G", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
                         (rnaSequence.length() - rnaSequence.replace("C", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
                 slr.setPercU_sequence(
                         (rnaSequence.length() - rnaSequence.replace("U", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
 
                 // Other signals in cDNA
                 // ----------------------
@@ -396,8 +398,8 @@ public class LoopCatcher implements Runnable{
                 // Polyadenilations Sites
                 // Look for the Kozak pattern
                 // Special TEST buscar otros posibles stems
-                slr.setRelativePos((double)slr.getStartsAt() / (double)rnaSequence.length());
-                
+                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
+
                 slrList.add(slr);
             }
 
@@ -419,28 +421,28 @@ public class LoopCatcher implements Runnable{
 
         return size;
     }
-    
-        public int sequenceExtendedResearch(Sequence fastaSeq, String stemLoopPattern,
+
+    public int sequenceExtendedResearch(Sequence fastaSeq, String stemLoopPattern,
             ArrayList<StemPosition> stemsDetected, CSVWriter writer) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
         slr = null;
         List<Integer> mismatchs = new ArrayList<>();
-        int size;
+        int size, i;
         char aux1, aux2;
         size = 0;
 
         int loopPos = 0,
-            loopLength = stemLoopPattern.length(),
-            sequenceLength = fastaSeq.getSequenceString().length();
-  
+                loopLength = stemLoopPattern.length(),
+                sequenceLength = fastaSeq.getSequenceString().length();
+
         boolean isValidHairpin;
         String dnaSequence = fastaSeq.getSequenceString().toUpperCase();
         String pairs = "";
         String rnaSequence = dnaSequence.replace('T', 'U');
         MFEData mfe = null;
-                
+
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
         Pattern p = Pattern.compile(regExp);
@@ -453,101 +455,108 @@ public class LoopCatcher implements Runnable{
             loopPos = loopFinder.start();
             mismatchs.clear();
             isValidHairpin = true;
-
             rnaLoop = rnaSequence.substring(loopPos, loopFinder.end());
-
+            int length = this.maxLength;
             slr = new StemLoop(this.inputType);
             slr.setTags(fastaSeq.getId());
+            try {
+                if ((loopPos - length) > 0
+                        && (loopPos + loopLength + length) < sequenceLength) {
+                    rnaSeq = rnaSequence.substring(loopPos - length, loopPos
+                            + loopLength + length);
 
-            if((loopPos - this.maxLength) > 0 
-                    && (loopPos + loopLength + this.maxLength) < sequenceLength){
-                rnaSeq = rnaSequence.substring(loopPos - this.maxLength, loopPos
-                    + loopLength + this.maxLength);
-                
-                mfe = rfa.getMFE(rnaSeq.getBytes());
-                hairpinModel = new String(mfe.structure).trim();
-                
-                if(mfe.mfe == 0)
+                    mfe = rfa.getMFE(rnaSeq.getBytes());
+                    hairpinModel = new String(mfe.structure).trim();
+
+                    if (mfe.mfe == 0) {
                         isValidHairpin = false;
-                
-                if(isValidHairpin){
-                    int ln = this.maxLength;
-                    boolean cut = true;
-                    
-                    for(int i = 0; i < ln && isValidHairpin && cut; i++){
-                        if(hairpinModel.charAt(i) == 
-                                hairpinModel.charAt(hairpinModel.length() - 1-i)
-                                && hairpinModel.charAt(i) == '.'){
-                            
-                            if(this.maxLength > this.minLength){
-                                this.maxLength--;
-                                hairpinModel = hairpinModel.substring(i + 1, hairpinModel.length() - 1);
-                                rnaSeq = rnaSeq.substring(i + 1, rnaSeq.length() - 1);
-                            } else 
-                                isValidHairpin = false;
-                        } else 
-                            cut = false;
                     }
-                    
-                    
-                }    
-                
-                if(isValidHairpin) {
-                    slr.setRnaHairpinSequence(rnaSeq);
-                    slr.setLoop(rnaLoop);
-                    slr.setStartsAt(loopPos - this.maxLength);
-                    slr.checkPairments();
-                    isValidHairpin = hairpinModel.length() 
-                            - hairpinModel.replace("(", "").length() >= this.maxLength * 0.5;
-                }
-                    
-                if(isValidHairpin)
-                    isValidHairpin = hairpinModel.charAt(0) == '(' ||
-                            hairpinModel.charAt(hairpinModel.length() - 1) == ')';
-                
-                if(isValidHairpin){
-                    aux1 = hairpinModel.charAt(this.maxLength - 1);
-                    aux2 = hairpinModel.charAt(this.maxLength + loopLength);
-                    isValidHairpin = aux1 == '(' && aux2 == ')';
-                }
-                
-                if(isValidHairpin)
-                for(int i = this.maxLength; i < this.maxLength + loopLength && isValidHairpin; i++){
-                    aux1 = hairpinModel.charAt(i);
 
-                    if( aux1 != '.')
-                        isValidHairpin = false;
+                    if (isValidHairpin) {
+                        boolean cut = true;
+
+                        for (i = 0; i < length && isValidHairpin && cut; i++) {
+                            if (hairpinModel.charAt(hairpinModel.length() - 1 - i) == '.'
+                                    && hairpinModel.charAt(i) == '.') {
+
+                                if (length - i - 1 > this.minLength) {
+                                    isValidHairpin = false;
+                                }
+                            } else {
+                                cut = false;
+                            }
+                        }
+
+                        if (isValidHairpin && i > 0) {
+                            hairpinModel = hairpinModel.substring(i, hairpinModel.length() - i);
+                            rnaSeq = rnaSeq.substring(i, rnaSeq.length() - i);
+                            length = length - i;
+                        }
+
+                    }
+
+                    if (isValidHairpin) {
+                        slr.setRnaHairpinSequence(rnaSeq);
+                        slr.setLoop(rnaLoop);
+                        slr.setStartsAt(loopPos - length);
+                        //slr.checkPairments();
+                        /*isValidHairpin = hairpinModel.length() 
+                            - hairpinModel.replace("(", "").length() >= length * 0.5;*/
+                    }
+
+                    if (isValidHairpin) {
+                        for (i = length; i < length + loopLength && isValidHairpin; i++) {
+                            aux1 = hairpinModel.charAt(i);
+
+                            if (aux1 != '.') {
+                                isValidHairpin = false;
+                            }
+                        }
+                    }
+
+                    if (isValidHairpin) {
+                        isValidHairpin = hairpinModel.charAt(0) == '('
+                                || hairpinModel.charAt(hairpinModel.length() - 1) == ')';
+                    }
+                    if (isValidHairpin) {
+                        aux1 = hairpinModel.charAt(length - 1);
+                        aux2 = hairpinModel.charAt(length + loopLength);
+                        isValidHairpin = aux1 == '(' && aux2 == ')';
+                    }
+
+                } else {
+                    isValidHairpin = false;
                 }
-                
-            } else {
-                isValidHairpin = false;
+
+            } catch (Exception e) {
+                out.println("ERROR!: Length" + length + " - Hairpin: " + hairpinModel + " - seq: " + rnaSeq);
             }
 
             if (isValidHairpin) {
                 // Fill the fields
                 slr.setSequenceLength(sequenceLength);
                 slr.setMfe(mfe.mfe);
-                slr.setStructure(new String(mfe.structure));
-                slr.setPredecessorLoop(this.maxLength);
-                slr.setNLoop(this.maxLength);
+                slr.setStructure(hairpinModel);
+                slr.setPredecessorLoop(length);
+                slr.setNLoop(length);
                 slr.setPercent_AG();
                 slr.setLoopPattern(stemLoopPattern);
                 slr.setPercent_AU();
                 slr.setPercent_CG();
-                slr.setStartsAt(loopPos - this.maxLength + 1);
-                slr.setEndsAt(loopFinder.end() + this.maxLength + 1);
+                slr.setStartsAt(loopPos - length + 1);
+                slr.setEndsAt(loopFinder.end() + length + 1);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
                 slr.setPercG_sequence(
                         (rnaSequence.length() - rnaSequence.replace("G", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
                         (rnaSequence.length() - rnaSequence.replace("C", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
                 slr.setPercU_sequence(
                         (rnaSequence.length() - rnaSequence.replace("U", "")
-                                .length()) / (float) rnaSequence.length());
+                        .length()) / (float) rnaSequence.length());
 
                 // Other signals in cDNA
                 // ----------------------
@@ -557,8 +566,8 @@ public class LoopCatcher implements Runnable{
                 // Polyadenilations Sites
                 // Look for the Kozak pattern
                 // Special TEST buscar otros posibles stems
-                slr.setRelativePos((double)slr.getStartsAt() / (double)rnaSequence.length());
-                
+                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
+
                 slrList.add(slr);
             }
 
@@ -581,7 +590,7 @@ public class LoopCatcher implements Runnable{
         return size;
     }
 
-    @Override    
+    @Override
     public void run() {
         ArrayList<StemPosition> currentStems = null;
         // Auxiliar values
@@ -600,12 +609,13 @@ public class LoopCatcher implements Runnable{
         out.println("Process started at " + Calendar.getInstance().getTime());
         out.flush();
 
-        if(fileList == null)
+        if (fileList == null) {
             return;
-        
+        }
+
         // I. File level
         for (File listOfFile : fileList) {
-            if (listOfFile.isFile() && (listOfFile.toString().endsWith(FASTA_EXT) 
+            if (listOfFile.isFile() && (listOfFile.toString().endsWith(FASTA_EXT)
                     || listOfFile.toString().endsWith(FASTA_EXT_2))) {
                 try {
                     fileName = listOfFile.getName();
@@ -614,7 +624,7 @@ public class LoopCatcher implements Runnable{
                     fileName = fileName.replaceAll(FASTA_EXT, "");
                     fileName = fileName.replaceAll(FASTA_EXT_2, "");
                     fileOut = this.pathOut + "\\" + fileName + CSV_EXT;
-                    
+
                     if (new File(fileOut).exists()) {
                         try {
                             delete = (new File(fileOut)).delete();
@@ -623,7 +633,7 @@ public class LoopCatcher implements Runnable{
                             out.flush();
                         }
                     }
-                    
+
                     Calendar.getInstance();
                     // Generation of the iterator of {id,sequence}
                     fasta = new FastaReader(FastaFileContent.DNA_SEQUENCE, listOfFile.getAbsolutePath());
@@ -635,43 +645,43 @@ public class LoopCatcher implements Runnable{
                     itr = list.iterator();
                     int listSize = list.size();
                     i = 1;
-                    
+
                     writer = new CSVWriter(new FileWriter(fileOut), ';',
                             CSVWriter.DEFAULT_QUOTE_CHARACTER,
                             CSVWriter.DEFAULT_ESCAPE_CHARACTER,
                             CSVWriter.DEFAULT_LINE_END);
                     writer.writeNext(StemLoop.getHeader(this.inputType).split(";"));
-                    
+
                     // II. Transcript level
                     while (itr.hasNext()) {
                         Sequence element = itr.next();
                         StemLoop aux = new StemLoop(this.inputType);
                         aux.setTags(element.getId());
-                        
+
                         // Here begins one cycle
                         Iterator<String> patternItr = loopPatterns.iterator();
-                        
+
                         while (patternItr.hasNext()) {
-                            
+
                             String currentPattern = patternItr.next();
                             currentPattern = currentPattern.trim();
-                            
+
                             // 1. Stem research
-                            if(extendedMode){    
-                                sequenceExtendedResearch(element, currentPattern, 
-                                        currentStems,writer);
+                            if (extendedMode) {
+                                sequenceExtendedResearch(element, currentPattern,
+                                        currentStems, writer);
                             } else {
-                                sequenceResearch(element, currentPattern, currentStems,writer);
+                                sequenceResearch(element, currentPattern, currentStems, writer);
                             }
                         }
-                        
+
                         if (i++ % 3000 == 0) {
-                            out.printf("%d out of %d. %2.2f%% processed...%n", 
+                            out.printf("%d out of %d. %2.2f%% processed...%n",
                                     i, listSize, //$NON-NLS-1$
                                     (i / (float) listSize) * 100);
                             out.flush();
                         }
-                        
+
                     }
 
                     writer.close();
