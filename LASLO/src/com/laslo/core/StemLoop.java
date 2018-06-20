@@ -346,8 +346,10 @@ public class StemLoop {
     }
 
     public String getLoopID() {
+        /*return this.predecessorLoop + this.loop
+                + ":" + this.getGUPairs() + "|" + this.getStemLength();*/
         return this.predecessorLoop + this.loop
-                + ":" + this.getGUPairs() + "|" + this.getStemLength();
+                + "(" + this.getTerminalPair() + ")|" + this.getStemLength();
     }
 
     public String getLoopPattern() {

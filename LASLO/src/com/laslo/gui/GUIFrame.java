@@ -21,7 +21,12 @@ import com.tools.fasta.InputSequence;
 import com.laslo.core.LoopCatcher;
 import com.tools.ReturnValue;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.io.PrintStream;
 import static java.lang.System.out;
@@ -41,7 +46,7 @@ public class GUIFrame extends javax.swing.JFrame {
     /**
      * Creates new form NewJFrame
      */
-    public GUIFrame() {
+    public GUIFrame() throws IOException {
         loopCatcher = new LoopCatcher();
         isRunning = false;
         
@@ -55,10 +60,14 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jFTpercMismatch.setVisible(false);
         this.jFTpercWooble.setVisible(false);
         
-        PrintStream printStream = new PrintStream(new CustomOutputStream(
+        /*PrintStream printStream = new PrintStream(new CustomOutputStream(
                 this.jTAConsole));
         System.setOut(printStream);
-        System.setErr(printStream);  
+        System.setErr(printStream); */
+        PipedOutputStream pOut = new PipedOutputStream();   
+        System.setOut(new PrintStream(pOut));   
+        PipedInputStream pIn = new PipedInputStream(pOut);  
+        BufferedReader reader = new BufferedReader(new InputStreamReader(pIn));
     }
 
     /**
@@ -401,14 +410,15 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jSpinMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5)
-                        .addComponent(jFTpercMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jFTpercMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)
+                        .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -586,7 +596,11 @@ public class GUIFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new GUIFrame().setVisible(true);
+            try {
+                new GUIFrame().setVisible(true);
+            } catch (IOException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 

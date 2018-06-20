@@ -24,14 +24,14 @@ public class FastaReader {
 		DNA_SEQUENCE, PROTEIN_SEQUENCE
 	};
 
-	private FastaFileContent contentType;
-	private String inputFile;
-	private List<Sequence> sequenceList;
+	private final FastaFileContent contentType;
+	private final String inputFile;
+	private final List<Sequence> sequenceList;
 
 	public FastaReader(FastaFileContent contentType, String inputFile) {
 		this.contentType = contentType;
 		this.inputFile = inputFile;
-		this.sequenceList = new ArrayList<Sequence>();
+		this.sequenceList = new ArrayList<>();
 	}
 
 	public Sequence getFirstSequence() {
@@ -61,9 +61,10 @@ public class FastaReader {
 						continue;
 					}
 					char firstChar = line.charAt(0);
-					if (firstChar == '>') {
-
-						// save the previous sequence read
+                                        
+                                        switch(firstChar){
+                                            case '>':
+                                                // save the previous sequence read
 						addToSequenceList(id, contentBuffer);
 
 						// now can get the new id > ..
@@ -72,18 +73,17 @@ public class FastaReader {
 						// start a new content buffer
 						contentBuffer = null;
 						contentBuffer = new StringBuffer();
-
-					} else if (firstChar == ';') {
-
-						// comment line, skip it
-
-					} else {
-
-						// carry on reading sequence content
+                                                break;
+                                                
+                                            case ';':
+                                                // comment line, skip it
+                                                break;
+                                            default:
+                                                // carry on reading sequence content
 						aux = line.trim();
 						contentBuffer.append(aux);
-
-					}
+                                                break;
+                                        }
 
 				} else {
 
@@ -95,11 +95,16 @@ public class FastaReader {
 			} while (line != null);
 
 		} catch (FileNotFoundException e) {
-			System.out.println("File " + inputFile + " is not found"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println("File " + inputFile + " is not found. " 
+                                + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 			System.exit(1);
 		} catch (IOException e) {
 			System.out.println("An IO error has occured: " + e.getMessage()); //$NON-NLS-1$
 			System.exit(1);
+                } catch (Exception e){
+                    System.out.println("Process out of memory: " + e.getMessage());
+                    System.exit(1);
+                    
 		} finally {
 			if (fileReader != null) {
 				try {
@@ -109,7 +114,7 @@ public class FastaReader {
 				}
 			}
 		}
-
+                contentBuffer.setLength(1);
 		contentBuffer = null;
 		return sequenceList;
 
@@ -127,9 +132,10 @@ public class FastaReader {
 			} else if (this.contentType == FastaFileContent.PROTEIN_SEQUENCE) {
 				s = new Protein(id, sb.toString());
 			}
-			} catch(Exception e){
-				System.err.println("Error en secuencia " + id
+			} catch(OutOfMemoryError  e){
+				System.out.println("Error en secuencia " + id
 						+ ". Longitud: " + sb.length());
+                                System.exit(1);
 			}
 			this.sequenceList.add(s);
 		}
