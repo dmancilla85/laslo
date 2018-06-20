@@ -21,12 +21,8 @@ import com.tools.fasta.InputSequence;
 import com.laslo.core.LoopCatcher;
 import com.tools.ReturnValue;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.io.PrintStream;
 import static java.lang.System.out;
@@ -45,6 +41,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form NewJFrame
+     * @throws java.io.IOException
      */
     public GUIFrame() throws IOException {
         loopCatcher = new LoopCatcher();
@@ -60,14 +57,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jFTpercMismatch.setVisible(false);
         this.jFTpercWooble.setVisible(false);
         
-        /*PrintStream printStream = new PrintStream(new CustomOutputStream(
-                this.jTAConsole));
-        System.setOut(printStream);
-        System.setErr(printStream); */
-        PipedOutputStream pOut = new PipedOutputStream();   
-        System.setOut(new PrintStream(pOut));   
-        PipedInputStream pIn = new PipedInputStream(pOut);  
-        BufferedReader reader = new BufferedReader(new InputStreamReader(pIn));
+        TextAreaOutputStream taos = new TextAreaOutputStream( jTAConsole );
+        PrintStream ps = new PrintStream( taos );
+        System.setOut( ps );
+        System.setErr( ps );
     }
 
     /**

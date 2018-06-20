@@ -528,21 +528,21 @@ public class StemLoop {
         
         int lengthIR = this.rnaHairpinSequence.length() - this.loop.length();
         String seq = rnaHairpinSequence;
-        int wooble = 0, mismatch = 0;
+        int woobleCount = 0, mismatch = 0;
         
         if(this.loop.isEmpty() || this.rnaHairpinSequence.isEmpty())
             return;
         
         for(int i = 0; i <(lengthIR)/2; i++){
             if(PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(seq.length() - 1- i)))
-                wooble++;
+                woobleCount++;
             else
                 if(!PairmentAnalizer.isComplementaryRNA(seq.charAt(i), seq.charAt(seq.length() - 1- i)))
                     mismatch++;
         }
         
         this.setMismatches(mismatch);
-        this.setPercent_GU(wooble);
+        this.setPercent_GU(woobleCount);
 
     }
     
