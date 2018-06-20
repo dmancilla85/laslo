@@ -479,7 +479,7 @@ public class LoopCatcher implements Runnable {
                             if (hairpinModel.charAt(hairpinModel.length() - 1 - i) == '.'
                                     && hairpinModel.charAt(i) == '.') {
 
-                                if (length - i - 1 > this.minLength) {
+                                if (length - i < this.minLength) {
                                     isValidHairpin = false;
                                 }
                             } else {
@@ -499,7 +499,7 @@ public class LoopCatcher implements Runnable {
                         slr.setRnaHairpinSequence(rnaSeq);
                         slr.setLoop(rnaLoop);
                         slr.setStartsAt(loopPos - length);
-                        //slr.checkPairments();
+                        slr.checkPairments();
                         /*isValidHairpin = hairpinModel.length() 
                             - hairpinModel.replace("(", "").length() >= length * 0.5;*/
                     }
