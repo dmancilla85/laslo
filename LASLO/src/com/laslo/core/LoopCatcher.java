@@ -15,12 +15,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.tools.joewandy.Sequence;
-import com.tools.io.FastaReader;
-import com.tools.io.FastaReader.FastaFileContent;
+//import com.tools.joewandy.Sequence;
+//import com.tools.io.FastaReader;
+//import com.tools.io.FastaReader.FastaFileContent;
 import com.opencsv.CSVWriter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.biojava.nbio.core.sequence.DNASequence;
+import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import rnafold4j.MFEData;
 import rnafold4j.RNAFoldAPI;
 
@@ -200,7 +204,7 @@ public class LoopCatcher implements Runnable {
      * @param writer
      * @return
      */
-    public int sequenceResearch(Sequence fastaSeq, String stemLoopPattern,
+    public int sequenceResearch(DNASequence fastaSeq, String stemLoopPattern,
             ArrayList<StemPosition> stemsDetected, CSVWriter writer) {
 
         List<StemLoop> slrList = new ArrayList<>();
@@ -215,15 +219,14 @@ public class LoopCatcher implements Runnable {
                 mismatchCount, woobleCount,
                 // Number of G=U pairs. Typically 1, max 4
                 lengthIR, // Length of the inverted repeat sequences
-                loopLength = stemLoopPattern.length(),
-                sequenceLength = fastaSeq.getSequenceString().length(), pos1,
+                loopLength = stemLoopPattern.length(), pos1,
                 pos2;
         boolean existsInvertedRepeat;
         existsInvertedRepeat = false;
         boolean checkWooblePair, isValidHairpin;
         // Upper all characters
-        String dnaSequence = fastaSeq.getSequenceString().toUpperCase();
-
+        String dnaSequence = fastaSeq.getSequenceAsString().toUpperCase();
+        int sequenceLength = dnaSequence.length();
         // Make the retro transcription
         String rnaSequence = dnaSequence.replace('T', 'U');
 
@@ -336,7 +339,7 @@ public class LoopCatcher implements Runnable {
             }
 
             slr = new StemLoop(this.inputType);
-            slr.setTags(fastaSeq.getId());
+            slr.setTags(fastaSeq.getOriginalHeader());
             slr.setStartsAt(loopPos - lengthIR + 1);
 
             /*
@@ -422,7 +425,7 @@ public class LoopCatcher implements Runnable {
         return size;
     }
 
-    public int sequenceExtendedResearch(Sequence fastaSeq, String stemLoopPattern,
+    public int sequenceExtendedResearch(DNASequence fastaSeq, String stemLoopPattern,
             ArrayList<StemPosition> stemsDetected, CSVWriter writer) {
 
         List<StemLoop> slrList = new ArrayList<>();
@@ -434,12 +437,12 @@ public class LoopCatcher implements Runnable {
         size = 0;
 
         int loopPos = 0,
-                loopLength = stemLoopPattern.length(),
-                sequenceLength = fastaSeq.getSequenceString().length();
+                loopLength = stemLoopPattern.length();
 
         boolean isValidHairpin;
-        String dnaSequence = fastaSeq.getSequenceString().toUpperCase();
-        String pairs = "";
+        String dnaSequence = fastaSeq.getSequenceAsString().toUpperCase();
+        int sequenceLength = dnaSequence.length();
+        //String pairs = "";
         String rnaSequence = dnaSequence.replace('T', 'U');
         MFEData mfe = null;
 
@@ -458,7 +461,7 @@ public class LoopCatcher implements Runnable {
             rnaLoop = rnaSequence.substring(loopPos, loopFinder.end());
             int length = this.maxLength;
             slr = new StemLoop(this.inputType);
-            slr.setTags(fastaSeq.getId());
+            slr.setTags(fastaSeq.getOriginalHeader());
             try {
                 if ((loopPos - length) > 0
                         && (loopPos + loopLength + length) < sequenceLength) {
@@ -529,7 +532,9 @@ public class LoopCatcher implements Runnable {
                 }
 
             } catch (Exception e) {
-                out.println("ERROR!: Length" + length + " - Hairpin: " + hairpinModel + " - seq: " + rnaSeq);
+                out.println("ERROR!: Length" + length + " - Hairpin: "
+                        + hairpinModel + " - seq: " + rnaSeq + ". Exception: "
+                        + e.getMessage());
             }
 
             if (isValidHairpin) {
@@ -595,12 +600,10 @@ public class LoopCatcher implements Runnable {
         ArrayList<StemPosition> currentStems = null;
         // Auxiliar values
         int i;
-        FastaReader fasta = null;
-        List<Sequence> list = null;
-        Iterator<Sequence> itr = null;
+
         CSVWriter writer;
         String auxParam;
-        boolean delete;
+        
         // To check the elapsed time
         Calendar ini, fin;
         String fileOut, fileName;
@@ -614,11 +617,11 @@ public class LoopCatcher implements Runnable {
         }
 
         // I. File level
-        for (File listOfFile : fileList) {
-            if (listOfFile.isFile() && (listOfFile.toString().endsWith(FASTA_EXT)
-                    || listOfFile.toString().endsWith(FASTA_EXT_2))) {
+        for (File currentFile : fileList) {
+            if (currentFile.isFile() && (currentFile.toString().endsWith(FASTA_EXT)
+                    || currentFile.toString().endsWith(FASTA_EXT_2))) {
                 try {
-                    fileName = listOfFile.getName();
+                    fileName = currentFile.getName();
                     out.println("File " + fileName); //$NON-NLS-1$
                     out.flush();
                     fileName = fileName.replaceAll(FASTA_EXT, "");
@@ -627,25 +630,33 @@ public class LoopCatcher implements Runnable {
 
                     if (new File(fileOut).exists()) {
                         try {
-                            delete = (new File(fileOut)).delete();
+                            boolean delete = (new File(fileOut)).delete();
+                            
+                            if(!delete){
+                              out.println("No se pudo eliminar: " + fileName + ".");
+                              return;
+                            }
+                            
                         } catch (Exception io) {
                             out.println(io.getMessage());
                             out.flush();
+                            return;
                         }
                     }
 
                     Calendar.getInstance();
-                    // Generation of the iterator of {id,sequence}
-                    fasta = new FastaReader(FastaFileContent.DNA_SEQUENCE, listOfFile.getAbsolutePath());
-                    list = fasta.processFile();
-                    if (list.isEmpty()) {
-                        out.println("No hay archivos para procesar.");
-                        System.exit(0);
-                    }
-                    itr = list.iterator();
-                    int listSize = list.size();
-                    i = 1;
 
+                    // Generation of the iterator of {id,sequence}
+                    LinkedHashMap<String, DNASequence> fasta = readFastaDNASequence(
+                            currentFile, false);
+
+                    if (fasta.isEmpty()) {
+                        out.println("No hay archivos para procesar.");
+                        return;
+                    }
+                    int listSize = fasta.size();
+                    i = 1;
+                    
                     writer = new CSVWriter(new FileWriter(fileOut), ';',
                             CSVWriter.DEFAULT_QUOTE_CHARACTER,
                             CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -653,10 +664,11 @@ public class LoopCatcher implements Runnable {
                     writer.writeNext(StemLoop.getHeader(this.inputType).split(";"));
 
                     // II. Transcript level
-                    while (itr.hasNext()) {
-                        Sequence element = itr.next();
+                    for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {      
+
+                        DNASequence element = entry.getValue();
                         StemLoop aux = new StemLoop(this.inputType);
-                        aux.setTags(element.getId());
+                        aux.setTags(element.getOriginalHeader());
 
                         // Here begins one cycle
                         Iterator<String> patternItr = loopPatterns.iterator();
@@ -675,7 +687,7 @@ public class LoopCatcher implements Runnable {
                             }
                         }
 
-                        if (i++ % 3000 == 0) {
+                        if (i++ % 2 == 0) {
                             out.printf("%d out of %d. %2.2f%% processed...%n",
                                     i, listSize, //$NON-NLS-1$
                                     (i / (float) listSize) * 100);
@@ -686,6 +698,8 @@ public class LoopCatcher implements Runnable {
 
                     writer.close();
                     writer = null;
+                    fasta = null;
+                    
                     // FASTA with the results
                     auxParam = "Stem loops length between " + this.minLength
                             + " and " + this.maxLength + ".\n";
@@ -708,9 +722,6 @@ public class LoopCatcher implements Runnable {
         out.flush();
 
         // Memory cleaning
-        list = null;
-        itr = null;
-        fasta = null;
         fileList = null;
     }
 }
