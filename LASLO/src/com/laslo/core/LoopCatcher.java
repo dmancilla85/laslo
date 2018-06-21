@@ -15,9 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-//import com.tools.joewandy.Sequence;
-//import com.tools.io.FastaReader;
-//import com.tools.io.FastaReader.FastaFileContent;
 import com.opencsv.CSVWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -479,8 +476,10 @@ public class LoopCatcher implements Runnable {
                         boolean cut = true;
 
                         for (i = 0; i < length && isValidHairpin && cut; i++) {
-                            if (hairpinModel.charAt(hairpinModel.length() - 1 - i) == '.'
-                                    && hairpinModel.charAt(i) == '.') {
+                            char otherBase = hairpinModel.charAt(hairpinModel.length() - 1 - i);
+                            
+                            if ((otherBase == '.' || otherBase == '(')
+                                    && hairpinModel.charAt(i) == '.' ) {
 
                                 if (length - i < this.minLength) {
                                     isValidHairpin = false;
@@ -630,12 +629,7 @@ public class LoopCatcher implements Runnable {
 
                     if (new File(fileOut).exists()) {
                         try {
-                            boolean delete = (new File(fileOut)).delete();
-                            
-                            if(!delete){
-                              out.println("No se pudo eliminar: " + fileName + ".");
-                              return;
-                            }
+                            (new File(fileOut)).delete();
                             
                         } catch (Exception io) {
                             out.println(io.getMessage());
