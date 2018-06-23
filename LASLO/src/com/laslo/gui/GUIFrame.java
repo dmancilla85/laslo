@@ -41,14 +41,15 @@ public class GUIFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form NewJFrame
+     *
      * @throws java.io.IOException
      */
     public GUIFrame() throws IOException {
         loopCatcher = new LoopCatcher();
         isRunning = false;
-        
+
         initComponents();
-        
+
         this.jLblError.setText("");
         this.jFTpercMismatch.setValue(25);
         this.jFTpercWooble.setValue(50);
@@ -56,11 +57,11 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jFTnumCols.setVisible(false);
         this.jFTpercMismatch.setVisible(false);
         this.jFTpercWooble.setVisible(false);
-        
-        TextAreaOutputStream taos = new TextAreaOutputStream( jTAConsole );
-        PrintStream ps = new PrintStream( taos );
-        System.setOut( ps );
-        System.setErr( ps );
+
+        TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
+        PrintStream ps = new PrintStream(taos);
+        System.setOut(ps);
+        System.setErr(ps);
     }
 
     /**
@@ -99,6 +100,9 @@ public class GUIFrame extends javax.swing.JFrame {
         jFTpercMismatch = new javax.swing.JFormattedTextField();
         jFTpercWooble = new javax.swing.JFormattedTextField();
         jcbExtended = new javax.swing.JCheckBox();
+        jcbMakeRandoms = new javax.swing.JCheckBox();
+        jLabel8 = new javax.swing.JLabel();
+        jftNumberOfRandoms = new javax.swing.JFormattedTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
@@ -258,11 +262,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jFTnumCols.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jFTnumCols.setToolTipText("Separador de campos");
 
-        try {
-            jFTfieldSep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("*")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
+        jFTfieldSep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
         jFTfieldSep.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jFTfieldSep.setToolTipText("Separador de campos");
 
@@ -283,12 +283,27 @@ public class GUIFrame extends javax.swing.JFrame {
         jFTpercWooble.setText("%");
         jFTpercWooble.setToolTipText("Separador de campos");
 
+        jcbExtended.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jcbExtended.setText("Extended mode");
         jcbExtended.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbExtendedActionPerformed(evt);
             }
         });
+
+        jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jcbMakeRandoms.setText("Randomize");
+        jcbMakeRandoms.setActionCommand("Randomize");
+        jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbMakeRandomsActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jLabel8.setText("Number of random copies");
+
+        jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
 
         jMenuFile.setText("File");
         jMenuFile.setToolTipText("");
@@ -319,61 +334,68 @@ public class GUIFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBStart, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLblError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jcbExtended)
-                                .addGap(18, 18, Short.MAX_VALUE)
-                                .addComponent(jLabel1)
-                                .addGap(106, 106, 106))
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel4)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel7))
+                                    .addComponent(jLabel6))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jCBOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jFTfieldSep, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jFTnumCols, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 193, Short.MAX_VALUE))
                                     .addComponent(jTFPathIn)
-                                    .addComponent(jTFPathOut))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButtonIn, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButtonOut, javax.swing.GroupLayout.Alignment.TRAILING)))
+                                    .addComponent(jTFPathOut))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jButtonIn, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jButtonOut, javax.swing.GroupLayout.Alignment.TRAILING)))
+                            .addComponent(jScrollPane1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jBStart, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLblError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCBOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jFTfieldSep, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jFTnumCols, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel3)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(4, 4, 4)
-                                .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jcbMakeRandoms)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jSpinMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jFTpercMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(404, 404, 404)
-                                .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(4, 4, 4)
+                                        .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jcbExtended))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jSpinMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jFTpercMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -392,11 +414,16 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jButtonOut, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jcbMakeRandoms)
+                    .addComponent(jLabel8)
+                    .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(jCBOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jFTfieldSep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jFTnumCols, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jcbExtended)
                     .addComponent(jLabel1)
@@ -412,7 +439,7 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel2)
                         .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -420,9 +447,12 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBStart)
                     .addComponent(jLblError))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
+
+        jLabel8.getAccessibleContext().setAccessibleName("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -526,17 +556,18 @@ public class GUIFrame extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
             isFolder = file.isDirectory();
-        } else
+        } else {
             return;
+        }
 
         if (file.exists()) {
-            if(isFolder){
-               this.listOfFiles = file.listFiles();
-               this.jTFPathOut.setText(file.getAbsolutePath()); 
+            if (isFolder) {
+                this.listOfFiles = file.listFiles();
+                this.jTFPathOut.setText(file.getAbsolutePath());
             } else {
                 this.listOfFiles = new File[1];
                 this.listOfFiles[0] = file;
-                this.jTFPathOut.setText(file.getParent() );
+                this.jTFPathOut.setText(file.getParent());
             }
             this.jTFPathIn.setText(file.getAbsolutePath());
         }
@@ -544,12 +575,13 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        if(this.isRunning){
-            MessageBox.show("No se puede salir de la aplicación mientras el " +
-                    "proceso se está ejecutando", "Proceso en ejecución");
-   
-        } else
+        if (this.isRunning) {
+            MessageBox.show("No se puede salir de la aplicación mientras el "
+                    + "proceso se está ejecutando", "Proceso en ejecución");
+
+        } else {
             System.exit(ReturnValue.SUCCESS.getReturnCode());
+        }
     }//GEN-LAST:event_formWindowClosing
 
     private void jCBOriginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBOriginActionPerformed
@@ -561,6 +593,10 @@ public class GUIFrame extends javax.swing.JFrame {
     private void jcbExtendedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbExtendedActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jcbExtendedActionPerformed
+
+    private void jcbMakeRandomsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbMakeRandomsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jcbMakeRandomsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -613,6 +649,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLblError;
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMIExit;
@@ -630,17 +667,19 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTFPathIn;
     private javax.swing.JTextField jTFPathOut;
     private javax.swing.JCheckBox jcbExtended;
+    private javax.swing.JCheckBox jcbMakeRandoms;
+    private javax.swing.JFormattedTextField jftNumberOfRandoms;
     // End of variables declaration//GEN-END:variables
 
     protected LoopCatcher loopCatcher;
     protected File[] listOfFiles;
     protected boolean isRunning;
 
-    public void setInputSequence(String value){
-     InputSequence origin;
-     String fs = "";
-     String cols = "0";
-     
+    public void setInputSequence(String value) {
+        InputSequence origin;
+        String fs = "";
+        String cols = "0";
+
         switch (value) {
             case "Ensembl":
                 origin = InputSequence.ENSEMBL;
@@ -667,22 +706,22 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jFTnumCols.setValue(cols);
         this.loopCatcher.setInputType(origin);
     }
-    
-    public void setIsRunning(boolean value){
+
+    public void setIsRunning(boolean value) {
         this.isRunning = value;
         this.jBStart.setEnabled(!value);
-        
-        if(value){
+
+        if (value) {
             out.println("Comenzando proceso...");
             this.jBStart.setText("Espere...");
         } else {
             this.jBStart.setText("Comenzar");
         }
     }
-    
+
     public boolean validateParameters(int min, int max, int wooble,
             int mismatch, String pathIn, String pathOut,
-            ArrayList<String> loopList) {
+            ArrayList<String> loopList, int randoms) {
         boolean isValid;
         isValid = true;
         String aux;
@@ -708,24 +747,31 @@ public class GUIFrame extends javax.swing.JFrame {
             this.jLblError.setText("Error! Ingrese motivos a buscar.");
             isValid = false;
         }
-        
-        for(int i = 0; i < loopList.size() && isValid; i++){
+
+        for (int i = 0; i < loopList.size() && isValid; i++) {
             aux = loopList.get(i);
             aux = aux.trim();
-            if(aux.length() <= 0){
+            if (aux.length() <= 0) {
                 isValid = false;
                 this.jLblError.setText("Error! Revise motivos a buscar.");
             }
         }
 
+        if (this.jcbMakeRandoms.isSelected()) {
+            if (randoms <= 0) {
+                this.jLblError.setText("Error! Ingrese un número válido de randoms.");
+                isValid = false;
+            }
+        }
+
         return isValid;
     }
-    
+
     public void start() {
 
         String inputValue;
         inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
-        int max, min, wooble, mismatch;
+        int max, min, wooble, mismatch, randoms;
         String pathOut = this.jTFPathOut.getText();
         String pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
@@ -733,24 +779,27 @@ public class GUIFrame extends javax.swing.JFrame {
         loopList = new ArrayList<>();
         this.jLblError.setText("");
 
-        if(this.isRunning)
+        if (this.isRunning) {
             return;
-        
+        }
+
         this.setIsRunning(true);
         this.setInputSequence(inputValue);
-            
+
         // Values
         min = new Integer(this.jSpinMinLength.getValue().toString());
         max = new Integer(this.jSpinMaxLength.getValue().toString());
         wooble = new Integer(this.jSpinWooble.getValue().toString());
         mismatch = new Integer(this.jSpinMismatch.getValue().toString());
+        randoms = new Integer(this.jftNumberOfRandoms.getValue().toString());
 
         // Loops
         loopList.addAll(Arrays.asList(loops));
 
         // 
-        if (!validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
-                loopList)) {
+        if (validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
+                loopList, randoms)) {
+        } else {
             setIsRunning(false);
             return;
         }
@@ -763,12 +812,15 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMaxMismatch(mismatch);
         loopCatcher.setMaxWooble(wooble);
         loopCatcher.setPathOut(pathOut);
+        loopCatcher.setPathIn(pathIn);
         loopCatcher.setFileList(this.listOfFiles);
-        loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected() );
+        loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected());
+        loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
+        loopCatcher.setNumberOfRandoms(randoms);
         
-        Thread thread = new Thread((Runnable)loopCatcher);
+        Thread thread = new Thread((Runnable) loopCatcher);
         thread.start();
-        
+
         try {
             thread.join();
         } catch (InterruptedException ex) {

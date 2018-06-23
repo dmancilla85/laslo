@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.opencsv.CSVWriter;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
@@ -32,6 +35,7 @@ import rnafold4j.RNAFoldAPI;
 public class LoopCatcher implements Runnable {
 
     protected String pathOut;
+    protected String pathIn;
     protected ArrayList<String> loopPatterns;
     protected InputSequence inputType;
     protected int minLength;
@@ -40,6 +44,9 @@ public class LoopCatcher implements Runnable {
     protected int maxMismatch;
     protected File[] fileList;
     protected boolean extendedMode;
+    private boolean makeRandoms;
+    private int numberOfRandoms;
+
     protected static final String LOG_EXT = ".log";
     protected static final String CSV_EXT = ".csv";
     protected static final String FASTA_EXT = ".fasta";
@@ -61,17 +68,13 @@ public class LoopCatcher implements Runnable {
         this.rfa = new RNAFoldAPI();
         this.fileList = null;
         this.extendedMode = false;
+        this.makeRandoms = false;
+        this.numberOfRandoms = 0;
     }
 
     public LoopCatcher() {
-        this.pathOut = "";
-        this.loopPatterns = new ArrayList<>();
-        this.inputType = InputSequence.ENSEMBL;
-        this.minLength = 4;
-        this.maxLength = 16;
-        this.maxWooble = 2;
-        this.maxMismatch = 0;
-        this.rfa = new RNAFoldAPI();
+        this("", "", new ArrayList<>(), InputSequence.ENSEMBL,
+                4, 16, 2, 0);
     }
 
     public File[] getFileList() {
@@ -96,6 +99,14 @@ public class LoopCatcher implements Runnable {
 
     public void setPathOut(String pathOut) {
         this.pathOut = pathOut;
+    }
+
+    public String getPathIn() {
+        return pathIn;
+    }
+
+    public void setPathIn(String pathIn) {
+        this.pathIn = pathIn;
     }
 
     public ArrayList<String> getLoopPatterns() {
@@ -222,10 +233,9 @@ public class LoopCatcher implements Runnable {
         existsInvertedRepeat = false;
         boolean checkWooblePair, isValidHairpin;
         // Upper all characters
-        String dnaSequence = fastaSeq.getSequenceAsString().toUpperCase();
-        int sequenceLength = dnaSequence.length();
         // Make the retro transcription
-        String rnaSequence = dnaSequence.replace('T', 'U');
+        String rnaSequence = fastaSeq.getSequenceAsString().toUpperCase().replace('T', 'U');
+        final int sequenceLength = rnaSequence.length();
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -293,7 +303,7 @@ public class LoopCatcher implements Runnable {
                         }
 
                     } catch (IndexOutOfBoundsException e) {
-                        out.println("Error: " + dnaSequence + " - i: "
+                        out.println("Error: " + rnaSequence + " - i: "
                                 + (loopPos - lengthIR) + " - i2: " //$NON-NLS-3$ //$NON-NLS-2$
                                 // //$NON-NLS-3$
                                 + (loopPos + loopLength + lengthIR)); // $NON-NLS-1$
@@ -426,21 +436,17 @@ public class LoopCatcher implements Runnable {
             ArrayList<StemPosition> stemsDetected, CSVWriter writer) {
 
         List<StemLoop> slrList = new ArrayList<>();
+        List<Integer> mismatchs = new ArrayList<>();
         StemLoop slr;
         slr = null;
-        List<Integer> mismatchs = new ArrayList<>();
         int size, i;
         char aux1, aux2;
         size = 0;
-
         int loopPos = 0,
                 loopLength = stemLoopPattern.length();
-
         boolean isValidHairpin;
-        String dnaSequence = fastaSeq.getSequenceAsString().toUpperCase();
-        int sequenceLength = dnaSequence.length();
-        //String pairs = "";
-        String rnaSequence = dnaSequence.replace('T', 'U');
+        String rnaSequence = fastaSeq.getSequenceAsString().toUpperCase().replace('T', 'U');
+        final int sequenceLength = rnaSequence.length();
         MFEData mfe = null;
 
         // Convert the original loop pattern to a regular expression
@@ -477,9 +483,9 @@ public class LoopCatcher implements Runnable {
 
                         for (i = 0; i < length && isValidHairpin && cut; i++) {
                             char otherBase = hairpinModel.charAt(hairpinModel.length() - 1 - i);
-                            
+
                             if ((otherBase == '.' || otherBase == '(')
-                                    && hairpinModel.charAt(i) == '.' ) {
+                                    && hairpinModel.charAt(i) == '.') {
 
                                 if (length - i < this.minLength) {
                                     isValidHairpin = false;
@@ -594,6 +600,14 @@ public class LoopCatcher implements Runnable {
         return size;
     }
 
+    // Union
+    public File[] unionFiles(File[] a, File[] b) {
+        Set<File> set;
+        set = new HashSet<>(Arrays.asList(a));
+        set.addAll(Arrays.asList(b));
+        return set.toArray(new File[set.size()]);
+    }
+
     @Override
     public void run() {
         ArrayList<StemPosition> currentStems = null;
@@ -602,7 +616,7 @@ public class LoopCatcher implements Runnable {
 
         CSVWriter writer;
         String auxParam;
-        
+
         // To check the elapsed time
         Calendar ini, fin;
         String fileOut, fileName;
@@ -615,7 +629,32 @@ public class LoopCatcher implements Runnable {
             return;
         }
 
-        // I. File level
+        if (this.makeRandoms) {
+            for (File currentFile : fileList) {
+                if (currentFile.isFile() && (currentFile.toString().endsWith(FASTA_EXT)
+                        || currentFile.toString().endsWith(FASTA_EXT_2))) {
+
+                    fileName = currentFile.getName();
+
+                    if (fileName.contains(FASTA_EXT)) {
+                        fileName = fileName.replaceAll(FASTA_EXT, "");
+                        ShuffleSeq.makeShuffleSequences(pathOut, fileName, FASTA_EXT, numberOfRandoms);
+                    } else {
+                        fileName = fileName.replaceAll(FASTA_EXT_2, "");
+                        ShuffleSeq.makeShuffleSequences(pathOut, fileName, FASTA_EXT, numberOfRandoms);
+                    }
+
+                }
+            }
+
+            File folder;
+            folder = new File(pathIn + ShuffleSeq.randDir);
+            File[] randomFiles;
+            randomFiles = folder.listFiles();
+            fileList = unionFiles(fileList, randomFiles);
+        }
+
+        // I. File level (hacer un hilo)
         for (File currentFile : fileList) {
             if (currentFile.isFile() && (currentFile.toString().endsWith(FASTA_EXT)
                     || currentFile.toString().endsWith(FASTA_EXT_2))) {
@@ -630,7 +669,7 @@ public class LoopCatcher implements Runnable {
                     if (new File(fileOut).exists()) {
                         try {
                             (new File(fileOut)).delete();
-                            
+
                         } catch (Exception io) {
                             out.println(io.getMessage());
                             out.flush();
@@ -650,7 +689,7 @@ public class LoopCatcher implements Runnable {
                     }
                     int listSize = fasta.size();
                     i = 1;
-                    
+
                     writer = new CSVWriter(new FileWriter(fileOut), ';',
                             CSVWriter.DEFAULT_QUOTE_CHARACTER,
                             CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -658,7 +697,7 @@ public class LoopCatcher implements Runnable {
                     writer.writeNext(StemLoop.getHeader(this.inputType).split(";"));
 
                     // II. Transcript level
-                    for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {      
+                    for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
 
                         DNASequence element = entry.getValue();
                         StemLoop aux = new StemLoop(this.inputType);
@@ -693,7 +732,7 @@ public class LoopCatcher implements Runnable {
                     writer.close();
                     writer = null;
                     fasta = null;
-                    
+
                     // FASTA with the results
                     auxParam = "Stem loops length between " + this.minLength
                             + " and " + this.maxLength + ".\n";
@@ -717,5 +756,21 @@ public class LoopCatcher implements Runnable {
 
         // Memory cleaning
         fileList = null;
+    }
+
+    public boolean isMakeRandoms() {
+        return makeRandoms;
+    }
+
+    public void setMakeRandoms(boolean makeRandoms) {
+        this.makeRandoms = makeRandoms;
+    }
+
+    public int getNumberOfRandoms() {
+        return numberOfRandoms;
+    }
+
+    public void setNumberOfRandoms(int numberOfRandoms) {
+        this.numberOfRandoms = numberOfRandoms;
     }
 }

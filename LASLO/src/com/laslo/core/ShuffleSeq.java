@@ -8,7 +8,6 @@ package com.laslo.core;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import static java.lang.System.out;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,14 +24,21 @@ public class ShuffleSeq {
     public static void main(String[] args) {
   
             Runtime rt = Runtime.getRuntime();
-            String path = "C:/Users/David/Desktop/";
-            String ext = ".fa";
-            String fileName = "yeast_she";
+            String path = "C:/Users/David/Desktop/profile/";
+            String ext = ".fasta";
+            String fileName = "repressed_non_bound";
             
-            makeShuffleSequences(path, fileName, ext, 2);
+            makeShuffleSequences(path, fileName, ext, 1000);
 
     }
 
+    /**
+     * 
+     * @param path
+     * @param fileName
+     * @param extension
+     * @param nRandoms 
+     */
     public static void makeShuffleSequences(String path, String fileName,
             String extension, int nRandoms) {
         Runtime rt;
@@ -44,7 +50,7 @@ public class ShuffleSeq {
         for (int i = 1; i <= nRandoms; i++) {
             try {
 
-                destiny = randDir + '/' + fileName + "_rnd" + i + extension;
+                destiny = path + randDir + '/' + fileName + "_rnd" + i + extension;
 
                 if (new File(destiny).exists()) {
                     boolean delete = (new File(destiny)).delete();
