@@ -52,6 +52,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         this.jLblError.setText("");
         this.jFTpercMismatch.setValue(25);
+        this.jftNumberOfRandoms.setValue(10);
         this.jFTpercWooble.setValue(50);
         this.jFTfieldSep.setVisible(false);
         this.jFTnumCols.setVisible(false);
@@ -293,7 +294,6 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jcbMakeRandoms.setText("Randomize");
-        jcbMakeRandoms.setActionCommand("Randomize");
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbMakeRandomsActionPerformed(evt);
@@ -303,7 +303,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel8.setText("Number of random copies");
 
-        jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+        jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
 
         jMenuFile.setText("File");
         jMenuFile.setToolTipText("");
@@ -701,9 +701,12 @@ public class GUIFrame extends javax.swing.JFrame {
                 fs = this.jFTfieldSep.getText();
                 cols = this.jFTnumCols.getText();
         }
+        
+        /*if(fs.length() != 0){
+            this.jFTfieldSep.setValue(fs);
+            this.jFTnumCols.setValue(cols);
+        }*/
 
-        this.jFTfieldSep.setValue(fs);
-        this.jFTnumCols.setValue(cols);
         this.loopCatcher.setInputType(origin);
     }
 
@@ -712,6 +715,9 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jBStart.setEnabled(!value);
 
         if (value) {
+            out.println();
+            out.println();
+            out.println(" ---------------------- ");
             out.println("Comenzando proceso...");
             this.jBStart.setText("Espere...");
         } else {
@@ -806,6 +812,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // Start process
         out.flush();
+        this.
         loopCatcher.setLoopPatterns(loopList);
         loopCatcher.setMaxLength(max);
         loopCatcher.setMinLength(min);
@@ -818,14 +825,12 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
         
-        Thread thread = new Thread((Runnable) loopCatcher);
-        thread.start();
-
-        try {
-            thread.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //loopCatcher.beginResearch();
+        
+        GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
+                this.jBStart, this.loopCatcher);
+        worker.execute();
+        
         setIsRunning(false);
     }
 }

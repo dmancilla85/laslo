@@ -3,6 +3,7 @@
  */
 package com.laslo.core;
 
+import com.tools.ShuffleSeq;
 import static com.laslo.core.PairmentAnalizer.*;
 import com.tools.fasta.InputSequence;
 import static java.lang.System.out;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.opencsv.CSVWriter;
+import com.tools.fasta.FASTACorrector;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -32,7 +34,7 @@ import rnafold4j.RNAFoldAPI;
  * @author David
  *
  */
-public class LoopCatcher implements Runnable {
+public class LoopCatcher {
 
     protected String pathOut;
     protected String pathIn;
@@ -106,7 +108,15 @@ public class LoopCatcher implements Runnable {
     }
 
     public void setPathIn(String pathIn) {
-        this.pathIn = pathIn;
+        
+        File aux = new File(pathIn);
+        
+        if(aux.isDirectory())
+            this.pathIn = pathIn;
+        else {
+            this.pathIn = aux.getParent();
+   
+        }
     }
 
     public ArrayList<String> getLoopPatterns() {
@@ -272,17 +282,21 @@ public class LoopCatcher implements Runnable {
 
                         if (isComplementaryRNA(rnaSequence.
                                 charAt(pos1), rnaSequence.charAt(pos2))
-                                || (isComplementaryRNAWooble(rnaSequence.charAt(pos1),
-                                        rnaSequence.charAt(pos2)) && checkWooblePair)
+                                || (isComplementaryRNAWooble(rnaSequence
+                                        .charAt(pos1),
+                                        rnaSequence.charAt(pos2)) 
+                                && checkWooblePair)
                                 || mismatchCount < this.maxMismatch) {
                             existsInvertedRepeat = true;
 
                             if (!isComplementaryRNA(
-                                    rnaSequence.charAt(pos1), rnaSequence.charAt(pos2))) {
+                                    rnaSequence.charAt(pos1), rnaSequence
+                                            .charAt(pos2))) {
                                 // A mismatch shouldn't be considered if is at
                                 // the border
 
-                                if (isComplementaryRNAWooble(rnaSequence.charAt(pos1),
+                                if (isComplementaryRNAWooble(rnaSequence
+                                        .charAt(pos1),
                                         rnaSequence.charAt(pos2))
                                         && woobleCount < this.maxWooble) {
                                     woobleCount++;
@@ -291,7 +305,8 @@ public class LoopCatcher implements Runnable {
                                         < this.maxMismatch) {
                                     mismatchCount++;
                                     mismatchs.add(lengthIR + 1);
-                                    mismatchs.add(loopPos + loopLength + lengthIR);
+                                    mismatchs.add(loopPos + loopLength 
+                                            + lengthIR);
                                 } else {
                                     existsInvertedRepeat = false;
                                 }
@@ -364,10 +379,12 @@ public class LoopCatcher implements Runnable {
             if (isValidHairpin) {
                 slr.setRnaHairpinSequence(rnaSeq);
 
-                slr.setLoop(rnaSequence.substring(loopPos, loopPos + loopLength));
+                slr.setLoop(rnaSequence.substring(loopPos, loopPos 
+                        + loopLength));
                 hairpinModel = slr.drawHairpinViennaStructure();
 
-                if (mfe.mfe == 0 || !hairpinModel.equals(new String(mfe.structure).trim())) {
+                if (mfe.mfe == 0 || !hairpinModel
+                        .equals(new String(mfe.structure).trim())) {
                     isValidHairpin = false;
                 }
             }
@@ -408,7 +425,8 @@ public class LoopCatcher implements Runnable {
                 // Polyadenilations Sites
                 // Look for the Kozak pattern
                 // Special TEST buscar otros posibles stems
-                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
+                slr.setRelativePos((double) slr.getStartsAt() 
+                        / (double) rnaSequence.length());
 
                 slrList.add(slr);
             }
@@ -432,8 +450,9 @@ public class LoopCatcher implements Runnable {
         return size;
     }
 
-    public int sequenceExtendedResearch(DNASequence fastaSeq, String stemLoopPattern,
-            ArrayList<StemPosition> stemsDetected, CSVWriter writer) {
+    public int sequenceExtendedResearch(DNASequence fastaSeq, 
+            String stemLoopPattern, ArrayList<StemPosition> stemsDetected, 
+            CSVWriter writer) {
 
         List<StemLoop> slrList = new ArrayList<>();
         List<Integer> mismatchs = new ArrayList<>();
@@ -445,9 +464,11 @@ public class LoopCatcher implements Runnable {
         int loopPos = 0,
                 loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
-        String rnaSequence = fastaSeq.getSequenceAsString().toUpperCase().replace('T', 'U');
+        String rnaSequence = fastaSeq.getSequenceAsString().
+                toUpperCase().replace('T', 'U');
         final int sequenceLength = rnaSequence.length();
         MFEData mfe = null;
+        //RNAfold fold = null;
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -472,9 +493,12 @@ public class LoopCatcher implements Runnable {
                             + loopLength + length);
 
                     mfe = rfa.getMFE(rnaSeq.getBytes());
-                    hairpinModel = new String(mfe.structure).trim();
+                    //fold = new RNAfold(rnaSeq);
+                    
+                    hairpinModel = new String(mfe.structure);
+                    //fold.getStructure();
 
-                    if (mfe.mfe == 0) {
+                    if (/*fold.getMfe()*/ mfe.mfe == 0.0) {
                         isValidHairpin = false;
                     }
 
@@ -482,7 +506,8 @@ public class LoopCatcher implements Runnable {
                         boolean cut = true;
 
                         for (i = 0; i < length && isValidHairpin && cut; i++) {
-                            char otherBase = hairpinModel.charAt(hairpinModel.length() - 1 - i);
+                            char otherBase = hairpinModel
+                                    .charAt(hairpinModel.length() - 1 - i);
 
                             if ((otherBase == '.' || otherBase == '(')
                                     && hairpinModel.charAt(i) == '.') {
@@ -496,7 +521,8 @@ public class LoopCatcher implements Runnable {
                         }
 
                         if (isValidHairpin && i > 0) {
-                            hairpinModel = hairpinModel.substring(i, hairpinModel.length() - i);
+                            hairpinModel = hairpinModel.substring(i, 
+                                    hairpinModel.length() - i);
                             rnaSeq = rnaSeq.substring(i, rnaSeq.length() - i);
                             length = length - i;
                         }
@@ -513,7 +539,8 @@ public class LoopCatcher implements Runnable {
                     }
 
                     if (isValidHairpin) {
-                        for (i = length; i < length + loopLength && isValidHairpin; i++) {
+                        for (i = length; i < length + loopLength 
+                                && isValidHairpin; i++) {
                             aux1 = hairpinModel.charAt(i);
 
                             if (aux1 != '.') {
@@ -524,7 +551,8 @@ public class LoopCatcher implements Runnable {
 
                     if (isValidHairpin) {
                         isValidHairpin = hairpinModel.charAt(0) == '('
-                                || hairpinModel.charAt(hairpinModel.length() - 1) == ')';
+                                || hairpinModel.charAt(hairpinModel.length() 
+                                        - 1) == ')';
                     }
                     if (isValidHairpin) {
                         aux1 = hairpinModel.charAt(length - 1);
@@ -537,15 +565,16 @@ public class LoopCatcher implements Runnable {
                 }
 
             } catch (Exception e) {
-                out.println("ERROR!: Length" + length + " - Hairpin: "
+                /*out.println("ERROR!: Length" + length + " - Hairpin: "
                         + hairpinModel + " - seq: " + rnaSeq + ". Exception: "
-                        + e.getMessage());
+                        + e.getMessage());*/
+                out.println(Arrays.toString(e.getStackTrace()));
             }
 
             if (isValidHairpin) {
                 // Fill the fields
                 slr.setSequenceLength(sequenceLength);
-                slr.setMfe(mfe.mfe);
+                slr.setMfe(/*fold.getMfe()*/ mfe.mfe);
                 slr.setStructure(hairpinModel);
                 slr.setPredecessorLoop(length);
                 slr.setNLoop(length);
@@ -608,8 +637,7 @@ public class LoopCatcher implements Runnable {
         return set.toArray(new File[set.size()]);
     }
 
-    @Override
-    public void run() {
+    public boolean beginResearch() {
         ArrayList<StemPosition> currentStems = null;
         // Auxiliar values
         int i;
@@ -626,7 +654,7 @@ public class LoopCatcher implements Runnable {
         out.flush();
 
         if (fileList == null) {
-            return;
+            return false;
         }
 
         if (this.makeRandoms) {
@@ -648,7 +676,7 @@ public class LoopCatcher implements Runnable {
             }
 
             File folder;
-            folder = new File(pathIn + ShuffleSeq.randDir);
+            folder = new File(pathIn + ShuffleSeq.getRandomDir());
             File[] randomFiles;
             randomFiles = folder.listFiles();
             fileList = unionFiles(fileList, randomFiles);
@@ -673,8 +701,8 @@ public class LoopCatcher implements Runnable {
                         } catch (Exception io) {
                             out.println(io.getMessage());
                             out.flush();
-                            return;
-                        }
+                            return false ;
+                        } 
                     }
 
                     Calendar.getInstance();
@@ -684,8 +712,17 @@ public class LoopCatcher implements Runnable {
                             currentFile, false);
 
                     if (fasta.isEmpty()) {
-                        out.println("No hay archivos para procesar.");
-                        return;
+                        out.println("El formato no es correcto.");
+                        out.println("Intentando reparar...");
+                        boolean formatFile = FASTACorrector.formatFile(
+                                currentFile.getAbsolutePath());
+                        if(formatFile){
+                            fasta = readFastaDNASequence(currentFile, false);                       
+                        }
+                        else {
+                            out.println("Ho se puede procesar.");
+                            return false;
+                        }
                     }
                     int listSize = fasta.size();
                     i = 1;
@@ -709,7 +746,7 @@ public class LoopCatcher implements Runnable {
                         while (patternItr.hasNext()) {
 
                             String currentPattern = patternItr.next();
-                            currentPattern = currentPattern.trim();
+                            currentPattern = currentPattern.trim().toUpperCase();
 
                             // 1. Stem research
                             if (extendedMode) {
@@ -720,7 +757,7 @@ public class LoopCatcher implements Runnable {
                             }
                         }
 
-                        if (i++ % 2 == 0) {
+                        if (i++ % 100 == 0) {
                             out.printf("%d out of %d. %2.2f%% processed...%n",
                                     i, listSize, //$NON-NLS-1$
                                     (i / (float) listSize) * 100);
@@ -756,6 +793,7 @@ public class LoopCatcher implements Runnable {
 
         // Memory cleaning
         fileList = null;
+        return true;
     }
 
     public boolean isMakeRandoms() {
