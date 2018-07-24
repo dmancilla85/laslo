@@ -30,7 +30,7 @@ import javax.swing.SwingWorker;
 
      @Override
      protected Integer doInBackground() throws Exception {
-        this.ok = this.loop.beginResearch();
+        this.ok = this.loop.beginSearch();
         return 1;
      }
 

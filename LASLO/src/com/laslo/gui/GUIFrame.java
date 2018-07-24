@@ -825,7 +825,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
         
-        //loopCatcher.beginResearch();
+        //loopCatcher.beginSearch();
         
         GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
                 this.jBStart, this.loopCatcher);
