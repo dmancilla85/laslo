@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class RNAfold {
 
     private final static String COMMAND_RNAFOLD = "./ext/RNAfold.exe";
-    private final static String RNAFOLD_ARGS = " --noLP -d2 --noPS";
+    private final static String RNAFOLD_ARGS = " -d2 --noLP --noPS";
     private String structure;
     private double mfe;
     

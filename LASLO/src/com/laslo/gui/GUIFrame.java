@@ -58,6 +58,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jFTnumCols.setVisible(false);
         this.jFTpercMismatch.setVisible(false);
         this.jFTpercWooble.setVisible(false);
+        this.jSpinMismatch.setVisible(false);
+        this.jSpinWooble.setVisible(false);
+        this.jLabel2.setVisible(false);
+        this.jLabel5.setVisible(false);
 
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
         PrintStream ps = new PrintStream(taos);
@@ -124,34 +128,35 @@ public class GUIFrame extends javax.swing.JFrame {
         });
 
         jLabel1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel1.setText("Stem length between");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("STEM_LENGTH_BETWEEN")); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel2.setText("Wooble pairs allowed to");
+        jLabel2.setText(bundle.getString("WOOBLE_ALLOWED_TO")); // NOI18N
 
         jLabel3.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel3.setText("WRITE THE LOOPS");
+        jLabel3.setText(bundle.getString("ENTER_THE_LOOPS")); // NOI18N
 
         jLabel4.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel4.setText("PATH");
+        jLabel4.setText(bundle.getString("PATH")); // NOI18N
 
         jTALoopPatterns.setColumns(20);
         jTALoopPatterns.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
         jTALoopPatterns.setRows(3);
         jTALoopPatterns.setTabSize(2);
         jTALoopPatterns.setText("CNGG, CNGGN, CNGGNN, CNGGNNN, CNGGNNNN");
-        jTALoopPatterns.setToolTipText("Ingrese los patrones de loop a buscar separados por coma");
+        jTALoopPatterns.setToolTipText(bundle.getString("ENTER_LOOP_TOOLTIP")); // NOI18N
         jTALoopPatterns.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane1.setViewportView(jTALoopPatterns);
 
         jLabel5.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel5.setText("Mismatchs allowed to");
+        jLabel5.setText(bundle.getString("MISMATCHS_ALLOWED_TO")); // NOI18N
 
         jLabel6.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel6.setText("DESTINATION");
+        jLabel6.setText(bundle.getString("DESTINATION")); // NOI18N
 
         jTFPathIn.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jTFPathIn.setToolTipText("Ubicaciòn de los archivos FASTA a revisar");
+        jTFPathIn.setToolTipText(bundle.getString("PATH_TOOLTIP")); // NOI18N
         jTFPathIn.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jTFPathIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -160,7 +165,7 @@ public class GUIFrame extends javax.swing.JFrame {
         });
 
         jTFPathOut.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jTFPathOut.setToolTipText("Donde se guardarán los resultados del proceso");
+        jTFPathOut.setToolTipText(bundle.getString("DESTINATION_TOOLTIP")); // NOI18N
         jTFPathOut.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jTFPathOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -184,7 +189,7 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jBStart.setText("Start");
+        jBStart.setText(bundle.getString("START")); // NOI18N
         jBStart.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jBStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -224,11 +229,11 @@ public class GUIFrame extends javax.swing.JFrame {
         });
 
         jLabel7.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel7.setText("ORIGIN");
+        jLabel7.setText(bundle.getString("SOURCE")); // NOI18N
 
         jCBOrigin.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jCBOrigin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ensembl", "FlyBase", "BioMart", "Otro" }));
-        jCBOrigin.setToolTipText("Origen del archivo FASTA");
+        jCBOrigin.setToolTipText(bundle.getString("SOURCE_TOOLTIP")); // NOI18N
         jCBOrigin.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCBOriginItemStateChanged(evt);
@@ -242,7 +247,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jLblError.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLblError.setForeground(new java.awt.Color(255, 0, 0));
-        jLblError.setText("ERROR");
+        jLblError.setText(bundle.getString("ERROR")); // NOI18N
 
         jTAConsole.setEditable(false);
         jTAConsole.setBackground(new java.awt.Color(204, 204, 204));
@@ -253,7 +258,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jTAConsole.setToolTipText("");
         jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder("Output lines"));
         jScrollPane2.setViewportView(jTAConsole);
-        jTAConsole.getAccessibleContext().setAccessibleName("Output");
+        jTAConsole.getAccessibleContext().setAccessibleName(bundle.getString("MONITOR")); // NOI18N
 
         try {
             jFTnumCols.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#")));
@@ -261,11 +266,11 @@ public class GUIFrame extends javax.swing.JFrame {
             ex.printStackTrace();
         }
         jFTnumCols.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jFTnumCols.setToolTipText("Separador de campos");
+        jFTnumCols.setToolTipText(bundle.getString("NUMBER_COLUMNS")); // NOI18N
 
         jFTfieldSep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
         jFTfieldSep.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jFTfieldSep.setToolTipText("Separador de campos");
+        jFTfieldSep.setToolTipText(bundle.getString("FIELD_SEPARATOR")); // NOI18N
 
         try {
             jFTpercMismatch.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##%")));
@@ -273,7 +278,7 @@ public class GUIFrame extends javax.swing.JFrame {
             ex.printStackTrace();
         }
         jFTpercMismatch.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jFTpercMismatch.setToolTipText("Separador de campos");
+        jFTpercMismatch.setToolTipText(bundle.getString("PERC_MISMATCH_TOOLTIP")); // NOI18N
 
         try {
             jFTpercWooble.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##%")));
@@ -282,10 +287,10 @@ public class GUIFrame extends javax.swing.JFrame {
         }
         jFTpercWooble.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jFTpercWooble.setText("%");
-        jFTpercWooble.setToolTipText("Separador de campos");
+        jFTpercWooble.setToolTipText(bundle.getString("PERC_WOOBLE_TOOLTIP")); // NOI18N
 
         jcbExtended.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jcbExtended.setText("Extended mode");
+        jcbExtended.setText(bundle.getString("EXTENDED_MODE_CHECK")); // NOI18N
         jcbExtended.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbExtendedActionPerformed(evt);
@@ -293,7 +298,7 @@ public class GUIFrame extends javax.swing.JFrame {
         });
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jcbMakeRandoms.setText("Randomize");
+        jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbMakeRandomsActionPerformed(evt);
@@ -301,14 +306,14 @@ public class GUIFrame extends javax.swing.JFrame {
         });
 
         jLabel8.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel8.setText("Number of random copies");
+        jLabel8.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
 
         jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
 
-        jMenuFile.setText("File");
+        jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
 
-        jMIExit.setText("Exit");
+        jMIExit.setText(bundle.getString("EXIT")); // NOI18N
         jMIExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMIExitActionPerformed(evt);
@@ -318,9 +323,9 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenuFile);
 
-        jMenuHelp.setText("Help");
+        jMenuHelp.setText(bundle.getString("HELP")); // NOI18N
 
-        jMIAbout.setText("About...");
+        jMIAbout.setText(bundle.getString("ABOUT")); // NOI18N
         jMenuHelp.add(jMIAbout);
 
         jMenuBar1.add(jMenuHelp);
@@ -473,7 +478,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // In response to a button click:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = fc.showDialog(myFrame, "Seleccione carpeta de salida");
+        int returnVal = fc.showDialog(myFrame, java.util.ResourceBundle.getBundle("resources/Bundle").getString("DESTINATION_FC_MSG"));
 
         if (JFileChooser.APPROVE_OPTION == returnVal) {
             folder = fc.getSelectedFile();
@@ -551,7 +556,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // In response to a button click:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        int returnVal = fc.showDialog(myFrame, "Seleccione carpeta o archivo");
+        int returnVal = fc.showDialog(myFrame, java.util.ResourceBundle.getBundle("resources/Bundle").getString("PATH_FC_MSG"));
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
@@ -576,8 +581,8 @@ public class GUIFrame extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         if (this.isRunning) {
-            MessageBox.show("No se puede salir de la aplicación mientras el "
-                    + "proceso se está ejecutando", "Proceso en ejecución");
+            MessageBox.show(java.util.ResourceBundle.getBundle("resources/Bundle").getString("CANT_EXIT_WHILE_RUNNING")
+                    + java.util.ResourceBundle.getBundle("resources/Bundle").getString("PROCESS_IS_RUNNING"), java.util.ResourceBundle.getBundle("resources/Bundle").getString("PROCESS_RUNNING_MSG_TITLE"));
 
         } else {
             System.exit(ReturnValue.SUCCESS.getReturnCode());
@@ -718,10 +723,10 @@ public class GUIFrame extends javax.swing.JFrame {
             out.println();
             out.println();
             out.println(" ---------------------- ");
-            out.println("Comenzando proceso...");
-            this.jBStart.setText("Espere...");
+            out.println(java.util.ResourceBundle.getBundle("resources/Bundle").getString("STARTING_PROCESS"));
+            this.jBStart.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("WAIT"));
         } else {
-            this.jBStart.setText("Comenzar");
+            this.jBStart.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("START"));
         }
     }
 
@@ -735,22 +740,22 @@ public class GUIFrame extends javax.swing.JFrame {
         // Validate numbers
         if (min > max || wooble > max || mismatch > max
                 || min < 3 || wooble < 0 || mismatch < 0) {
-            this.jLblError.setText("Error! Revise los parámetros.");
+            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_PARAM"));
             isValid = false;
         }
 
         // Validate paths
         if (!new File(pathOut).exists()) {
-            this.jLblError.setText("Error! Especificar carpeta de destino.");
+            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_DEST_FOLDER"));
             isValid = false;
         }
         if (!new File(pathIn).exists()) {
-            this.jLblError.setText("Error! Especificar fuente.");
+            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_SOURCE"));
             isValid = false;
         }
 
         if (loopList.size() <= 0 || loopList.get(0).trim().length() == 0) {
-            this.jLblError.setText("Error! Ingrese motivos a buscar.");
+            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_LOOPS"));
             isValid = false;
         }
 
@@ -759,13 +764,13 @@ public class GUIFrame extends javax.swing.JFrame {
             aux = aux.trim();
             if (aux.length() <= 0) {
                 isValid = false;
-                this.jLblError.setText("Error! Revise motivos a buscar.");
+                this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_CHECK_LOOPS"));
             }
         }
 
         if (this.jcbMakeRandoms.isSelected()) {
             if (randoms <= 0) {
-                this.jLblError.setText("Error! Ingrese un número válido de randoms.");
+                this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_INVALID_NBR_RANDOMS"));
                 isValid = false;
             }
         }

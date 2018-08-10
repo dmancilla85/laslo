@@ -17,6 +17,10 @@ public class FastaID {
     protected String geneSymbol;
     protected String fieldDelimiter;
     protected String rowDelimiter;
+    public static final String LOG_EXT = ".log";
+    public static final String CSV_EXT = ".csv";
+    public static final String FASTA_EXT = ".fasta";
+    public static final String FASTA_EXT_2 = ".fa";
 
     public String getTranscriptID() {
         return transcriptID;

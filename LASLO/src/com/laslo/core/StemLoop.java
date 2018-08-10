@@ -307,7 +307,7 @@ public class StemLoop {
     }
 
     public String getHairpinStructure() {
-        return drawHairpinStructure();
+        return hairpinStructure; //drawHairpinStructure();
     }
     
 
@@ -529,18 +529,27 @@ public class StemLoop {
         int lengthIR = this.rnaHairpinSequence.length() - this.loop.length();
         String seq = rnaHairpinSequence;
         int woobleCount = 0, mismatch = 0;
+        this.hairpinStructure = "";
         
         if(this.loop.isEmpty() || this.rnaHairpinSequence.isEmpty())
             return;
         
         for(int i = 0; i <(lengthIR)/2; i++){
-            if(PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(seq.length() - 1- i)))
-                woobleCount++;
-            else
-                if(!PairmentAnalizer.isComplementaryRNA(seq.charAt(i), seq.charAt(seq.length() - 1- i)))
+            
+            if(structure.charAt(i) == '('){
+                if(PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(seq.length() - 1- i))){
+                    woobleCount++;
+                    this.hairpinStructure += "*"; 
+                }
+                else this.hairpinStructure += "(";
+            }
+            else {
+                //if(!PairmentAnalizer.isComplementaryRNA(seq.charAt(i), seq.charAt(seq.length() - 1- i)))
                     mismatch++;
+                    this.hairpinStructure += ".";
+            }
         }
-        
+        this.hairpinStructure += structure.substring(lengthIR/2, structure.length() - 1);
         this.setMismatches(mismatch);
         this.setPercent_GU(woobleCount);
 
