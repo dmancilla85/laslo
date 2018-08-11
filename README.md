@@ -1,2 +1,3 @@
-# laslo
-Stem loops
+# LASLO v1.0 - README
+
+

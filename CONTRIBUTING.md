@@ -1,0 +1,2 @@
+# CONTRIBUTING
+Add text here
