@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import static java.util.ResourceBundle.getBundle;
 import java.util.Set;
@@ -50,6 +51,7 @@ public class LoopCatcher {
     protected int minLength;
     protected int maxLength;
     protected int maxWooble;
+    protected Locale currentLocale;
     protected int maxMismatch;
     protected File[] fileList;
     protected boolean extendedMode;
@@ -63,7 +65,7 @@ public class LoopCatcher {
     public LoopCatcher(String pathOut, String pathIn,
             ArrayList<String> loopPatterns, InputSequence inputType,
             int minLength, int maxLength,
-            int maxWooble, int maxMismatch) {
+            int maxWooble, int maxMismatch, Locale locale) {
         this.pathOut = pathOut;
         this.loopPatterns = loopPatterns;
         this.inputType = inputType;
@@ -76,6 +78,7 @@ public class LoopCatcher {
         this.extendedMode = false;
         this.makeRandoms = false;
         this.numberOfRandoms = 0;
+        this.currentLocale = locale;
     }
 
     /**
@@ -83,7 +86,7 @@ public class LoopCatcher {
      */
     public LoopCatcher() {
         this("", "", new ArrayList<>(), InputSequence.ENSEMBL, //NOI18N
-                4, 16, 2, 0);
+                4, 16, 2, 0, new Locale("es", "AR"));
     }
 
     /**
@@ -174,6 +177,10 @@ public class LoopCatcher {
         this.loopPatterns = loopPatterns;
     }
 
+    public void setCurrentLocale(Locale locale){
+        this.currentLocale  = locale;
+    }
+    
     /**
      *
      * @return
@@ -915,7 +922,7 @@ public class LoopCatcher {
 
         ini = Calendar.getInstance();
         out.println(
-                java.text.MessageFormat.format(getBundle("resources/Bundle").
+                java.text.MessageFormat.format(getBundle("resources/Bundle", currentLocale).
                         getString("START_TIME"), new Object[] {Calendar.getInstance().getTime()}));
         out.flush();
 
@@ -959,7 +966,7 @@ public class LoopCatcher {
         }
 
         fin = Calendar.getInstance();
-        out.println(java.text.MessageFormat.format(getBundle("resources/Bundle").getString("TOTAL_TIME"), 
+        out.println(java.text.MessageFormat.format(getBundle("resources/Bundle", currentLocale).getString("TOTAL_TIME"), 
                 new Object[] {((fin.getTimeInMillis() - ini.getTimeInMillis())/ 1000)} ) + " s."); 
         out.flush();
 
@@ -980,7 +987,7 @@ public class LoopCatcher {
 
         try {
             fileName = actualFile.getName();
-            out.println(java.text.MessageFormat.format(getBundle("resources/Bundle")
+            out.println(java.text.MessageFormat.format(getBundle("resources/Bundle", currentLocale)
                     .getString("FILE_PRINT"), 
                     new Object[] {fileName})); //$NON-NLS-1$
             out.flush();
@@ -1006,14 +1013,14 @@ public class LoopCatcher {
                     actualFile, false);
 
             if (fasta.isEmpty()) {
-                out.println(getBundle("resources/Bundle").getString("INVALID_FILE_FORMAT"));
-                out.println(getBundle("resources/Bundle").getString("TRYING_TO_FIX"));
+                out.println(getBundle("resources/Bundle", currentLocale).getString("INVALID_FILE_FORMAT"));
+                out.println(getBundle("resources/Bundle", currentLocale).getString("TRYING_TO_FIX"));
                 boolean formatFile = FASTACorrector.formatFile(
                         actualFile.getAbsolutePath());
                 if (formatFile) {
                     fasta = readFastaDNASequence(actualFile, false);
                 } else {
-                    out.println(getBundle("resources/Bundle").getString("CANT_PROCESS"));
+                    out.println(getBundle("resources/Bundle", currentLocale).getString("CANT_PROCESS"));
                     return;
                 }
             }
@@ -1069,7 +1076,7 @@ public class LoopCatcher {
                 }
 
                 if (i++ % 100 == 0) {
-                    out.printf(getBundle("resources/Bundle").getString("PERCENT_PROCESSED_SEQS"),
+                    out.printf(getBundle("resources/Bundle", currentLocale).getString("PERCENT_PROCESSED_SEQS"),
                             i, listSize, //$NON-NLS-1$
                             (i / (float) listSize) * 100);
                     out.flush();
@@ -1091,14 +1098,14 @@ public class LoopCatcher {
             //auxParam += "Total sequences analized: " + secuencias
             //        + ".\n";
             currentStems = null;
-            out.printf(getBundle("resources/Bundle").getString("RESUME"),
+            out.printf(getBundle("resources/Bundle", currentLocale).getString("RESUME"),
                             this.minLength, 
                             this.maxLength, 
                             secuencias);
             out.flush();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
-            out.println(getBundle("resources/Bundle").getString("CANT_OPEN_FILE"));
+            out.println(getBundle("resources/Bundle", currentLocale).getString("CANT_OPEN_FILE"));
         } catch (IOException ex) {
             Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
         }
