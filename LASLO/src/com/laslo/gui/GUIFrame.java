@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.io.PrintStream;
 import static java.lang.System.out;
 import java.util.Arrays;
+import static java.util.ResourceBundle.getBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -478,7 +479,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // In response to a button click:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = fc.showDialog(myFrame, java.util.ResourceBundle.getBundle("resources/Bundle").getString("DESTINATION_FC_MSG"));
+        int returnVal = fc.showDialog(myFrame, getBundle("resources/Bundle").getString("DESTINATION_FC_MSG"));
 
         if (JFileChooser.APPROVE_OPTION == returnVal) {
             folder = fc.getSelectedFile();
@@ -556,7 +557,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // In response to a button click:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        int returnVal = fc.showDialog(myFrame, java.util.ResourceBundle.getBundle("resources/Bundle").getString("PATH_FC_MSG"));
+        int returnVal = fc.showDialog(myFrame, getBundle("resources/Bundle").getString("PATH_FC_MSG"));
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
@@ -581,8 +582,8 @@ public class GUIFrame extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         if (this.isRunning) {
-            MessageBox.show(java.util.ResourceBundle.getBundle("resources/Bundle").getString("CANT_EXIT_WHILE_RUNNING")
-                    + java.util.ResourceBundle.getBundle("resources/Bundle").getString("PROCESS_IS_RUNNING"), java.util.ResourceBundle.getBundle("resources/Bundle").getString("PROCESS_RUNNING_MSG_TITLE"));
+            MessageBox.show(getBundle("resources/Bundle").getString("CANT_EXIT_WHILE_RUNNING")
+                    + getBundle("resources/Bundle").getString("PROCESS_IS_RUNNING"), getBundle("resources/Bundle").getString("PROCESS_RUNNING_MSG_TITLE"));
 
         } else {
             System.exit(ReturnValue.SUCCESS.getReturnCode());
@@ -720,13 +721,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jBStart.setEnabled(!value);
 
         if (value) {
-            out.println();
-            out.println();
-            out.println(" ---------------------- ");
-            out.println(java.util.ResourceBundle.getBundle("resources/Bundle").getString("STARTING_PROCESS"));
-            this.jBStart.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("WAIT"));
+            out.println(getBundle("resources/Bundle").getString("STARTING_PROCESS"));
+            this.jBStart.setText(getBundle("resources/Bundle").getString("WAIT"));
         } else {
-            this.jBStart.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("START"));
+            this.jBStart.setText(getBundle("resources/Bundle").getString("START"));
         }
     }
 
@@ -740,22 +738,22 @@ public class GUIFrame extends javax.swing.JFrame {
         // Validate numbers
         if (min > max || wooble > max || mismatch > max
                 || min < 3 || wooble < 0 || mismatch < 0) {
-            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_PARAM"));
+            this.jLblError.setText(getBundle("resources/Bundle").getString("ERROR_PARAM"));
             isValid = false;
         }
 
         // Validate paths
         if (!new File(pathOut).exists()) {
-            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_DEST_FOLDER"));
+            this.jLblError.setText(getBundle("resources/Bundle").getString("ERROR_DEST_FOLDER"));
             isValid = false;
         }
         if (!new File(pathIn).exists()) {
-            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_SOURCE"));
+            this.jLblError.setText(getBundle("resources/Bundle").getString("ERROR_SOURCE"));
             isValid = false;
         }
 
         if (loopList.size() <= 0 || loopList.get(0).trim().length() == 0) {
-            this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_LOOPS"));
+            this.jLblError.setText(getBundle("resources/Bundle").getString("ERROR_LOOPS"));
             isValid = false;
         }
 
@@ -764,13 +762,13 @@ public class GUIFrame extends javax.swing.JFrame {
             aux = aux.trim();
             if (aux.length() <= 0) {
                 isValid = false;
-                this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_CHECK_LOOPS"));
+                this.jLblError.setText(getBundle("resources/Bundle").getString("ERROR_CHECK_LOOPS"));
             }
         }
 
         if (this.jcbMakeRandoms.isSelected()) {
             if (randoms <= 0) {
-                this.jLblError.setText(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_INVALID_NBR_RANDOMS"));
+                this.jLblError.setText(getBundle("resources/Bundle").getString("ERROR_INVALID_NBR_RANDOMS"));
                 isValid = false;
             }
         }
