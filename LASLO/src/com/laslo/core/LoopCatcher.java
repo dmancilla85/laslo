@@ -590,8 +590,8 @@ public class LoopCatcher {
             try {
                 if ((loopPos - length) > 0
                         && (loopPos + loopLength + length) < sequenceLength) {
-                    rnaSeq = rnaSequence.substring(loopPos - length, loopPos
-                            + loopLength + length);
+                    rnaSeq = rnaSequence.substring(loopPos - length, 
+                            loopPos + loopLength + length);
 
                     mfe = rfa.getMFE(rnaSeq.getBytes());
                     //fold = new RNAfold(rnaSeq);
@@ -618,7 +618,7 @@ public class LoopCatcher {
             }
 
             if (isValidHairpin) {
-                int extIzq = hairpinModel.lastIndexOf("(") + 1; //NOI18N //NOI18N
+                int extIzq = hairpinModel.lastIndexOf("(") + 1; //NOI18N
                 int extDer = hairpinModel.length() - extIzq - loopLength;
                 rnaSeq = rnaSequence.substring(loopPos - extIzq, loopPos
                         + loopLength + extDer);
@@ -635,8 +635,8 @@ public class LoopCatcher {
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
                 slr.setLoopPattern(stemLoopPattern);
-                slr.setPercent_AU();
-                slr.setPercent_CG();
+                //slr.setPercent_AU();
+                //slr.setPercent_CG();
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "") //NOI18N
@@ -682,7 +682,8 @@ public class LoopCatcher {
 
         return size;
     }
-
+    
+    @SuppressWarnings("empty-statement")
     public String isValidHairpin(String hairpin,
             int loopLength) {
         boolean ret, begin = true;
@@ -708,8 +709,8 @@ public class LoopCatcher {
         if (ret) {
             // 2.a Si encuentra un . o un ) en el extremo izquierdo, remover base (stemLength-1)
             // repetir 2.a hasta que complete el recorrido. 
-            extremoIzq = hairpin.substring(0, stemLength);
-
+           extremoIzq = hairpin.substring(0, stemLength);
+           
             for (int i = 0; i < stemLength; i++) {
                 if (extremoIzq.charAt(i) == '.' || extremoIzq.charAt(i) == ')') {
                     if (begin) {
@@ -724,8 +725,7 @@ public class LoopCatcher {
                     begin = false;
                 }
             }
-            // aaaaaccccaaaaa
-            // 01234
+            
             hairpin = hairpin.substring(stemLength - newLength,
                     hairpin.length() - (stemLength - newLength));
             stemLength = newLength;
@@ -751,9 +751,27 @@ public class LoopCatcher {
                 }
             }
             
-            hairpin = hairpin.substring(0, stemLength + loopLength - 1);
+            hairpin = hairpin.substring(0, stemLength + loopLength);
             extremoDer = extremoDer.substring(0, newLength - 1);
             hairpin = hairpin + extremoDer;
+            
+            int auxR = StringUtils.countMatches(hairpin, ")");
+            int auxL = StringUtils.countMatches(hairpin, "(");
+            int i = hairpin.lastIndexOf("(");
+            while(auxL > 0 && auxR > 0){
+                if(hairpin.charAt(i--) == '('){
+                    auxR--;
+                    auxL--;
+                }
+            }
+            
+            hairpin = hairpin.substring(i + 1, hairpin.length());
+            
+            int k;
+            for(k=hairpin.length()-1; hairpin.charAt(k) == '.';k--);
+            
+            hairpin = hairpin.substring(0, k + 1);
+                
         }
         
         if(ret)

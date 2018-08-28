@@ -49,9 +49,9 @@ public class GUIFrame extends javax.swing.JFrame {
     public GUIFrame() throws IOException {
         loopCatcher = new LoopCatcher();
         isRunning = false;
-        this.locale = new Locale("en", "EN");
+        this.locale = new Locale("en", "US");
         initComponents();
-        this.jRBen_EN.setSelected(true);
+        this.jRBen_US.setSelected(true);
         this.jRBes_AR.setSelected(false);
         this.jLblError.setText("");
         this.jFTpercMismatch.setValue(25);
@@ -115,7 +115,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
-        jRBen_EN = new javax.swing.JRadioButtonMenuItem();
+        jRBen_US = new javax.swing.JRadioButtonMenuItem();
         jRBes_AR = new javax.swing.JRadioButtonMenuItem();
         jMIAbout = new javax.swing.JMenuItem();
 
@@ -330,14 +330,14 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jMenuHelp.setText(bundle.getString("HELP")); // NOI18N
 
-        jRBen_EN.setSelected(true);
-        jRBen_EN.setText("English");
-        jRBen_EN.addActionListener(new java.awt.event.ActionListener() {
+        jRBen_US.setSelected(true);
+        jRBen_US.setText("English");
+        jRBen_US.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRBen_ENActionPerformed(evt);
+                jRBen_USActionPerformed(evt);
             }
         });
-        jMenuHelp.add(jRBen_EN);
+        jMenuHelp.add(jRBen_US);
 
         jRBes_AR.setSelected(true);
         jRBes_AR.setText("Spanish");
@@ -628,16 +628,16 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
         // TODO add your handling code here:
-        jRBen_EN.setSelected(false);
+        jRBen_US.setSelected(false);
        this.locale = new Locale("es", "AR");
     }//GEN-LAST:event_jRBes_ARActionPerformed
 
-    private void jRBen_ENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_ENActionPerformed
+    private void jRBen_USActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
         // TODO add your handling code here:
         jRBes_AR.setSelected(false);
         
-        this.locale = new Locale("en", "EN");
-    }//GEN-LAST:event_jRBen_ENActionPerformed
+        this.locale = new Locale("en", "US");
+    }//GEN-LAST:event_jRBen_USActionPerformed
 
     /**
      * @param args the command line arguments
@@ -697,7 +697,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
-    private javax.swing.JRadioButtonMenuItem jRBen_EN;
+    private javax.swing.JRadioButtonMenuItem jRBen_US;
     private javax.swing.JRadioButtonMenuItem jRBes_AR;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -871,6 +871,8 @@ public class GUIFrame extends javax.swing.JFrame {
         GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
                 this.jBStart, this.loopCatcher);
         worker.execute();
+        
+        //loopCatcher.beginSearch();
         
         setIsRunning(false);
     }

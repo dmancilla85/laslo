@@ -9,6 +9,7 @@ import com.tools.fasta.EnsemblFastaID;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 13/12/2016
@@ -212,7 +213,7 @@ public class StemLoop {
                 //+ "# Stem-loop" + ROW_DELIMITER //$NON-NLS-1$
                 + "StartsAt" + FastaID.ROW_DELIMITER //$NON-NLS-1$
                 + "EndsAt" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "StemLength" + FastaID.ROW_DELIMITER //$NON-NLS-1$
+                + "Pairments" + FastaID.ROW_DELIMITER //$NON-NLS-1$
                 + "LoopPattern" + FastaID.ROW_DELIMITER
                 + "LoopID" + FastaID.ROW_DELIMITER
                 + "GU_Pairs" + FastaID.ROW_DELIMITER
@@ -500,8 +501,8 @@ public class StemLoop {
     }
     
     public String getTerminalPair() {
-        Character a = rnaHairpinSequence.charAt((rnaHairpinSequence.length() - loop.length()) / 2 - 1);
-        Character b = rnaHairpinSequence.charAt((rnaHairpinSequence.length() - loop.length()) / 2 + loop.length());
+        Character a = rnaHairpinSequence.charAt(structure.lastIndexOf("("));
+        Character b = rnaHairpinSequence.charAt(structure.indexOf(")"));
 
         return a.toString() + b.toString();
     }
@@ -525,33 +526,53 @@ public class StemLoop {
     }
 
     public void checkPairments(){
-        
-        int lengthIR = this.rnaHairpinSequence.length() - this.loop.length();
-        String seq = rnaHairpinSequence;
+       
+        String seq = this.rnaHairpinSequence;
         int woobleCount = 0, mismatch = 0;
-        this.hairpinStructure = "";
+        int CG = 0, AU = 0;
+        StringBuilder aux = new StringBuilder(this.structure);
+        int firstIzq=1;
         
-        if(this.loop.isEmpty() || this.rnaHairpinSequence.isEmpty())
+        if(this.loop.isEmpty() || this.structure.isEmpty())
             return;
         
-        for(int i = 0; i <(lengthIR)/2; i++){
-            
+        try{
+        firstIzq = this.structure.lastIndexOf('(');
+        int firstDer = this.structure.indexOf(')');
+        
+        for(int i = firstIzq; i >= 0 && firstDer < structure.length(); i--){
             if(structure.charAt(i) == '('){
-                if(PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(seq.length() - 1- i))){
-                    woobleCount++;
-                    this.hairpinStructure += "*"; 
+                while(structure.charAt(firstDer) != ')')
+                    firstDer++;
+                
+                if(structure.charAt(firstDer) == ')'){
+                    if(PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))){
+                        aux.setCharAt(i, '*');
+                        woobleCount++;
+                    } else {
+                        if( (seq.charAt(i) == 'U' && seq.charAt(firstDer) == 'A') ||
+                             (seq.charAt(i) == 'A' && seq.charAt(firstDer) == 'U')   )
+                            AU++;
+                        
+                        if( (seq.charAt(i) == 'C' && seq.charAt(firstDer) == 'G') ||
+                             (seq.charAt(i) == 'G' && seq.charAt(firstDer) == 'C')   )
+                            CG++;
+                    }
                 }
-                else this.hairpinStructure += "(";
-            }
-            else {
-                //if(!PairmentAnalizer.isComplementaryRNA(seq.charAt(i), seq.charAt(seq.length() - 1- i)))
-                    mismatch++;
-                    this.hairpinStructure += ".";
-            }
+                
+                firstDer++;
+            } else mismatch++;
         }
-        this.hairpinStructure += structure.substring(lengthIR/2, structure.length() - 1);
+        
+        } catch(Exception e){
+            System.out.println("checkPairments-ERROR: " + e.getMessage());
+        }
+        this.hairpinStructure = aux.toString();
+        this.percent_AU = (double)AU / (double)(AU+CG+woobleCount);
+        this.percent_CG = (double)CG / (double)(AU+CG+woobleCount);
+        this.percent_GU = (double)woobleCount / (double)(AU+CG+woobleCount);
         this.setMismatches(mismatch);
-        this.setPercent_GU(woobleCount);
+        //this.setPercent_GU(woobleCount);
 
     }
     
@@ -679,7 +700,6 @@ public class StemLoop {
         aux = aux.substring(0, size);
 
         percentGU = new Float(wooble) / new Float(aux.length());
-
         this.percent_GU = percentGU;
     }
 
