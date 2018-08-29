@@ -22,6 +22,36 @@ public class FastaID {
     public static final String FASTA_EXT = ".fasta";
     public static final String FASTA_EXT_2 = ".fa";
 
+	public static InputSequence detectHeader(String header){
+		
+		InputSequence out = InputSequence.GENERIC;
+		
+		if(header.contains("gene:") &&
+			header.contains("gene_biotype:") &&
+			header.contains("transcript_biotype:") &&
+			header.contains("gene_symbol:") &&
+			header.contains("description:"))
+			out = InputSequence.ENSEMBL;
+		else {
+			if(header.contains("type=") &&
+				header.contains("loc=") &&
+				header.contains("name=") &&
+				header.contains("dbxref=") &&
+				header.contains("score=") &&
+				header.contains("MD5=") &&
+				header.contains("release="))
+				out = InputSequence.FLYBASE;
+				
+			else {
+				if(header.contains("|"))
+					out = InputSequence.BIOMART;
+			}
+		}
+			
+			
+		return out;
+	}
+	
     public String getTranscriptID() {
         return transcriptID;
     }

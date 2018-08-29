@@ -10,6 +10,7 @@ package com.tools.fasta;
 public class BioMartFastaID extends FastaID {
 
     protected static int nCols = 6;
+    protected static char fs = '=';
 
     /**
      *
@@ -36,7 +37,7 @@ public class BioMartFastaID extends FastaID {
 
     public void setBioMartTags(String idSequence) {
 
-        String auxSeq = idSequence.replace('=', '@');
+        String auxSeq = idSequence.replace(fs, '@');
         auxSeq = auxSeq.replace(';', '-');
         String [] cols = auxSeq.split("@");
         

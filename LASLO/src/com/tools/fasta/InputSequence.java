@@ -11,5 +11,6 @@ public enum InputSequence {
 	ENSEMBL,
 	FLYBASE,
 	BIOMART,
+        GENBANK,
 	GENERIC
 }
