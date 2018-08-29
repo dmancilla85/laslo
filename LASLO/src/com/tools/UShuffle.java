@@ -25,16 +25,18 @@ public class UShuffle {
 
     private static final String COMMAND_SHUFFLE = "./ext/ushuffle.exe -s ";
     private static final String RANDOM_PATH = "\\shuffled";
+    
     public static void main(String[] args) {
   
-            String path = "C:\\Users\\David\\Desktop\\profile\\";
-            String ext = ".fasta";
-            String fileName = "repressed_non_bound";
+            String path = "C:\\Users\\david\\Documents\\NetBeansProjects\\laslo\\LASLO\\ext";
+            String ext = ".fa";
+            String fileName = "test";
             
+            System.out.println("Iniciando...");
 			// Generation of the iterator of {id,sequence}
 			LinkedHashMap<String, DNASequence> fasta = null;
         try {
-            fasta = readFastaDNASequence(new File(fileName), false);
+            fasta = readFastaDNASequence(new File("./ext/" +fileName + ext), false);
         } catch (IOException ex) {
             Logger.getLogger(UShuffle.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -62,7 +64,7 @@ public class UShuffle {
         Runtime rt;
         String aux="";
         rt = Runtime.getRuntime();
-        String fileName = ""; // fileName here
+        String fileName = "test"; // fileName here
         String destiny = "", sequence = "", header = "";
         boolean mkdirs, delete;
         mkdirs = new File(path + RANDOM_PATH).mkdirs();
@@ -85,8 +87,9 @@ public class UShuffle {
 					DNASequence element = entry.getValue();
 					header = element.getOriginalHeader();
                                         sequence = element.getSequenceAsString();
-					Process pr = rt.exec(COMMAND_SHUFFLE + sequence
-						+ "-n " + nRandoms + "-k" + k);
+					String cmd = COMMAND_SHUFFLE + sequence
+						+ " -n " + nRandoms + " -k " + k;
+                                        Process pr = rt.exec(cmd);
 
 					try (InputStream in = pr.getInputStream()) {
 						int c;
