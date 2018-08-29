@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
+import com.tools.UShuffle;
 import com.tools.fasta.FASTACorrector;
 import static com.tools.fasta.FastaID.CSV_EXT;
 import static com.tools.fasta.FastaID.FASTA_EXT;
@@ -57,6 +58,7 @@ public class LoopCatcher {
     protected boolean extendedMode;
     private boolean makeRandoms;
     private int numberOfRandoms;
+	private int kLetRandoms;
     protected File actualFile;
 
     // Create a new instance of RNAFold4J
@@ -255,8 +257,10 @@ public class LoopCatcher {
      * @param stemResearch
      * @param headerList
      */
-    public void writeCSV(String sFileName, List<StemLoop> stemResearch, String headerList) {
-        CSVWriter writer;
+    public void writeCSV(String sFileName, List<StemLoop> stemResearch, 
+		String headerList) {
+        
+		CSVWriter writer;
 
         if (stemResearch.isEmpty() && headerList == null) {
             return;
@@ -338,7 +342,8 @@ public class LoopCatcher {
         boolean checkWooblePair, isValidHairpin;
         // Upper all characters
         // Make the retro transcription
-        String rnaSequence = fastaSeq.getSequenceAsString().toUpperCase().replace('T', 'U');
+        String rnaSequence = fastaSeq.getSequenceAsString().toUpperCase()
+			.replace('T', 'U');
         final int sequenceLength = rnaSequence.length();
 
         // Convert the original loop pattern to a regular expression
@@ -413,9 +418,9 @@ public class LoopCatcher {
 
                     } catch (IndexOutOfBoundsException e) {
                         out.println("Error: " + rnaSequence + " - i: "
-                                + (loopPos - lengthIR) + " - i2: " //$NON-NLS-3$ //$NON-NLS-2$ //NOI18N
+                                + (loopPos - lengthIR) + " - i2: " 
                                 // //$NON-NLS-3$
-                                + (loopPos + loopLength + lengthIR)); // $NON-NLS-1$
+                                + (loopPos + loopLength + lengthIR)); 
                         out.flush();
 
                     }
@@ -568,8 +573,8 @@ public class LoopCatcher {
         String rnaSequence = fastaSeq.getSequenceAsString().
                 toUpperCase().replace('T', 'U');
         final int sequenceLength = rnaSequence.length();
-        MFEData mfe = null;
-        //RNAfold fold = null;
+        //MFEData mfe = null;
+        RNAfold fold = null;
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -593,13 +598,13 @@ public class LoopCatcher {
                     rnaSeq = rnaSequence.substring(loopPos - length, 
                             loopPos + loopLength + length);
 
-                    mfe = rfa.getMFE(rnaSeq.getBytes());
-                    //fold = new RNAfold(rnaSeq);
+                    //mfe = rfa.getMFE(rnaSeq.getBytes());
+                    fold = new RNAfold(rnaSeq);
 
-                    hairpinModel = new String(mfe.structure);
-                    //fold.getStructure();
+                    hairpinModel = //new String(mfe.structure);
+                        fold.getStructure();
 
-                    if (/*fold.getMfe()*/mfe.mfe == 0.0) {
+                    if (fold.getMfe()/*mfe.mfe*/ == 0.0) {
                         isValidHairpin = false;
                     } else {
                         hairpinModel = isValidHairpin(hairpinModel, loopLength);
@@ -630,7 +635,7 @@ public class LoopCatcher {
                 slr.setStructure(hairpinModel);
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
-                slr.setMfe(/*fold.getMfe()*/mfe.mfe);
+                slr.setMfe(new RNAfold(rnaSeq).getMfe());
                 slr.setPredecessorLoop(extIzq);
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
@@ -659,7 +664,8 @@ public class LoopCatcher {
                 // Polyadenilations Sites
                 // Look for the Kozak pattern
                 // Special TEST buscar otros posibles stems
-                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
+                slr.setRelativePos((double) slr.getStartsAt() 
+					/ (double) rnaSequence.length());
 
                 slrList.add(slr);
             }
@@ -684,8 +690,7 @@ public class LoopCatcher {
     }
     
     @SuppressWarnings("empty-statement")
-    public String isValidHairpin(String hairpin,
-            int loopLength) {
+    public String isValidHairpin(String hairpin, int loopLength) {
         boolean ret, begin = true;
         String extremoIzq = "", extremoDer = ""; //NOI18N
         int stemLength = (hairpin.length() - loopLength) / 2;
@@ -707,10 +712,12 @@ public class LoopCatcher {
 
         // 2. Analizar lado izq. y derecho del stem desde extremo 5',
         if (ret) {
-            // 2.a Si encuentra un . o un ) en el extremo izquierdo, remover base (stemLength-1)
-            // repetir 2.a hasta que complete el recorrido. 
+            // 2.a 	Si encuentra un . o un ) en el extremo izquierdo, remover 
+			// 		base (stemLength-1)
+            // Repetir 2.a hasta que complete el recorrido. 
            extremoIzq = hairpin.substring(0, stemLength);
            
+		   try{
             for (int i = 0; i < stemLength; i++) {
                 if (extremoIzq.charAt(i) == '.' || extremoIzq.charAt(i) == ')') {
                     if (begin) {
@@ -730,9 +737,11 @@ public class LoopCatcher {
                     hairpin.length() - (stemLength - newLength));
             stemLength = newLength;
 
-            // 2.b Si encuentra un . o un ( en el extremo derecho, remover base (stemLength-1)
-            // repetir 2.b hasta que complete el recorrido. 	
-            extremoDer = hairpin.substring(stemLength + loopLength, hairpin.length());
+            // 2.b 	Si encuentra un . o un ( en el extremo derecho, remover base 
+			//		(stemLength-1)
+            // Repetir 2.b hasta que complete el recorrido. 	
+            extremoDer = hairpin.substring(stemLength + loopLength, 
+				hairpin.length());
             begin = true;
             
             for (int i = stemLength - 1; i >= 0; i--) {
@@ -771,7 +780,9 @@ public class LoopCatcher {
             for(k=hairpin.length()-1; hairpin.charAt(k) == '.';k--);
             
             hairpin = hairpin.substring(0, k + 1);
-                
+			} catch(IndexOutOfBoundsException e){
+				e.printStackTrace();
+			}
         }
         
         if(ret)
@@ -828,7 +839,7 @@ public class LoopCatcher {
                             + loopLength + length);
 
                     hairpinModel = fullStr.substring(loopPos - length, loopPos
-                            + loopLength + length);;
+                            + loopLength + length);
                     //fold.getStructure();
 
                     if (fold.getMfe()== 0.0) {
@@ -891,7 +902,8 @@ public class LoopCatcher {
                 // Polyadenilations Sites
                 // Look for the Kozak pattern
                 // Special TEST buscar otros posibles stems
-                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
+                slr.setRelativePos((double) slr.getStartsAt() 
+					/ (double) rnaSequence.length());
 
                 slrList.add(slr);
             }
@@ -940,8 +952,9 @@ public class LoopCatcher {
 
         ini = Calendar.getInstance();
         out.println(
-                java.text.MessageFormat.format(getBundle("resources/Bundle", currentLocale).
-                        getString("START_TIME"), new Object[] {Calendar.getInstance().getTime()}));
+                java.text.MessageFormat.format(getBundle("resources/Bundle", 
+					currentLocale).getString("START_TIME"), new Object[] 
+					{Calendar.getInstance().getTime()}));
         out.flush();
 
         if (fileList == null) {
@@ -950,19 +963,21 @@ public class LoopCatcher {
 
         if (this.makeRandoms) {
             for (File currentFile : fileList) {
-                if (currentFile.isFile() && (currentFile.toString().endsWith(FASTA_EXT)
+                if (currentFile.isFile() 
+						&& (currentFile.toString().endsWith(FASTA_EXT)
                         || currentFile.toString().endsWith(FASTA_EXT_2))) {
 
-                    fileName = currentFile.getName();
-
-                    if (fileName.contains(FASTA_EXT)) {
-                        fileName = fileName.replaceAll(FASTA_EXT, ""); //NOI18N
-                        ShuffleSeq.makeShuffleSequences(pathOut, fileName, FASTA_EXT, numberOfRandoms);
-                    } else {
-                        fileName = fileName.replaceAll(FASTA_EXT_2, ""); //NOI18N
-                        ShuffleSeq.makeShuffleSequences(pathOut, fileName, FASTA_EXT, numberOfRandoms);
+                    //fileName = currentFile.getName();
+                    LinkedHashMap<String, DNASequence> fasta = null;
+                    
+                    try { 
+                        fasta = readFastaDNASequence(currentFile, false);
+                    } catch (IOException ex) {
+                        Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
+						
+                    UShuffle.makeShuffleSequences(pathOut, fasta, 
+						numberOfRandoms, kLetRandoms);
                 }
             }
 
@@ -984,9 +999,11 @@ public class LoopCatcher {
         }
 
         fin = Calendar.getInstance();
-        out.println(java.text.MessageFormat.format(getBundle("resources/Bundle", currentLocale).getString("TOTAL_TIME"), 
-                new Object[] {((fin.getTimeInMillis() - ini.getTimeInMillis())/ 1000)} ) + " s."); 
-        out.flush();
+        out.println(java.text.MessageFormat.format(getBundle("resources/Bundle", 
+			currentLocale).getString("TOTAL_TIME"), new Object[] 
+			{((fin.getTimeInMillis() - ini.getTimeInMillis())/ 1000)} ) + " s."); 
+        
+		out.flush();
 
         // Memory cleaning
         fileList = null;
@@ -1005,9 +1022,9 @@ public class LoopCatcher {
 
         try {
             fileName = actualFile.getName();
-            out.println(java.text.MessageFormat.format(getBundle("resources/Bundle", currentLocale)
-                    .getString("FILE_PRINT"), 
-                    new Object[] {fileName})); //$NON-NLS-1$
+            out.println(java.text.MessageFormat.format(
+				getBundle("resources/Bundle", currentLocale).
+				getString("FILE_PRINT"), new Object[] {fileName})); //$NON-NLS-1$
             out.flush();
             fileName = fileName.replaceAll(FASTA_EXT, ""); //NOI18N
             fileName = fileName.replaceAll(FASTA_EXT_2, ""); //NOI18N
@@ -1031,14 +1048,17 @@ public class LoopCatcher {
                     actualFile, false);
 
             if (fasta.isEmpty()) {
-                out.println(getBundle("resources/Bundle", currentLocale).getString("INVALID_FILE_FORMAT"));
-                out.println(getBundle("resources/Bundle", currentLocale).getString("TRYING_TO_FIX"));
+                out.println(getBundle("resources/Bundle", currentLocale)
+					.getString("INVALID_FILE_FORMAT"));
+                out.println(getBundle("resources/Bundle", currentLocale)
+					.getString("TRYING_TO_FIX"));
                 boolean formatFile = FASTACorrector.formatFile(
                         actualFile.getAbsolutePath());
                 if (formatFile) {
                     fasta = readFastaDNASequence(actualFile, false);
                 } else {
-                    out.println(getBundle("resources/Bundle", currentLocale).getString("CANT_PROCESS"));
+                    out.println(getBundle("resources/Bundle", currentLocale)
+					.getString("CANT_PROCESS"));
                     return;
                 }
             }
@@ -1070,7 +1090,6 @@ public class LoopCatcher {
                         toUpperCase().replace('T', 'U');
                     fold = new RNAfold(rnaSequence);
                 }
-                //MFEData fold = rfa.getMFE(rnaSequence.getBytes());
                 secuencias++;
                 
                 // III. Loop level
@@ -1086,15 +1105,15 @@ public class LoopCatcher {
                                 fold,
                                 currentPattern,
                                 currentStems, writer);
-                        //sequenceExtendedResearch(element, currentPattern, currentStems, writer);
                     } else {
-                        sequenceExtendedResearch(element, currentPattern, currentStems, writer);
-                        //sequenceResearch(element, currentPattern, currentStems, writer);
+                        sequenceExtendedResearch(element, currentPattern, 
+							currentStems, writer);
                     }
                 }
 
                 if (i++ % 100 == 0) {
-                    out.printf(getBundle("resources/Bundle", currentLocale).getString("PERCENT_PROCESSED_SEQS"),
+                    out.printf(getBundle("resources/Bundle", currentLocale)
+						.getString("PERCENT_PROCESSED_SEQS"),
                             i, listSize, //$NON-NLS-1$
                             (i / (float) listSize) * 100);
                     out.flush();
@@ -1116,16 +1135,20 @@ public class LoopCatcher {
             //auxParam += "Total sequences analized: " + secuencias
             //        + ".\n";
             currentStems = null;
-            out.printf(getBundle("resources/Bundle", currentLocale).getString("RESUME"),
+            out.printf(getBundle("resources/Bundle", currentLocale)
+				.getString("RESUME"),
                             this.minLength, 
                             this.maxLength, 
                             secuencias);
             out.flush();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
-            out.println(getBundle("resources/Bundle", currentLocale).getString("CANT_OPEN_FILE"));
+            Logger.getLogger(LoopCatcher.class.getName())
+				.log(Level.SEVERE, null, ex);
+            out.println(getBundle("resources/Bundle", currentLocale)
+				.getString("CANT_OPEN_FILE"));
         } catch (IOException ex) {
-            Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoopCatcher.class.getName())
+				.log(Level.SEVERE, null, ex);
         }
         currentStems = null;
         writer = null;
