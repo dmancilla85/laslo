@@ -28,9 +28,9 @@ public class UShuffle {
     
     public static void main(String[] args) {
   
-            String path = "C:\\Users\\david\\Documents\\NetBeansProjects\\laslo\\LASLO\\ext";
-            String ext = ".fa";
-            String fileName = "test";
+            String path = "C:\\Users\\David\\Documents\\NetBeansProjects\\lasloProject\\LASLO\\ext";
+            String ext = ".fasta";
+            String fileName = "fruitfly_chen";
             
             System.out.println("Iniciando...");
 			// Generation of the iterator of {id,sequence}
@@ -40,7 +40,7 @@ public class UShuffle {
         } catch (IOException ex) {
             Logger.getLogger(UShuffle.class.getName()).log(Level.SEVERE, null, ex);
         }
-            makeShuffleSequences(path, fasta, 1, 2);
+            makeShuffleSequences(path, fileName, fasta, 5, 2);
 
     }
 
@@ -59,12 +59,12 @@ public class UShuffle {
      * @param k
      * @param nRandoms 
      */
-    public static void makeShuffleSequences(String path, LinkedHashMap<String, 
-            DNASequence> fasta, int nRandoms, int k) {
+    public static void makeShuffleSequences(String path, String filename,
+            LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k) {
         Runtime rt;
         String aux="";
         rt = Runtime.getRuntime();
-        String fileName = "test"; // fileName here
+        String fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
         String destiny = "", sequence = "", header = "";
         boolean mkdirs, delete;
         mkdirs = new File(path + RANDOM_PATH).mkdirs();
@@ -72,51 +72,56 @@ public class UShuffle {
         for (int i = 1; i <= nRandoms; i++) {
             try {
 
-                destiny = path + RANDOM_PATH + '\\' + fileName + "_rnd" + i + ".fa";
-				File file = new  File(destiny);
+                destiny = path + RANDOM_PATH + '\\' + fileNameWithOutExt 
+                        + "_rnd" + i + ".fa";
+		File file = new  File(destiny);
 				
-                if (file.exists()) 
+                if (file.exists()) {
                     delete = (new File(destiny)).delete();
+                }
                 
-				file.createNewFile();
+		file.createNewFile();
 				
-				FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-				BufferedWriter bw = new BufferedWriter(fw);
+		FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+		BufferedWriter bw = new BufferedWriter(fw);
 				
-				for (Map.Entry<String, DNASequence> entry : fasta.entrySet()){
-					DNASequence element = entry.getValue();
-					header = element.getOriginalHeader();
-                                        sequence = element.getSequenceAsString();
-					String cmd = COMMAND_SHUFFLE + sequence
-						+ " -n " + nRandoms + " -k " + k;
-                                        Process pr = rt.exec(cmd);
+                for (Map.Entry<String, DNASequence> entry : fasta.entrySet()){
+                        DNASequence element = entry.getValue();
+                        header = element.getOriginalHeader();
+                        sequence = element.getSequenceAsString();
+                        String cmd = COMMAND_SHUFFLE + sequence
+                                + " -n 1 -k " + k;
+                        Process pr = rt.exec(cmd);
 
-					try (InputStream in = pr.getInputStream()) {
-						int c;
+                        try (InputStream in = pr.getInputStream()) {
+                                int c;
 
-						while ((c = in.read()) != -1) {
+                                while ((c = in.read()) != -1) {
 
-							if (c != '\n') {
-								aux += (char) c;
-							} else {
-								i++;
-								aux = "";
-								bw.write(header);
-								bw.newLine();
-								bw.write(aux);
-								bw.newLine();
-							}
+                                        if (c != '\n') {
+                                                aux += (char) c;
+                                        } else {
+                                                bw.write(">" + header);
+                                                bw.newLine();
+                                                bw.write(aux);
+                                                bw.newLine();
+                                                bw.newLine();
+                                                aux = "";
+                                        }
 
-						}
-					}
+                                }
+                        }
 
-					 int exitVal = pr.waitFor();
-                
-					System.out.println("Generating randomized sequences in " + destiny
-					+ " - ["+ exitVal + "]");
-					
-				}
-				
+                         int exitVal = pr.waitFor();
+
+                        System.out.println("Generating randomized sequences in " + destiny
+                        + " - ["+ exitVal + "]");
+
+                }
+
+                bw.close();
+                bw = null;
+                fw = null;
 				
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(ShuffleSeq.class.getName()).log(Level.SEVERE, null, ex);
