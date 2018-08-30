@@ -58,7 +58,7 @@ public class LoopCatcher {
     protected boolean extendedMode;
     private boolean makeRandoms;
     private int numberOfRandoms;
-	private int kLetRandoms;
+    private int kLetRandoms;
     protected File actualFile;
 
     // Create a new instance of RNAFold4J
@@ -976,8 +976,8 @@ public class LoopCatcher {
                         Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
                     }
 						
-                    UShuffle.makeShuffleSequences(pathOut, fasta, 
-						numberOfRandoms, kLetRandoms);
+                    UShuffle.makeShuffleSequences(pathOut, currentFile.getName(), 
+                            fasta, numberOfRandoms, kLetRandoms);
                 }
             }
 
