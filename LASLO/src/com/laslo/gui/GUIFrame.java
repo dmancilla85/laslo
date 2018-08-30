@@ -28,6 +28,7 @@ import java.io.PrintStream;
 import static java.lang.System.out;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,6 +51,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher = new LoopCatcher();
         isRunning = false;
         this.locale = new Locale("en", "US");
+        this.bundle = getBundle("resources/Bundle", locale);
         initComponents();
         this.jRBen_US.setSelected(true);
         this.jRBes_AR.setSelected(false);
@@ -501,7 +503,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // In response to a button click:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = fc.showDialog(myFrame, getBundle("resources/Bundle", locale).getString("DESTINATION_FC_MSG"));
+        int returnVal = fc.showDialog(myFrame, bundle.getString("DESTINATION_FC_MSG"));
 
         if (JFileChooser.APPROVE_OPTION == returnVal) {
             folder = fc.getSelectedFile();
@@ -579,7 +581,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // In response to a button click:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        int returnVal = fc.showDialog(myFrame, getBundle("resources/Bundle", locale).getString("PATH_FC_MSG"));
+        int returnVal = fc.showDialog(myFrame, bundle.getString("PATH_FC_MSG"));
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
@@ -604,8 +606,8 @@ public class GUIFrame extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         if (this.isRunning) {
-            MessageBox.show(getBundle("resources/Bundle", locale).getString("CANT_EXIT_WHILE_RUNNING")
-                    + getBundle("resources/Bundle", locale).getString("PROCESS_IS_RUNNING"), getBundle("resources/Bundle", locale).getString("PROCESS_RUNNING_MSG_TITLE"));
+            MessageBox.show(bundle.getString("CANT_EXIT_WHILE_RUNNING")
+                    + bundle.getString("PROCESS_IS_RUNNING"), bundle.getString("PROCESS_RUNNING_MSG_TITLE"));
 
         } else {
             System.exit(ReturnValue.SUCCESS.getReturnCode());
@@ -715,6 +717,7 @@ public class GUIFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     protected Locale locale;
+    private   ResourceBundle bundle;
     protected LoopCatcher loopCatcher;
     protected File[] listOfFiles;
     protected boolean isRunning;
@@ -759,10 +762,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jBStart.setEnabled(!value);
 
         if (value) {
-            out.println(getBundle("resources/Bundle", locale).getString("STARTING_PROCESS"));
-            this.jBStart.setText(getBundle("resources/Bundle", locale).getString("WAIT"));
+            out.println(bundle.getString("STARTING_PROCESS"));
+            this.jBStart.setText(bundle.getString("WAIT"));
         } else {
-            this.jBStart.setText(getBundle("resources/Bundle", locale).getString("START"));
+            this.jBStart.setText(bundle.getString("START"));
         }
     }
 
@@ -776,22 +779,22 @@ public class GUIFrame extends javax.swing.JFrame {
         // Validate numbers
         if (min > max || wooble > max || mismatch > max
                 || min < 3 || wooble < 0 || mismatch < 0) {
-            this.jLblError.setText(getBundle("resources/Bundle", locale).getString("ERROR_PARAM"));
+            this.jLblError.setText(bundle.getString("ERROR_PARAM"));
             isValid = false;
         }
 
         // Validate paths
         if (!new File(pathOut).exists()) {
-            this.jLblError.setText(getBundle("resources/Bundle", locale).getString("ERROR_DEST_FOLDER"));
+            this.jLblError.setText(bundle.getString("ERROR_DEST_FOLDER"));
             isValid = false;
         }
         if (!new File(pathIn).exists()) {
-            this.jLblError.setText(getBundle("resources/Bundle", locale).getString("ERROR_SOURCE"));
+            this.jLblError.setText(bundle.getString("ERROR_SOURCE"));
             isValid = false;
         }
 
         if (loopList.size() <= 0 || loopList.get(0).trim().length() == 0) {
-            this.jLblError.setText(getBundle("resources/Bundle", locale).getString("ERROR_LOOPS"));
+            this.jLblError.setText(bundle.getString("ERROR_LOOPS"));
             isValid = false;
         }
 
@@ -800,13 +803,13 @@ public class GUIFrame extends javax.swing.JFrame {
             aux = aux.trim();
             if (aux.length() <= 0) {
                 isValid = false;
-                this.jLblError.setText(getBundle("resources/Bundle", locale).getString("ERROR_CHECK_LOOPS"));
+                this.jLblError.setText(bundle.getString("ERROR_CHECK_LOOPS"));
             }
         }
 
         if (this.jcbMakeRandoms.isSelected()) {
             if (randoms <= 0) {
-                this.jLblError.setText(getBundle("resources/Bundle", locale).getString("ERROR_INVALID_NBR_RANDOMS"));
+                this.jLblError.setText(bundle.getString("ERROR_INVALID_NBR_RANDOMS"));
                 isValid = false;
             }
         }
@@ -825,7 +828,7 @@ public class GUIFrame extends javax.swing.JFrame {
         ArrayList<String> loopList;
         loopList = new ArrayList<>();
         this.jLblError.setText("");
-
+        
         if (this.isRunning) {
             return;
         }
@@ -853,7 +856,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // Start process
         out.flush();
-        loopCatcher.setCurrentLocale(locale);
+        loopCatcher.setBundle(bundle);
         loopCatcher.setLoopPatterns(loopList);
         loopCatcher.setMaxLength(max);
         loopCatcher.setMinLength(min);
