@@ -9,7 +9,8 @@ package com.laslo.core;
  */
 public class BiologyPatterns {
 	// PUMILIO
-	public static final String PUMILIO = "UGUANUA"; //$NON-NLS-1$
+	public static final String PUM1 = "UGUANAUA"; //$NON-NLS-1$
+        public static final String PUM2 = "UGUANAUARNNNNBBBBSCCS";
 	// Methyl-6-Adenosine Degenerated Consensus
 	public static final String MET6_A_DEG_CONSENSUS = "RRACH";
 	// Polyadenilation signal 1
