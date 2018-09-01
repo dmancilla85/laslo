@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -60,18 +62,29 @@ public class RNAfold {
                     }
                 }
                 
-                String result[] = output.split(" ");
-                this.structure = result[0];
+                //String result[] = output.split(" ");
                 
-                if(result.length > 2){
+                //if(result[0].length() > 0)
+                
+                this.structure = output.trim()
+                        .substring(0, sequence.length()) ;
+                
+                /*if(result.length > 2){
                     for(int j = 2; j < result.length; j++)
                         result[1] += result[j];
+                }*/
+                
+                Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)");
+                Matcher matcher = regex.matcher(output);
+                if(matcher.find()){
+                    this.mfe = new Double(matcher.group(1));
+                    this.mfe *= (-1);
                 }
                 
-                this.mfe = new Double(result[1].
+                /*this.mfe = new Double(output.substring(output.) .
                         replace(")", "").
                         replace("(", "").
-                        replace('\r', ' '));
+                        replace('\r', ' '));*/
             }
             
             out.close();
