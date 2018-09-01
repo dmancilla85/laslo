@@ -53,7 +53,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.locale = new Locale("en", "US");
         this.bundle = getBundle("resources/Bundle", locale);
         initComponents();
-        this.jRBen_US.setSelected(true);
+        this.jRBen_EN.setSelected(true);
         this.jRBes_AR.setSelected(false);
         this.jLblError.setText("");
         this.jFTpercMismatch.setValue(25);
@@ -113,11 +113,13 @@ public class GUIFrame extends javax.swing.JFrame {
         jcbMakeRandoms = new javax.swing.JCheckBox();
         jLabel8 = new javax.swing.JLabel();
         jftNumberOfRandoms = new javax.swing.JFormattedTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jftAdditionalSeq = new javax.swing.JFormattedTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
-        jRBen_US = new javax.swing.JRadioButtonMenuItem();
+        jRBen_EN = new javax.swing.JRadioButtonMenuItem();
         jRBes_AR = new javax.swing.JRadioButtonMenuItem();
         jMIAbout = new javax.swing.JMenuItem();
 
@@ -135,7 +137,7 @@ public class GUIFrame extends javax.swing.JFrame {
         });
 
         jLabel1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle", locale); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("STEM_LENGTH_BETWEEN")); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
@@ -162,6 +164,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel6.setText(bundle.getString("DESTINATION")); // NOI18N
 
+        jTFPathIn.setEditable(false);
         jTFPathIn.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jTFPathIn.setToolTipText(bundle.getString("PATH_TOOLTIP")); // NOI18N
         jTFPathIn.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -171,6 +174,7 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
+        jTFPathOut.setEditable(false);
         jTFPathOut.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jTFPathOut.setToolTipText(bundle.getString("DESTINATION_TOOLTIP")); // NOI18N
         jTFPathOut.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -239,8 +243,9 @@ public class GUIFrame extends javax.swing.JFrame {
         jLabel7.setText(bundle.getString("SOURCE")); // NOI18N
 
         jCBOrigin.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jCBOrigin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ensembl", "FlyBase", "BioMart", "Otro" }));
+        jCBOrigin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ensembl", "FLyBase", "BioMART", "GenBank", "Generic" }));
         jCBOrigin.setToolTipText(bundle.getString("SOURCE_TOOLTIP")); // NOI18N
+        jCBOrigin.setEnabled(false);
         jCBOrigin.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCBOriginItemStateChanged(evt);
@@ -317,6 +322,12 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
 
+        jLabel9.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jLabel9.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
+
+        jftAdditionalSeq.setText("UGUANAUA");
+        jftAdditionalSeq.setToolTipText("Look for another sequence (Not a stem-loop)");
+
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
 
@@ -332,14 +343,14 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jMenuHelp.setText(bundle.getString("HELP")); // NOI18N
 
-        jRBen_US.setSelected(true);
-        jRBen_US.setText("English");
-        jRBen_US.addActionListener(new java.awt.event.ActionListener() {
+        jRBen_EN.setSelected(true);
+        jRBen_EN.setText("English");
+        jRBen_EN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRBen_USActionPerformed(evt);
+                jRBen_ENActionPerformed(evt);
             }
         });
-        jMenuHelp.add(jRBen_US);
+        jMenuHelp.add(jRBen_EN);
 
         jRBes_AR.setSelected(true);
         jRBes_AR.setText("Spanish");
@@ -366,6 +377,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
                             .addComponent(jScrollPane2)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -379,7 +391,6 @@ public class GUIFrame extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jButtonIn, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jButtonOut, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addComponent(jScrollPane1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jBStart, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -424,7 +435,11 @@ public class GUIFrame extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                        .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -472,8 +487,12 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(7, 7, 7)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBStart)
                     .addComponent(jLblError))
@@ -630,11 +649,11 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
         // TODO add your handling code here:
-        jRBen_US.setSelected(false);
+       this.jRBen_EN.setSelected(false);
        this.locale = new Locale("es", "AR");
     }//GEN-LAST:event_jRBes_ARActionPerformed
 
-    private void jRBen_USActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
+    private void jRBen_ENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
         // TODO add your handling code here:
         jRBes_AR.setSelected(false);
         
@@ -693,13 +712,14 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLblError;
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMIExit;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
-    private javax.swing.JRadioButtonMenuItem jRBen_US;
+    private javax.swing.JRadioButtonMenuItem jRBen_EN;
     private javax.swing.JRadioButtonMenuItem jRBes_AR;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -713,6 +733,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTFPathOut;
     private javax.swing.JCheckBox jcbExtended;
     private javax.swing.JCheckBox jcbMakeRandoms;
+    private javax.swing.JFormattedTextField jftAdditionalSeq;
     private javax.swing.JFormattedTextField jftNumberOfRandoms;
     // End of variables declaration//GEN-END:variables
 
