@@ -59,8 +59,8 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jFTpercMismatch.setValue(25);
         this.jftNumberOfRandoms.setValue(10);
         this.jFTpercWooble.setValue(50);
-        this.jFTfieldSep.setVisible(false);
-        this.jFTnumCols.setVisible(false);
+        //this.jFTfieldSep.setVisible(false);
+        //this.jFTnumCols.setVisible(false);
         this.jFTpercMismatch.setVisible(false);
         this.jFTpercWooble.setVisible(false);
         this.jSpinMismatch.setVisible(false);
@@ -100,13 +100,9 @@ public class GUIFrame extends javax.swing.JFrame {
         jSpinMaxLength = new javax.swing.JSpinner();
         jSpinWooble = new javax.swing.JSpinner();
         jSpinMismatch = new javax.swing.JSpinner();
-        jLabel7 = new javax.swing.JLabel();
-        jCBOrigin = new javax.swing.JComboBox<>();
         jLblError = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTAConsole = new javax.swing.JTextArea();
-        jFTnumCols = new javax.swing.JFormattedTextField();
-        jFTfieldSep = new javax.swing.JFormattedTextField();
         jFTpercMismatch = new javax.swing.JFormattedTextField();
         jFTpercWooble = new javax.swing.JFormattedTextField();
         jcbExtended = new javax.swing.JCheckBox();
@@ -239,24 +235,6 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel7.setText(bundle.getString("SOURCE")); // NOI18N
-
-        jCBOrigin.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jCBOrigin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ensembl", "FLyBase", "BioMART", "GenBank", "Generic" }));
-        jCBOrigin.setToolTipText(bundle.getString("SOURCE_TOOLTIP")); // NOI18N
-        jCBOrigin.setEnabled(false);
-        jCBOrigin.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jCBOriginItemStateChanged(evt);
-            }
-        });
-        jCBOrigin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCBOriginActionPerformed(evt);
-            }
-        });
-
         jLblError.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLblError.setForeground(new java.awt.Color(255, 0, 0));
         jLblError.setText(bundle.getString("ERROR")); // NOI18N
@@ -271,18 +249,6 @@ public class GUIFrame extends javax.swing.JFrame {
         jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder("Output lines"));
         jScrollPane2.setViewportView(jTAConsole);
         jTAConsole.getAccessibleContext().setAccessibleName(bundle.getString("MONITOR")); // NOI18N
-
-        try {
-            jFTnumCols.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        jFTnumCols.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jFTnumCols.setToolTipText(bundle.getString("NUMBER_COLUMNS")); // NOI18N
-
-        jFTfieldSep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
-        jFTfieldSep.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jFTfieldSep.setToolTipText(bundle.getString("FIELD_SEPARATOR")); // NOI18N
 
         try {
             jFTpercMismatch.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##%")));
@@ -323,10 +289,15 @@ public class GUIFrame extends javax.swing.JFrame {
         jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
 
         jLabel9.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel9.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
+        jLabel9.setText(bundle.getString("ADDITIONAL_SEQ")); // NOI18N
 
+        try {
+            jftAdditionalSeq.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("UUUUUUUUUUUUUUUUUUUU")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
         jftAdditionalSeq.setText("UGUANAUA");
-        jftAdditionalSeq.setToolTipText("Look for another sequence (Not a stem-loop)");
+        jftAdditionalSeq.setToolTipText(bundle.getString("ADDITION_SEQ_TOOLTIP"));
 
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
@@ -398,21 +369,7 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jCBOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jFTfieldSep, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jFTnumCols, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel3)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jcbMakeRandoms)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
@@ -439,7 +396,13 @@ public class GUIFrame extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jcbMakeRandoms)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -462,13 +425,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jcbMakeRandoms)
                     .addComponent(jLabel8)
                     .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jCBOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jFTfieldSep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jFTnumCols, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jcbExtended)
                     .addComponent(jLabel1)
@@ -586,10 +543,6 @@ public class GUIFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jSpinMaxLengthStateChanged
 
-    private void jCBOriginItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCBOriginItemStateChanged
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCBOriginItemStateChanged
-
     private void jButtonInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInActionPerformed
         // TODO add your handling code here:
         final JFileChooser fc = new JFileChooser();
@@ -632,12 +585,6 @@ public class GUIFrame extends javax.swing.JFrame {
             System.exit(ReturnValue.SUCCESS.getReturnCode());
         }
     }//GEN-LAST:event_formWindowClosing
-
-    private void jCBOriginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBOriginActionPerformed
-        // TODO add your handling code here:
-        int index = this.jCBOrigin.getSelectedIndex();
-        setInputSequence(this.jCBOrigin.getItemAt(index));
-    }//GEN-LAST:event_jCBOriginActionPerformed
 
     private void jcbExtendedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbExtendedActionPerformed
         // TODO add your handling code here:
@@ -699,9 +646,6 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JButton jBStart;
     private javax.swing.JButton jButtonIn;
     private javax.swing.JButton jButtonOut;
-    private javax.swing.JComboBox<String> jCBOrigin;
-    private javax.swing.JFormattedTextField jFTfieldSep;
-    private javax.swing.JFormattedTextField jFTnumCols;
     private javax.swing.JFormattedTextField jFTpercMismatch;
     private javax.swing.JFormattedTextField jFTpercWooble;
     private javax.swing.JLabel jLabel1;
@@ -710,7 +654,6 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLblError;
@@ -766,8 +709,8 @@ public class GUIFrame extends javax.swing.JFrame {
                 break;
             default:
                 origin = InputSequence.GENERIC;
-                fs = this.jFTfieldSep.getText();
-                cols = this.jFTnumCols.getText();
+                //fs = this.jFTfieldSep.getText();
+                //cols = this.jFTnumCols.getText();
         }
         
         /*if(fs.length() != 0){
@@ -840,8 +783,8 @@ public class GUIFrame extends javax.swing.JFrame {
 
     public void start() {
 
-        String inputValue;
-        inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
+        //String inputValue;
+        //inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
         int max, min, wooble, mismatch, randoms;
         String pathOut = this.jTFPathOut.getText();
         String pathIn = this.jTFPathIn.getText();
@@ -855,7 +798,7 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         this.setIsRunning(true);
-        this.setInputSequence(inputValue);
+        //this.setInputSequence(inputValue);
 
         // Values
         min = new Integer(this.jSpinMinLength.getValue().toString());
@@ -879,6 +822,7 @@ public class GUIFrame extends javax.swing.JFrame {
         out.flush();
         loopCatcher.setBundle(bundle);
         loopCatcher.setLoopPatterns(loopList);
+        loopCatcher.setAdditionalSequence(this.jftAdditionalSeq.getText());
         loopCatcher.setMaxLength(max);
         loopCatcher.setMinLength(min);
         loopCatcher.setMaxMismatch(mismatch);
