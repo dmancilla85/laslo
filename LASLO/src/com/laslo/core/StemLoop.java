@@ -50,12 +50,30 @@ public class StemLoop {
     protected double percU_sequence;
     protected double relativePos;
     protected double mfe;
-    protected List<Integer> pumilioLocations;
+    protected List<Integer> additionalSeqLocations;
+
+    public String getAdditional5Seq() {
+        return additional5Seq;
+    }
+
+    public void setAdditional5Seq(String additional5Seq) {
+        this.additional5Seq = additional5Seq;
+    }
+
+    public String getAdditional3Seq() {
+        return additional3Seq;
+    }
+
+    public void setAdditional3Seq(String additional3Seq) {
+        this.additional3Seq = additional3Seq;
+    }
+    
+    
     
     private String getFormattedNumber(Double number) {
         NumberFormat numberFormatter
                 = NumberFormat.getNumberInstance(Locale.getDefault());
-
+        numberFormatter.setMinimumFractionDigits(3);
         return numberFormatter.format(number);
     }
 
@@ -109,7 +127,7 @@ public class StemLoop {
         this.structure = "";
         this.additional5Seq = "";
         this.additional3Seq = "";
-        this.pumilioLocations = new ArrayList<>();
+        this.additionalSeqLocations = new ArrayList<>();
     }
 
     public int getMismatches() {
@@ -192,8 +210,8 @@ public class StemLoop {
                 + "PurinePercentStem" + FastaID.ROW_DELIMITER
                 + "RnaFoldMFE" + FastaID.ROW_DELIMITER
                 + "RelativePosition" + FastaID.ROW_DELIMITER
-                + "AditionalSeqMatches" + FastaID.ROW_DELIMITER
-                + "AditionalSeqPositions" + FastaID.ROW_DELIMITER;
+                + "AdditionalSeqMatches" + FastaID.ROW_DELIMITER
+                + "AdditionalSeqPositions" + FastaID.ROW_DELIMITER;
     }
 
     public int getEndsAt() {
@@ -213,7 +231,7 @@ public class StemLoop {
     }
 
     public String getGUPairs() {
-        long pairs = Math.round(this.percent_GU * this.getStemLength());
+        long pairs = Math.round(this.percent_GU * this.getPairments());
 
         return pairs + "";
     }
@@ -228,9 +246,9 @@ public class StemLoop {
 
     public String getLoopID() {
         /*return this.predecessorLoop + this.loop
-                + ":" + this.getGUPairs() + "|" + this.getStemLength();*/
+                + ":" + this.getGUPairs() + "|" + this.getPairments();*/
         return this.predecessorLoop + this.loop
-                + "(" + this.getTerminalPair() + ")|" + this.getStemLength();
+                + "(" + this.getTerminalPair() + ")|" + this.getPairments();
     }
 
     public String getLoopPattern() {
@@ -298,26 +316,26 @@ public class StemLoop {
         return predecessorLoop;
     }
 
-    public String getPumilioCount() {
+    public String getAdditionalSequenceCount() {
 
         Integer count = 0;
 
-        if (this.pumilioLocations != null) {
-            count = this.pumilioLocations.size();
+        if (this.additionalSeqLocations != null) {
+            count = this.additionalSeqLocations.size();
         }
 
         return count.toString();
     }
 
-    public String getPumilioLocations() {
+    public String getAdditionalSequenceLocations() {
 
         String locations = ""; //$NON-NLS-1$
 
-        if (this.pumilioLocations == null) {
+        if (this.additionalSeqLocations == null) {
             return "";
         }
 
-        Iterator<Integer> itr = this.pumilioLocations.iterator();
+        Iterator<Integer> itr = this.additionalSeqLocations.iterator();
 
         while (itr.hasNext()) {
 
@@ -345,7 +363,7 @@ public class StemLoop {
         return startsAt;
     }
 
-    public int getStemLength() {
+    public int getPairments() {
         Integer l = (rnaHairpinSequence.length() - loop.length()) / 2;
 
         return l;
@@ -634,8 +652,8 @@ public class StemLoop {
         this.predecessorLoop = precedes;
     }
 
-    public void setPumilioLocations(List<Integer> pumilioLocations) {
-        this.pumilioLocations = pumilioLocations;
+    public void setAdditionalSeqLocations(List<Integer> pumilioLocations) {
+        this.additionalSeqLocations = pumilioLocations;
     }
 
     public void setRnaHairpinSequence(String rnaHairpinSequence) {
@@ -686,7 +704,7 @@ public class StemLoop {
                 + this.additional3Seq + FastaID.ROW_DELIMITER
                 + this.getHairpinStructure() + FastaID.ROW_DELIMITER
                 + this.getStructure() + FastaID.ROW_DELIMITER
-                + this.getStemLength() + FastaID.ROW_DELIMITER /* para que me de apareamientos */
+                + this.getPairments() + FastaID.ROW_DELIMITER /* para que me de apareamientos */
                 + this.getGUPairs() + FastaID.ROW_DELIMITER
                 + this.getMismatches() + FastaID.ROW_DELIMITER
                 + this.bulges + FastaID.ROW_DELIMITER
@@ -701,10 +719,10 @@ public class StemLoop {
                 + getFormattedNumber(this.percent_CG) + FastaID.ROW_DELIMITER
                 + getFormattedNumber(this.percent_GU) + FastaID.ROW_DELIMITER
                 + getFormattedNumber(this.percent_AG) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.getMfe()) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.getRelativePos()) + FastaID.ROW_DELIMITER
-                + this.getPumilioCount() + FastaID.ROW_DELIMITER
-                + this.getPumilioLocations() + FastaID.ROW_DELIMITER;
+                + getFormattedNumber(this.mfe) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.relativePos) + FastaID.ROW_DELIMITER
+                + this.getAdditionalSequenceCount() + FastaID.ROW_DELIMITER
+                + this.getAdditionalSequenceLocations() + FastaID.ROW_DELIMITER;
     }
 
 }
