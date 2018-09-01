@@ -6,9 +6,11 @@ import com.tools.fasta.GenericID;
 import com.tools.fasta.FastaID;
 import com.tools.fasta.FlyBaseFastaID;
 import com.tools.fasta.EnsemblFastaID;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -17,16 +19,21 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StemLoop {
 
-    final static String ROW_DELIMITER = ";";
-
     protected FastaID id_fasta;
+    protected InputSequence mode;
     protected String rnaHairpinSequence;
     protected String loop;
     protected String hairpinStructure;
+    protected String additional5Seq;
+    protected String additional3Seq;
+    protected String loopPattern;
+    protected String structure;
     protected int sequenceLength;
     protected int startsAt;
-    protected InputSequence mode;
     protected int endsAt;
+    protected int mismatches;
+    protected int bulges;
+    protected char predecessor2Loop;
     protected char predecessorLoop;
     protected char n2Loop;
     protected char n5Loop;
@@ -40,20 +47,17 @@ public class StemLoop {
     protected double percA_sequence;
     protected double percG_sequence;
     protected double percC_sequence;
-    protected String loopPattern;
     protected double percU_sequence;
     protected double relativePos;
-    protected int    mismatches;
     protected double mfe;
-    protected String structure;
-    
-    // Subsets
     protected List<Integer> pumilioLocations;
-    //protected List<Integer> kozakLocations;
-    //protected List<Integer> poliAdenylationSignalLocations;
-    protected List<Integer> consensusLocations[];
+    
+    private String getFormattedNumber(Double number) {
+        NumberFormat numberFormatter
+                = NumberFormat.getNumberInstance(Locale.getDefault());
 
-    protected List<Integer> wooble;
+        return numberFormatter.format(number);
+    }
 
     public StemLoop(InputSequence mode) {
         super();
@@ -94,18 +98,18 @@ public class StemLoop {
         this.endsAt = 0;
         this.startsAt = 0;
         this.mismatches = 0;
+        this.bulges = 0;
         this.relativePos = 0.0;
         this.predecessorLoop = 0;
-        this.n2Loop = this.n5Loop = this.n6Loop = 
-                this.n7Loop = this.n8Loop = 0;
+        this.predecessor2Loop = 0;
+        this.n2Loop = this.n5Loop = this.n6Loop
+                = this.n7Loop = this.n8Loop = 0;
 
         this.mfe = (float) 0.0;
         this.structure = "";
-        
-        //this.kozakLocations = new ArrayList<Integer>();
+        this.additional5Seq = "";
+        this.additional3Seq = "";
         this.pumilioLocations = new ArrayList<>();
-        this.wooble = new ArrayList<>();
-        //this.poliAdenylationSignalLocations = new ArrayList<Integer>();
     }
 
     public int getMismatches() {
@@ -116,7 +120,7 @@ public class StemLoop {
         this.mismatches = mismatches;
     }
 
-    public void setLoopPattern(String pattern){
+    public void setLoopPattern(String pattern) {
         this.loopPattern = pattern;
     }
 
@@ -126,64 +130,6 @@ public class StemLoop {
 
     public void setRelativePos(double relativePos) {
         this.relativePos = relativePos;
-    }
-    
-    
-    
-    private String drawHairpinStructure() {
-        String theStructure = ""; //$NON-NLS-1$
-        String rna = rnaHairpinSequence;
-        int pairs = (rna.length() - this.loop.length()) / 2;
-
-        for (int i = 0; i < rna.length(); i++) {
-            if (i < pairs) {
-                if (PairmentAnalizer.isComplementaryRNA(rna.charAt(i), rna.charAt(rna.length() - 1 - i))) {
-                    theStructure = theStructure.concat("(");
-                } else if (PairmentAnalizer.isComplementaryRNAWooble(rna.charAt(i), rna.charAt(rna.length() - 1 - i))) {
-                    theStructure = theStructure.concat("*");
-                } else {
-                    theStructure = theStructure.concat(".");
-                }
-            } else if (i > pairs + this.loop.length() - 1) {
-                if (PairmentAnalizer.isComplementaryRNA(rna.charAt(i), rna.charAt(rna.length() - 1 - i))) {
-                    theStructure = theStructure.concat(")");
-                } else if (PairmentAnalizer.isComplementaryRNAWooble(rna.charAt(i), rna.charAt(rna.length() - 1 - i))) {
-                    theStructure = theStructure.concat("*");
-                } else {
-                    theStructure = theStructure.concat(".");
-                }
-            } else {
-                theStructure = theStructure.concat(".");
-            }
-        }
-
-        return theStructure;
-    }
-    
-     public String drawHairpinViennaStructure() {
-        String theStructure = ""; //$NON-NLS-1$
-        String rna = rnaHairpinSequence;
-        int pairs = (rna.length() - this.loop.length()) / 2;
-
-        for (int i = 0; i < rna.length(); i++) {
-            if (i < pairs) {
-                if (PairmentAnalizer.isMismatch(rna.charAt(i), rna.charAt(rna.length() - 1 - i))) {
-                    theStructure = theStructure.concat(".");
-                } else {
-                    theStructure = theStructure.concat("(");
-                }
-            } else if (i > pairs + this.loop.length() - 1) {
-                if (PairmentAnalizer.isMismatch(rna.charAt(i), rna.charAt(rna.length() - 1 - i))) {
-                    theStructure = theStructure.concat(".");
-                } else {
-                    theStructure = theStructure.concat(")");
-                }
-            } else {
-                theStructure = theStructure.concat(".");
-            }
-        }
-
-        return theStructure;
     }
 
     public static String getHeader(InputSequence mode) {
@@ -202,6 +148,10 @@ public class StemLoop {
             case BIOMART:
                 header = BioMartFastaID.getHeader();
                 break;
+                
+            case GENBANK:
+                header = BioMartFastaID.getHeader();
+                break;    
 
             case GENERIC:
                 header = GenericID.getHeader();
@@ -209,80 +159,41 @@ public class StemLoop {
         }
 
         return header
-                + "SeqLength" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                //+ "# Stem-loop" + ROW_DELIMITER //$NON-NLS-1$
-                + "StartsAt" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "EndsAt" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "Pairments" + FastaID.ROW_DELIMITER //$NON-NLS-1$
                 + "LoopPattern" + FastaID.ROW_DELIMITER
                 + "LoopID" + FastaID.ROW_DELIMITER
-                + "GU_Pairs" + FastaID.ROW_DELIMITER
+                + "TerminalPair" + FastaID.ROW_DELIMITER
+                + "N-2" + FastaID.ROW_DELIMITER
+                + "N-1" + FastaID.ROW_DELIMITER
+                + "N2" + FastaID.ROW_DELIMITER
+                + "N5" + FastaID.ROW_DELIMITER
+                + "N6" + FastaID.ROW_DELIMITER
+                + "N7" + FastaID.ROW_DELIMITER
+                + "N8" + FastaID.ROW_DELIMITER
+                + "Loop" + FastaID.ROW_DELIMITER
+                + "StemLoopSequence" + FastaID.ROW_DELIMITER
+                + "Additional5Seq" + FastaID.ROW_DELIMITER
+                + "Additional3Seq" + FastaID.ROW_DELIMITER
+                + "PredictedStructure" + FastaID.ROW_DELIMITER
+                + "ViennaBracketStr" + FastaID.ROW_DELIMITER
+                + "Pairments" + FastaID.ROW_DELIMITER
+                + "WooblePairs" + FastaID.ROW_DELIMITER
                 + "Mismatches" + FastaID.ROW_DELIMITER
-                + "Loop" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "Terminal pair" + FastaID.ROW_DELIMITER
-                + "Seq(RNA)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "Seq(Structure)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "N(-1)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "N(2)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "N(5)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "N(6)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "N(7)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "N(8)" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "A_SeqPercent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "G_SeqPercent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "C_SeqPercent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "U_SeqPercent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "AU_percent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "CG_percent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "GU_percent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "Purine_percent" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "MFE_InSilico" + FastaID.ROW_DELIMITER
-                + "RnaFold_Structure" + FastaID.ROW_DELIMITER
-                + "PUMILIOs" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "PUMILIO_positions" + FastaID.ROW_DELIMITER //$NON-NLS-1$
-                + "Position from start" + FastaID.ROW_DELIMITER;
-        /*+ "PolyASignalCount" + ROW_DELIMITER  //$NON-NLS-1$
-				+ "PolyASignal_positions" + ROW_DELIMITER //$NON-NLS-1$;*/
-        //+ "+3'UTR value" + ROW_DELIMITER
-        /*+ "KOZAK" + ROW_DELIMITER
-				+ "KOZAK_positions" + ROW_DELIMITER*/
-        //+ "+5'UTR value";
-    }
-
-    
-    
-    public String getConsensusCount(int index) {
-        Integer count = 0;
-
-        if (this.consensusLocations[index] != null) {
-            count = this.consensusLocations[index].size();
-        }
-
-        return count.toString();
-    }
-
-    public String getConsensusLocations(int index) {
-
-        String locations = ""; //$NON-NLS-1$
-
-        if (this.consensusLocations[index] == null) {
-            return "";
-        }
-
-        Iterator<Integer> itr = this.consensusLocations[index].iterator();
-
-        while (itr.hasNext()) {
-
-            Integer element = itr.next();
-
-            if (itr.hasNext()) {
-                locations = locations.concat(element + ","); //$NON-NLS-1$
-            } else {
-                locations = locations.concat(Integer.toString(element));
-            }
-        }
-
-        return locations;
+                + "Bulges" + FastaID.ROW_DELIMITER
+                + "SequenceLength" + FastaID.ROW_DELIMITER
+                + "StartsAt" + FastaID.ROW_DELIMITER
+                + "EndsAt" + FastaID.ROW_DELIMITER
+                + "A_PercentSequence" + FastaID.ROW_DELIMITER
+                + "C_PercentSequence" + FastaID.ROW_DELIMITER
+                + "G_PercentSequence" + FastaID.ROW_DELIMITER
+                + "U_PercentSequence" + FastaID.ROW_DELIMITER
+                + "AU_PercentPairs" + FastaID.ROW_DELIMITER
+                + "CG_PercentPairs" + FastaID.ROW_DELIMITER
+                + "GU_PercentPairs" + FastaID.ROW_DELIMITER
+                + "PurinePercentStem" + FastaID.ROW_DELIMITER
+                + "RnaFoldMFE" + FastaID.ROW_DELIMITER
+                + "RelativePosition" + FastaID.ROW_DELIMITER
+                + "AditionalSeqMatches" + FastaID.ROW_DELIMITER
+                + "AditionalSeqPositions" + FastaID.ROW_DELIMITER;
     }
 
     public int getEndsAt() {
@@ -309,37 +220,6 @@ public class StemLoop {
 
     public String getHairpinStructure() {
         return hairpinStructure; //drawHairpinStructure();
-    }
-    
-
-    public String getKozakCount() {
-
-        Integer count = 0;
-
-        /*if(this.kozakLocations != null)
-			count = this.kozakLocations.size();*/
-        return count.toString();
-    }
-
-    public String getKozakLocations() {
-
-        String locations = ""; //$NON-NLS-1$
-
-//		if(this.kozakLocations == null)
-//			return "";
-//		
-//		Iterator<Integer> itr = this.kozakLocations.iterator();
-//
-//		while (itr.hasNext()) {
-//
-//			Integer element = itr.next();
-//
-//			if(itr.hasNext())
-//				locations = locations.concat(element + ","); //$NON-NLS-1$
-//			else
-//				locations = locations.concat(Integer.toString(element));
-//		}
-        return locations;
     }
 
     public String getLoop() {
@@ -414,35 +294,6 @@ public class StemLoop {
         return percU_sequence;
     }
 
-    public String getPoliAdenylationSignalCount() {
-        Integer count = 0;
-
-        /*if(this.poliAdenylationSignalLocations != null)
-			count = this.poliAdenylationSignalLocations.size();*/
-        return count.toString();
-    }
-
-    public String getPoliAdenylationSignalLocations() {
-
-        String locations = ""; //$NON-NLS-1$
-
-//		if(this.poliAdenylationSignalLocations == null)
-//			return "";
-//		
-//		Iterator<Integer> itr = this.poliAdenylationSignalLocations.iterator();
-//
-//		while (itr.hasNext()) {
-//
-//			Integer element = itr.next();
-//
-//			if(itr.hasNext())
-//				locations = locations.concat(element + ","); //$NON-NLS-1$
-//			else
-//				locations = locations.concat(Integer.toString(element));
-//		}
-        return locations;
-    }
-
     public char getPredecessorLoop() {
         return predecessorLoop;
     }
@@ -499,7 +350,7 @@ public class StemLoop {
 
         return l;
     }
-    
+
     public String getTerminalPair() {
         Character a = rnaHairpinSequence.charAt(structure.lastIndexOf("("));
         Character b = rnaHairpinSequence.charAt(structure.indexOf(")"));
@@ -525,57 +376,69 @@ public class StemLoop {
         this.loop = loopPattern;
     }
 
-    public void checkPairments(){
-       
+    public void checkPairments() {
+
         String seq = this.rnaHairpinSequence;
-        int woobleCount = 0, mismatch = 0;
+        int woobleCount = 0, mismatch = 0, bulge = 0;
         int CG = 0, AU = 0;
         StringBuilder aux = new StringBuilder(this.structure);
-        int firstIzq=1;
-        
-        if(this.loop.isEmpty() || this.structure.isEmpty())
+        int firstIzq = 1;
+
+        if (this.loop.isEmpty() || this.structure.isEmpty()) {
             return;
-        
-        try{
-        firstIzq = this.structure.lastIndexOf('(');
-        int firstDer = this.structure.indexOf(')');
-        
-        for(int i = firstIzq; i >= 0 && firstDer < structure.length(); i--){
-            if(structure.charAt(i) == '('){
-                while(structure.charAt(firstDer) != ')')
-                    firstDer++;
-                
-                if(structure.charAt(firstDer) == ')'){
-                    if(PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))){
-                        aux.setCharAt(i, '*');
-                        woobleCount++;
-                    } else {
-                        if( (seq.charAt(i) == 'U' && seq.charAt(firstDer) == 'A') ||
-                             (seq.charAt(i) == 'A' && seq.charAt(firstDer) == 'U')   )
-                            AU++;
-                        
-                        if( (seq.charAt(i) == 'C' && seq.charAt(firstDer) == 'G') ||
-                             (seq.charAt(i) == 'G' && seq.charAt(firstDer) == 'C')   )
-                            CG++;
-                    }
-                }
-                
-                firstDer++;
-            } else mismatch++;
         }
-        
-        } catch(Exception e){
+
+        // Count mismatchs and bulges
+        mismatch = StringUtils.countMatches(this.structure, "(.(")
+                + StringUtils.countMatches(this.structure, ").)");
+
+        bulges = StringUtils.countMatches(this.structure, "..(")
+                + StringUtils.countMatches(this.structure, ")..");
+
+        try {
+            firstIzq = this.structure.lastIndexOf('(');
+            int firstDer = this.structure.indexOf(')');
+
+            for (int i = firstIzq; i >= 0 && firstDer < structure.length(); i--) {
+                if (structure.charAt(i) == '(') {
+                    while (structure.charAt(firstDer) != ')') {
+                        firstDer++;
+                    }
+
+                    if (structure.charAt(firstDer) == ')') {
+                        if (PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))) {
+                            aux.setCharAt(i, '{');
+                            aux.setCharAt(firstDer, '}');
+                            woobleCount++;
+                        } else {
+                            if ((seq.charAt(i) == 'U' && seq.charAt(firstDer) == 'A')
+                                    || (seq.charAt(i) == 'A' && seq.charAt(firstDer) == 'U')) {
+                                AU++;
+                            }
+
+                            if ((seq.charAt(i) == 'C' && seq.charAt(firstDer) == 'G')
+                                    || (seq.charAt(i) == 'G' && seq.charAt(firstDer) == 'C')) {
+                                CG++;
+                            }
+                        }
+                    }
+
+                    firstDer++;
+                }
+            }
+
+        } catch (Exception e) {
             System.out.println("checkPairments-ERROR: " + e.getMessage());
         }
         this.hairpinStructure = aux.toString();
-        this.percent_AU = (double)AU / (double)(AU+CG+woobleCount);
-        this.percent_CG = (double)CG / (double)(AU+CG+woobleCount);
-        this.percent_GU = (double)woobleCount / (double)(AU+CG+woobleCount);
+        this.percent_AU = (double) AU / (double) (AU + CG + woobleCount);
+        this.percent_CG = (double) CG / (double) (AU + CG + woobleCount);
+        this.percent_GU = (double) woobleCount / (double) (AU + CG + woobleCount);
         this.setMismatches(mismatch);
-        //this.setPercent_GU(woobleCount);
+        this.bulges = bulge;
 
     }
-    
+
     public void setNLoop(int startPosLoop) {
         char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
 
@@ -648,7 +511,7 @@ public class StemLoop {
     public void setStructure(String structure) {
         this.structure = structure;
     }
-    
+
     public void setPercent_AU() {
         float percentAU = 0;
         int count = 0;
@@ -804,74 +667,44 @@ public class StemLoop {
         }
     }
 
-    public void setWoobleLocations(List<Integer> woobleLocations) {
-        this.wooble = woobleLocations;
-    }
-
     public String toRowCSV() {
 
-        //long minKozac = 0, maxPoliA = 0;
-        /*	for(int i = 0; i < this.kozakLocations.size(); i++){
-			if(i == 0)
-				minKozac = this.kozakLocations.get(i);
-			else
-				if(minKozac > this.kozakLocations.get(i) && this.kozakLocations.get(i) !=0 )
-					minKozac = this.kozakLocations.get(i);
-		}*/
- /*for(int i = 0; i < this.poliAdenylationSignalLocations.size(); i++){
-			if(i == 0)
-				maxPoliA = this.poliAdenylationSignalLocations.get(i);
-			else
-				if(maxPoliA < this.poliAdenylationSignalLocations.get(i) 
-						&& this.poliAdenylationSignalLocations.get(i) !=0 )
-					maxPoliA = this.poliAdenylationSignalLocations.get(i);
-		}*/
-        return this.id_fasta.toRowCSV() + sequenceLength + FastaID.ROW_DELIMITER
-                + startsAt + FastaID.ROW_DELIMITER + endsAt + FastaID.ROW_DELIMITER
-                + this.getStemLength() + FastaID.ROW_DELIMITER /* para que me de apareamientos */
+        return this.id_fasta.toRowCSV()
                 + this.getLoopPattern() + FastaID.ROW_DELIMITER
                 + this.getLoopID() + FastaID.ROW_DELIMITER
-                + this.getGUPairs() + FastaID.ROW_DELIMITER
-                + this.getMismatches() + FastaID.ROW_DELIMITER
-                + this.loop + FastaID.ROW_DELIMITER
                 + this.getTerminalPair() + FastaID.ROW_DELIMITER
-                + this.rnaHairpinSequence + FastaID.ROW_DELIMITER
-                + this.getHairpinStructure() + FastaID.ROW_DELIMITER
+                + this.predecessorLoop + FastaID.ROW_DELIMITER //n-2
                 + this.predecessorLoop + FastaID.ROW_DELIMITER
                 + this.n2Loop + FastaID.ROW_DELIMITER
                 + this.n5Loop + FastaID.ROW_DELIMITER
                 + this.n6Loop + FastaID.ROW_DELIMITER
                 + this.n7Loop + FastaID.ROW_DELIMITER
                 + this.n8Loop + FastaID.ROW_DELIMITER
-                + Double.toString(this.percA_sequence).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percG_sequence).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percC_sequence).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percU_sequence).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percent_AU).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percent_CG).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percent_GU).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.percent_AG).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + Double.toString(this.getMfe()).replace('.', ',')
-                + FastaID.ROW_DELIMITER
-                + this.getStructure()
-                + FastaID.ROW_DELIMITER
+                + this.loop + FastaID.ROW_DELIMITER
+                + this.rnaHairpinSequence + FastaID.ROW_DELIMITER
+                + this.additional5Seq + FastaID.ROW_DELIMITER
+                + this.additional3Seq + FastaID.ROW_DELIMITER
+                + this.getHairpinStructure() + FastaID.ROW_DELIMITER
+                + this.getStructure() + FastaID.ROW_DELIMITER
+                + this.getStemLength() + FastaID.ROW_DELIMITER /* para que me de apareamientos */
+                + this.getGUPairs() + FastaID.ROW_DELIMITER
+                + this.getMismatches() + FastaID.ROW_DELIMITER
+                + this.bulges + FastaID.ROW_DELIMITER
+                + this.sequenceLength + FastaID.ROW_DELIMITER
+                + this.startsAt + FastaID.ROW_DELIMITER
+                + this.endsAt + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percA_sequence) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percC_sequence) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percG_sequence) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percU_sequence) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percent_AU) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percent_CG) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percent_GU) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.percent_AG) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.getMfe()) + FastaID.ROW_DELIMITER
+                + getFormattedNumber(this.getRelativePos()) + FastaID.ROW_DELIMITER
                 + this.getPumilioCount() + FastaID.ROW_DELIMITER
-                + this.getPumilioLocations() + FastaID.ROW_DELIMITER
-                + Double.toString(this.getRelativePos()).replace('.', ',') + FastaID.ROW_DELIMITER;
-        /*+ this.getPoliAdenylationSignalCount() + FastaID.ROW_DELIMITER
-				+ this.getPoliAdenylationSignalLocations() +FastaID.ROW_DELIMITER
-				+ maxPoliA + FastaID.ROW_DELIMITER
-				+ this.getKozakCount() + FastaID.ROW_DELIMITER
-				+ this.getKozakLocations() +FastaID.ROW_DELIMITER
-				+ minKozac;*/
+                + this.getPumilioLocations() + FastaID.ROW_DELIMITER;
     }
 
 }
