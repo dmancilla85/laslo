@@ -27,6 +27,14 @@ public class RNAfold {
     
     /**
      * 
+     */
+    public RNAfold(){
+        this.mfe = 0.0;
+        this.structure = "";
+    }
+    
+    /**
+     * 
      * @param sequence 
      */
     public RNAfold(String sequence){
