@@ -64,6 +64,22 @@ public class LoopCatcher {
     protected File actualFile;
     protected String additionalSequence;
 
+    public int getkLetRandoms() {
+        return kLetRandoms;
+    }
+
+    public void setkLetRandoms(int kLetRandoms) {
+        this.kLetRandoms = kLetRandoms;
+    }
+
+    public String getAdditionalSequence() {
+        return additionalSequence;
+    }
+
+    public void setAdditionalSequence(String additionalSequence) {
+        this.additionalSequence = additionalSequence;
+    }
+
     // Create a new instance of RNAFold4J
     //protected RNAFoldAPI rfa;
     public LoopCatcher(String pathOut, String pathIn,
