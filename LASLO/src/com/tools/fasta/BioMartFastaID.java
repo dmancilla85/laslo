@@ -10,7 +10,7 @@ package com.tools.fasta;
 public class BioMartFastaID extends FastaID {
 
     protected static int nCols = 6;
-    protected static char fs = '=';
+    protected static char fs = '|';
 
     /**
      *
