@@ -650,6 +650,7 @@ public class StemLoop {
         }
 
         this.predecessorLoop = precedes;
+        this.predecessor2Loop = this.rnaHairpinSequence.charAt(irLength - 2);
     }
 
     public void setAdditionalSeqLocations(List<Integer> pumilioLocations) {
@@ -691,7 +692,7 @@ public class StemLoop {
                 + this.getLoopPattern() + SourceFile.ROW_DELIMITER
                 + this.getLoopID() + SourceFile.ROW_DELIMITER
                 + this.getTerminalPair() + SourceFile.ROW_DELIMITER
-                + this.predecessorLoop + SourceFile.ROW_DELIMITER //n-2
+                + this.predecessor2Loop + SourceFile.ROW_DELIMITER //n-2
                 + this.predecessorLoop + SourceFile.ROW_DELIMITER
                 + this.n2Loop + SourceFile.ROW_DELIMITER
                 + this.n5Loop + SourceFile.ROW_DELIMITER
