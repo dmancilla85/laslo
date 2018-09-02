@@ -27,7 +27,7 @@ public class StemLoop {
     protected String additional5Seq;
     protected String additional3Seq;
     protected String loopPattern;
-    protected String structure;
+    protected String viennaStructure;
     protected int sequenceLength;
     protected int startsAt;
     protected int endsAt;
@@ -124,7 +124,7 @@ public class StemLoop {
                 = this.n7Loop = this.n8Loop = 0;
 
         this.mfe = (float) 0.0;
-        this.structure = "";
+        this.viennaStructure = "";
         this.additional5Seq = "";
         this.additional3Seq = "";
         this.additionalSeqLocations = new ArrayList<>();
@@ -364,14 +364,14 @@ public class StemLoop {
     }
 
     public int getPairments() {
-        Integer l = (rnaHairpinSequence.length() - loop.length()) / 2;
+        int count = StringUtils.countMatches(viennaStructure, "(");;
 
-        return l;
+        return count;
     }
 
     public String getTerminalPair() {
-        Character a = rnaHairpinSequence.charAt(structure.lastIndexOf("("));
-        Character b = rnaHairpinSequence.charAt(structure.indexOf(")"));
+        Character a = rnaHairpinSequence.charAt(viennaStructure.lastIndexOf("("));
+        Character b = rnaHairpinSequence.charAt(viennaStructure.indexOf(")"));
 
         return a.toString() + b.toString();
     }
@@ -384,12 +384,6 @@ public class StemLoop {
         this.endsAt = endsAt;
     }
 
-//	public void setKozakLocations(List<Integer> kozakLocations) {
-//		this.kozakLocations = kozakLocations;
-//	}
-    /*	public void setHairpinStructure(int loopLength, int irLength, List<Integer> mismatchs) {
-		this.hairpinStructure = drawHairpinStructure(loopLength, irLength, mismatchs);
-	}*/
     public void setLoop(String loopPattern) {
         this.loop = loopPattern;
     }
@@ -399,31 +393,31 @@ public class StemLoop {
         String seq = this.rnaHairpinSequence;
         int woobleCount = 0, mismatch = 0, bulge = 0;
         int CG = 0, AU = 0;
-        StringBuilder aux = new StringBuilder(this.structure);
+        StringBuilder aux = new StringBuilder(this.viennaStructure);
         int firstIzq = 1;
 
-        if (this.loop.isEmpty() || this.structure.isEmpty()) {
+        if (this.loop.isEmpty() || this.viennaStructure.isEmpty()) {
             return;
         }
 
         // Count mismatchs and bulges
-        mismatch = StringUtils.countMatches(this.structure, "(.(")
-                + StringUtils.countMatches(this.structure, ").)");
+        mismatch = StringUtils.countMatches(this.viennaStructure, "(.(")
+                + StringUtils.countMatches(this.viennaStructure, ").)");
 
-        bulge = StringUtils.countMatches(this.structure, "..(")
-                + StringUtils.countMatches(this.structure, ")..");
+        bulge = StringUtils.countMatches(this.viennaStructure, "..(")
+                + StringUtils.countMatches(this.viennaStructure, ")..");
 
         try {
-            firstIzq = this.structure.lastIndexOf('(');
-            int firstDer = this.structure.indexOf(')');
+            firstIzq = this.viennaStructure.lastIndexOf('(');
+            int firstDer = this.viennaStructure.indexOf(')');
 
-            for (int i = firstIzq; i >= 0 && firstDer < structure.length(); i--) {
-                if (structure.charAt(i) == '(') {
-                    while (structure.charAt(firstDer) != ')') {
+            for (int i = firstIzq; i >= 0 && firstDer < viennaStructure.length(); i--) {
+                if (viennaStructure.charAt(i) == '(') {
+                    while (viennaStructure.charAt(firstDer) != ')') {
                         firstDer++;
                     }
 
-                    if (structure.charAt(firstDer) == ')') {
+                    if (viennaStructure.charAt(firstDer) == ')') {
                         if (PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))) {
                             aux.setCharAt(i, '{');
                             aux.setCharAt(firstDer, '}');
@@ -523,11 +517,11 @@ public class StemLoop {
     }
 
     public String getStructure() {
-        return structure;
+        return viennaStructure;
     }
 
     public void setStructure(String structure) {
-        this.structure = structure;
+        this.viennaStructure = structure;
     }
 
     public void setPercent_AU() {
@@ -592,65 +586,18 @@ public class StemLoop {
         this.percU_sequence = percU_sequence;
     }
 
-    /*public void setPolyAdenylationStart(List<Integer> poliALocations, String sequence) {
-		
-		List<Integer> guSites ,cf1Sites;
-		
-		// 1. Use 3' utr average
-		Iterator<Integer> it = poliALocations.iterator();
-		
-		while(it.hasNext()){
-			
-			Integer element = it.next();
-			
-			if(element < this.sequenceLength * 0.333 - THREE_UTR_AVR){
-				poliALocations.set(poliALocations.indexOf(element) , 0) ;
-			}
-			else{
-				// 2. Check the GU - portion
-				guSites = Laslo.getPatternLocations(sequence.substring(element), BiologyPatterns.GU_RICH_PATTERN );
-				
-				Iterator<Integer> it2 = guSites.iterator();
-				
-				while(it2.hasNext()){
-					Integer gu_pos = it2.next();
-					
-					if( 25 <= gu_pos - element && gu_pos - element <= 45  )
-					{
-						// 3. Check for the Cleavage Factor 1 signal
-						cf1Sites = Laslo.getPatternLocations(sequence.substring(gu_pos), BiologyPatterns.CLEAVAGE_FACTOR1_SITE);
-						
-						if(cf1Sites.isEmpty())
-							guSites.set(guSites.indexOf(gu_pos) , 0) ;
-					} 
-					else guSites.set(guSites.indexOf(gu_pos) , 0) ;
-				}
-			
-				while(guSites.indexOf(0) > 0 ){
-					guSites.remove(guSites.indexOf(0));
-				}
-				
-				if(guSites.isEmpty())
-					poliALocations.set(poliALocations.indexOf(element) , 0);
-				
-			}
-		}
-		
-		// Clean the final list
-//		for(int i = 0; i < poliALocations.size(); i++ )
-//			if( poliALocations.get(i) != 0)
-//				this.poliAdenylationSignalLocations.add(poliALocations.get(i));
-	}*/
     public void setPredecessorLoop(int irLength) {
 
-        char precedes = ' ';
+        char precedes = ' ', precedes2 = ' ';
 
-        if (this.rnaHairpinSequence != null) {
+        if (this.rnaHairpinSequence != null 
+                && rnaHairpinSequence.length() > 0) {
             precedes = this.rnaHairpinSequence.charAt(irLength - 1);
+            precedes2 = this.rnaHairpinSequence.charAt(irLength - 2);
         }
 
         this.predecessorLoop = precedes;
-        this.predecessor2Loop = this.rnaHairpinSequence.charAt(irLength - 2);
+        this.predecessor2Loop = precedes2;
     }
 
     public void setAdditionalSeqLocations(List<Integer> pumilioLocations) {

@@ -667,9 +667,9 @@ public class LoopCatcher {
                 slr.setSequenceLength(sequenceLength);
                 try{
                 slr.setAdditional5Seq( rnaSequence
-                        .substring(posAux - 1 -k, posAux - 1));
-                slr.setAdditional5Seq( rnaSequence.substring(posAux 
-                        + rnaSeq.length() + 1,posAux + rnaSeq.length() + 1 +k) );
+                        .substring(posAux -k, posAux));
+                slr.setAdditional3Seq( rnaSequence.substring(posAux 
+                        + rnaSeq.length(),posAux + rnaSeq.length() +k) );
                 } catch(IndexOutOfBoundsException e){
                     slr.setAdditional3Seq("");
                     slr.setAdditional5Seq("");
