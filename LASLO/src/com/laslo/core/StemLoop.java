@@ -1,11 +1,11 @@
 package com.laslo.core;
 
-import com.tools.fasta.InputSequence;
-import com.tools.fasta.BioMartFastaID;
-import com.tools.fasta.GenericID;
-import com.tools.fasta.FastaID;
-import com.tools.fasta.FlyBaseFastaID;
-import com.tools.fasta.EnsemblFastaID;
+import com.tools.io.InputSequence;
+import com.tools.io.BioMartFastaID;
+import com.tools.io.GenericID;
+import com.tools.io.SourceFile;
+import com.tools.io.FlyBaseFastaID;
+import com.tools.io.EnsemblFastaID;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StemLoop {
 
-    protected FastaID id_fasta;
+    protected SourceFile id_fasta;
     protected InputSequence mode;
     protected String rnaHairpinSequence;
     protected String loop;
@@ -177,41 +177,41 @@ public class StemLoop {
         }
 
         return header
-                + "LoopPattern" + FastaID.ROW_DELIMITER
-                + "LoopID" + FastaID.ROW_DELIMITER
-                + "TerminalPair" + FastaID.ROW_DELIMITER
-                + "N-2" + FastaID.ROW_DELIMITER
-                + "N-1" + FastaID.ROW_DELIMITER
-                + "N2" + FastaID.ROW_DELIMITER
-                + "N5" + FastaID.ROW_DELIMITER
-                + "N6" + FastaID.ROW_DELIMITER
-                + "N7" + FastaID.ROW_DELIMITER
-                + "N8" + FastaID.ROW_DELIMITER
-                + "Loop" + FastaID.ROW_DELIMITER
-                + "StemLoopSequence" + FastaID.ROW_DELIMITER
-                + "Additional5Seq" + FastaID.ROW_DELIMITER
-                + "Additional3Seq" + FastaID.ROW_DELIMITER
-                + "PredictedStructure" + FastaID.ROW_DELIMITER
-                + "ViennaBracketStr" + FastaID.ROW_DELIMITER
-                + "Pairments" + FastaID.ROW_DELIMITER
-                + "WooblePairs" + FastaID.ROW_DELIMITER
-                + "Mismatches" + FastaID.ROW_DELIMITER
-                + "Bulges" + FastaID.ROW_DELIMITER
-                + "SequenceLength" + FastaID.ROW_DELIMITER
-                + "StartsAt" + FastaID.ROW_DELIMITER
-                + "EndsAt" + FastaID.ROW_DELIMITER
-                + "A_PercentSequence" + FastaID.ROW_DELIMITER
-                + "C_PercentSequence" + FastaID.ROW_DELIMITER
-                + "G_PercentSequence" + FastaID.ROW_DELIMITER
-                + "U_PercentSequence" + FastaID.ROW_DELIMITER
-                + "AU_PercentPairs" + FastaID.ROW_DELIMITER
-                + "CG_PercentPairs" + FastaID.ROW_DELIMITER
-                + "GU_PercentPairs" + FastaID.ROW_DELIMITER
-                + "PurinePercentStem" + FastaID.ROW_DELIMITER
-                + "RnaFoldMFE" + FastaID.ROW_DELIMITER
-                + "RelativePosition" + FastaID.ROW_DELIMITER
-                + "AdditionalSeqMatches" + FastaID.ROW_DELIMITER
-                + "AdditionalSeqPositions" + FastaID.ROW_DELIMITER;
+                + "LoopPattern" + SourceFile.ROW_DELIMITER
+                + "LoopID" + SourceFile.ROW_DELIMITER
+                + "TerminalPair" + SourceFile.ROW_DELIMITER
+                + "N-2" + SourceFile.ROW_DELIMITER
+                + "N-1" + SourceFile.ROW_DELIMITER
+                + "N2" + SourceFile.ROW_DELIMITER
+                + "N5" + SourceFile.ROW_DELIMITER
+                + "N6" + SourceFile.ROW_DELIMITER
+                + "N7" + SourceFile.ROW_DELIMITER
+                + "N8" + SourceFile.ROW_DELIMITER
+                + "Loop" + SourceFile.ROW_DELIMITER
+                + "StemLoopSequence" + SourceFile.ROW_DELIMITER
+                + "Additional5Seq" + SourceFile.ROW_DELIMITER
+                + "Additional3Seq" + SourceFile.ROW_DELIMITER
+                + "PredictedStructure" + SourceFile.ROW_DELIMITER
+                + "ViennaBracketStr" + SourceFile.ROW_DELIMITER
+                + "Pairments" + SourceFile.ROW_DELIMITER
+                + "WooblePairs" + SourceFile.ROW_DELIMITER
+                + "Mismatches" + SourceFile.ROW_DELIMITER
+                + "Bulges" + SourceFile.ROW_DELIMITER
+                + "SequenceLength" + SourceFile.ROW_DELIMITER
+                + "StartsAt" + SourceFile.ROW_DELIMITER
+                + "EndsAt" + SourceFile.ROW_DELIMITER
+                + "A_PercentSequence" + SourceFile.ROW_DELIMITER
+                + "C_PercentSequence" + SourceFile.ROW_DELIMITER
+                + "G_PercentSequence" + SourceFile.ROW_DELIMITER
+                + "U_PercentSequence" + SourceFile.ROW_DELIMITER
+                + "AU_PercentPairs" + SourceFile.ROW_DELIMITER
+                + "CG_PercentPairs" + SourceFile.ROW_DELIMITER
+                + "GU_PercentPairs" + SourceFile.ROW_DELIMITER
+                + "PurinePercentStem" + SourceFile.ROW_DELIMITER
+                + "RnaFoldMFE" + SourceFile.ROW_DELIMITER
+                + "RelativePosition" + SourceFile.ROW_DELIMITER
+                + "AdditionalSeqMatches" + SourceFile.ROW_DELIMITER
+                + "AdditionalSeqPositions" + SourceFile.ROW_DELIMITER;
     }
 
     public int getEndsAt() {
@@ -688,41 +688,41 @@ public class StemLoop {
     public String toRowCSV() {
 
         return this.id_fasta.toRowCSV()
-                + this.getLoopPattern() + FastaID.ROW_DELIMITER
-                + this.getLoopID() + FastaID.ROW_DELIMITER
-                + this.getTerminalPair() + FastaID.ROW_DELIMITER
-                + this.predecessorLoop + FastaID.ROW_DELIMITER //n-2
-                + this.predecessorLoop + FastaID.ROW_DELIMITER
-                + this.n2Loop + FastaID.ROW_DELIMITER
-                + this.n5Loop + FastaID.ROW_DELIMITER
-                + this.n6Loop + FastaID.ROW_DELIMITER
-                + this.n7Loop + FastaID.ROW_DELIMITER
-                + this.n8Loop + FastaID.ROW_DELIMITER
-                + this.loop + FastaID.ROW_DELIMITER
-                + this.rnaHairpinSequence + FastaID.ROW_DELIMITER
-                + this.additional5Seq + FastaID.ROW_DELIMITER
-                + this.additional3Seq + FastaID.ROW_DELIMITER
-                + this.getHairpinStructure() + FastaID.ROW_DELIMITER
-                + this.getStructure() + FastaID.ROW_DELIMITER
-                + this.getPairments() + FastaID.ROW_DELIMITER /* para que me de apareamientos */
-                + this.getGUPairs() + FastaID.ROW_DELIMITER
-                + this.getMismatches() + FastaID.ROW_DELIMITER
-                + this.bulges + FastaID.ROW_DELIMITER
-                + this.sequenceLength + FastaID.ROW_DELIMITER
-                + this.startsAt + FastaID.ROW_DELIMITER
-                + this.endsAt + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percA_sequence) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percC_sequence) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percG_sequence) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percU_sequence) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percent_AU) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percent_CG) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percent_GU) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.percent_AG) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.mfe) + FastaID.ROW_DELIMITER
-                + getFormattedNumber(this.relativePos) + FastaID.ROW_DELIMITER
-                + this.getAdditionalSequenceCount() + FastaID.ROW_DELIMITER
-                + this.getAdditionalSequenceLocations() + FastaID.ROW_DELIMITER;
+                + this.getLoopPattern() + SourceFile.ROW_DELIMITER
+                + this.getLoopID() + SourceFile.ROW_DELIMITER
+                + this.getTerminalPair() + SourceFile.ROW_DELIMITER
+                + this.predecessorLoop + SourceFile.ROW_DELIMITER //n-2
+                + this.predecessorLoop + SourceFile.ROW_DELIMITER
+                + this.n2Loop + SourceFile.ROW_DELIMITER
+                + this.n5Loop + SourceFile.ROW_DELIMITER
+                + this.n6Loop + SourceFile.ROW_DELIMITER
+                + this.n7Loop + SourceFile.ROW_DELIMITER
+                + this.n8Loop + SourceFile.ROW_DELIMITER
+                + this.loop + SourceFile.ROW_DELIMITER
+                + this.rnaHairpinSequence + SourceFile.ROW_DELIMITER
+                + this.additional5Seq + SourceFile.ROW_DELIMITER
+                + this.additional3Seq + SourceFile.ROW_DELIMITER
+                + this.getHairpinStructure() + SourceFile.ROW_DELIMITER
+                + this.getStructure() + SourceFile.ROW_DELIMITER
+                + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
+                + this.getGUPairs() + SourceFile.ROW_DELIMITER
+                + this.getMismatches() + SourceFile.ROW_DELIMITER
+                + this.bulges + SourceFile.ROW_DELIMITER
+                + this.sequenceLength + SourceFile.ROW_DELIMITER
+                + this.startsAt + SourceFile.ROW_DELIMITER
+                + this.endsAt + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percA_sequence) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percC_sequence) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percG_sequence) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percU_sequence) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percent_AU) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percent_CG) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percent_GU) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.percent_AG) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.mfe) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.relativePos) + SourceFile.ROW_DELIMITER
+                + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
+                + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
     }
 
 }

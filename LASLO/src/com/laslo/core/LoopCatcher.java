@@ -5,7 +5,7 @@ package com.laslo.core;
 
 import com.tools.ShuffleSeq;
 import static com.laslo.core.PairmentAnalizer.*;
-import com.tools.fasta.InputSequence;
+import com.tools.io.InputSequence;
 import static java.lang.System.out;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,11 +19,12 @@ import java.util.regex.Pattern;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.UShuffle;
-import com.tools.fasta.FASTACorrector;
-import com.tools.fasta.FastaID;
-import static com.tools.fasta.FastaID.CSV_EXT;
-import static com.tools.fasta.FastaID.FASTA_EXT;
-import static com.tools.fasta.FastaID.FASTA_EXT_2;
+import com.tools.io.FASTACorrector;
+import com.tools.io.SourceFile;
+import static com.tools.io.SourceFile.CSV_EXT;
+import static com.tools.io.SourceFile.FASTA_EXT;
+import static com.tools.io.SourceFile.FASTA_EXT_2;
+import static com.tools.io.SourceFile.GENBANK_EXT;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.biojava.nbio.core.sequence.DNASequence;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
+import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
 //import rnafold4j.MFEData;
 //import rnafold4j.RNAFoldAPI;
 
@@ -352,8 +354,7 @@ public class LoopCatcher {
         size = 0;
         int loopPos = 0, loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
-        String rnaSequence = fastaSeq.getSequenceAsString().
-                toUpperCase().replace('T', 'U');
+        String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
         final int sequenceLength = rnaSequence.length();
         //MFEData mfe = null;
         RNAfold fold = null;
@@ -738,8 +739,6 @@ public class LoopCatcher {
     public boolean beginSearch() {
         // To check the elapsed time
         Calendar ini, fin;
-        String fileName;
-
         ini = Calendar.getInstance();
         out.println(
                 java.text.MessageFormat.format(bundle.getString("START_TIME"), new Object[]{Calendar.getInstance().getTime()}));
@@ -753,14 +752,21 @@ public class LoopCatcher {
             for (File currentFile : fileList) {
                 if (currentFile.isFile()
                         && (currentFile.toString().endsWith(FASTA_EXT)
-                        || currentFile.toString().endsWith(FASTA_EXT_2))) {
+                        || currentFile.toString().endsWith(FASTA_EXT_2)
+                        || currentFile.toString().endsWith(GENBANK_EXT))) {
 
                     //fileName = currentFile.getName();
                     LinkedHashMap<String, DNASequence> fasta = null;
 
                     try {
-                        fasta = readFastaDNASequence(currentFile, false);
-                    } catch (IOException ex) {
+                        if(currentFile.toString().endsWith(GENBANK_EXT))
+                            fasta = readGenbankDNASequence(currentFile, false);
+                        else
+                            fasta = readFastaDNASequence(currentFile, false);
+                        
+                    } catch (IOException ex ) {
+                        Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (Exception ex) {
                         Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
@@ -779,7 +785,8 @@ public class LoopCatcher {
         // I. File level (hacer un hilo)
         for (File currentFile : fileList) {
             if (currentFile.isFile() && (currentFile.toString().endsWith(FASTA_EXT)
-                    || currentFile.toString().endsWith(FASTA_EXT_2))) {
+                    || currentFile.toString().endsWith(FASTA_EXT_2)
+                    || currentFile.toString().endsWith(GENBANK_EXT))) {
 
                 this.actualFile = currentFile;
                 run();
@@ -810,8 +817,7 @@ public class LoopCatcher {
             fileName = actualFile.getName();
             out.println(java.text.MessageFormat.format(bundle.getString("FILE_PRINT"), new Object[]{fileName})); //$NON-NLS-1$
             out.flush();
-            fileName = fileName.replaceAll(FASTA_EXT, ""); //NOI18N
-            fileName = fileName.replaceAll(FASTA_EXT_2, ""); //NOI18N
+            fileName = fileName.replaceFirst("[.][^.]+$", ""); //NOI18N
             fileOut = this.pathOut + "\\" + fileName + CSV_EXT; //NOI18N //NOI18N
 
             if (new File(fileOut).exists()) {
@@ -828,8 +834,12 @@ public class LoopCatcher {
             Calendar.getInstance();
 
             // Generation of the iterator of {id,sequence}
-            LinkedHashMap<String, DNASequence> fasta = readFastaDNASequence(
-                    actualFile, false);
+            LinkedHashMap<String, DNASequence> fasta;
+            
+            if(actualFile.getName().endsWith(GENBANK_EXT))
+                fasta = readGenbankDNASequence(actualFile, false);
+            else
+                fasta = readFastaDNASequence(actualFile, false);
 
             if (fasta.isEmpty()) {
                 out.println(bundle.getString("INVALID_FILE_FORMAT"));
@@ -844,7 +854,7 @@ public class LoopCatcher {
                 }
             }
 
-            this.inputType = FastaID.detectHeader(fasta.entrySet().iterator()
+            this.inputType = SourceFile.detectHeader(fasta.entrySet().iterator()
                     .next().getValue().getOriginalHeader());
             int listSize = fasta.size();
             i = 1;
@@ -861,16 +871,13 @@ public class LoopCatcher {
                 DNASequence element = entry.getValue();
                 StemLoop aux = new StemLoop(this.inputType);
                 aux.setTags(element.getOriginalHeader());
-                /*out.println("Analizando " + aux.getGeneSymbol() + " - "
-                    + aux.getGeneID() + " transcripto " + aux.getTranscriptID() 
-                    + "...");*/
+
                 // Here begins one cycle
                 Iterator<String> patternItr = loopPatterns.iterator();
 
                 // sólo para modo dos
                 if (extendedMode) {
-                    rnaSequence = element.getSequenceAsString().
-                            toUpperCase().replace('T', 'U');
+                    rnaSequence = element.getRNASequence().getSequenceAsString();
                     fold = new RNAfold(rnaSequence);
                 }
                 secuencias++;
@@ -905,16 +912,6 @@ public class LoopCatcher {
             writer = null;
             fasta = null;
 
-            // FASTA with the results
-            //auxParam = "Stem loops length between " + this.minLength
-            //         + " and " + this.maxLength + ".\n";
-            //auxParam += "Wooble pairs allowed up to " + this.maxWooble
-            //        + ".\n";
-            //auxParam += "Mismatch allowed up to " + this.maxMismatch
-            //        + ".\n";
-            //auxParam += "Total sequences analized: " + secuencias
-            //        + ".\n";
-            //currentStems = null;
             out.printf(bundle.getString("RESUME"),
                     this.minLength,
                     this.maxLength,
@@ -927,12 +924,15 @@ public class LoopCatcher {
         } catch (IOException ex) {
             Logger.getLogger(LoopCatcher.class.getName())
                     .log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(LoopCatcher.class.getName())
+                    .log(Level.SEVERE, null, ex);
         }
-        //currentStems = null;
+        
         writer = null;
         fileName = null;
         fileOut = null;
-        //auxParam = null;
+        
         System.gc();
     }
 

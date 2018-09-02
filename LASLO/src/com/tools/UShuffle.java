@@ -52,13 +52,14 @@ public class UShuffle {
         return RANDOM_PATH;
     }
     
-    /**
-     * 
-     * @param path
-     * @param fasta
-     * @param k
-     * @param nRandoms 
-     */
+/**
+ * 
+ * @param path
+ * @param filename
+ * @param fasta
+ * @param nRandoms
+ * @param k 
+ */
     public static void makeShuffleSequences(String path, String filename,
             LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k) {
         Runtime rt;
@@ -84,7 +85,7 @@ public class UShuffle {
 				
 		FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
 		BufferedWriter bw = new BufferedWriter(fw);
-				
+		int j = 1;		
                 for (Map.Entry<String, DNASequence> entry : fasta.entrySet()){
                         DNASequence element = entry.getValue();
                         header = element.getOriginalHeader();
@@ -114,8 +115,8 @@ public class UShuffle {
 
                          int exitVal = pr.waitFor();
 
-                        System.out.println("Generating randomized sequences in " + destiny
-                        + " - ["+ exitVal + "]");
+                        /*System.out.println(destiny + ": Sequence " + j++
+                        + " - ["+ exitVal + "]");*/
 
                 }
 
@@ -124,7 +125,7 @@ public class UShuffle {
                 fw = null;
 				
             } catch (IOException | InterruptedException ex) {
-                Logger.getLogger(ShuffleSeq.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Error: " + ex.getMessage());
             }
         }
 

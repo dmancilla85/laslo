@@ -17,7 +17,7 @@
  */
 package com.laslo.gui;
 
-import com.tools.fasta.InputSequence;
+import com.tools.io.InputSequence;
 import com.laslo.core.LoopCatcher;
 import com.tools.ReturnValue;
 import java.awt.event.WindowEvent;
