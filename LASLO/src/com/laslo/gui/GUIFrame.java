@@ -107,7 +107,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jFTpercWooble = new javax.swing.JFormattedTextField();
         jcbExtended = new javax.swing.JCheckBox();
         jcbMakeRandoms = new javax.swing.JCheckBox();
-        jLabel8 = new javax.swing.JLabel();
+        jLblNRand = new javax.swing.JLabel();
         jftNumberOfRandoms = new javax.swing.JFormattedTextField();
         jLabel9 = new javax.swing.JLabel();
         jftAdditionalSeq = new javax.swing.JFormattedTextField();
@@ -283,10 +283,12 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel8.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel8.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
+        jLblNRand.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jLblNRand.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
+        jLblNRand.setEnabled(false);
 
         jftNumberOfRandoms.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
+        jftNumberOfRandoms.setEnabled(false);
 
         jLabel9.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel9.setText(bundle.getString("ADDITIONAL_SEQ")); // NOI18N
@@ -298,6 +300,7 @@ public class GUIFrame extends javax.swing.JFrame {
         }
         jftAdditionalSeq.setText("UGUANAUA");
         jftAdditionalSeq.setToolTipText(bundle.getString("ADDITION_SEQ_TOOLTIP"));
+        jftAdditionalSeq.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
 
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
@@ -400,7 +403,7 @@ public class GUIFrame extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jcbMakeRandoms)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))))
@@ -423,7 +426,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jcbMakeRandoms)
-                    .addComponent(jLabel8)
+                    .addComponent(jLblNRand)
                     .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -458,7 +461,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jLabel8.getAccessibleContext().setAccessibleName("");
+        jLblNRand.getAccessibleContext().setAccessibleName("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -592,6 +595,9 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jcbMakeRandomsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbMakeRandomsActionPerformed
         // TODO add your handling code here:
+        boolean val = jcbMakeRandoms.isSelected();
+        this.jLblNRand.setEnabled(val);
+        this.jftNumberOfRandoms.setEnabled(val);
     }//GEN-LAST:event_jcbMakeRandomsActionPerformed
 
     private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
@@ -654,9 +660,9 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLblError;
+    private javax.swing.JLabel jLblNRand;
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMIExit;
     private javax.swing.JMenuBar jMenuBar1;

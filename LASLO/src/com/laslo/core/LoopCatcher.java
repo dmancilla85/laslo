@@ -40,8 +40,8 @@ import org.apache.commons.lang.StringUtils;
 import org.biojava.nbio.core.sequence.DNASequence;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
-//import rnafold4j.MFEData;
-//import rnafold4j.RNAFoldAPI;
+import rnafold4j.MFEData;
+import rnafold4j.RNAFoldAPI;
 
 /**
  * @author David
@@ -83,7 +83,7 @@ public class LoopCatcher {
     }
 
     // Create a new instance of RNAFold4J
-    //protected RNAFoldAPI rfa;
+    protected RNAFoldAPI rfa;
     public LoopCatcher(String pathOut, String pathIn,
             ArrayList<String> loopPatterns, String additionalSequence,
             InputSequence inputType,
@@ -96,7 +96,7 @@ public class LoopCatcher {
         this.maxLength = maxLength;
         this.maxWooble = maxWooble;
         this.maxMismatch = maxMismatch;
-        //this.rfa = new RNAFoldAPI();
+        this.rfa = new RNAFoldAPI();
         this.fileList = null;
         this.extendedMode = false;
         this.makeRandoms = false;
@@ -356,8 +356,8 @@ public class LoopCatcher {
         boolean isValidHairpin;
         String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
         final int sequenceLength = rnaSequence.length();
-        //MFEData mfe = null;
-        RNAfold fold = null;
+        MFEData mfe = null;
+        //RNAfold fold = null;
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -381,18 +381,18 @@ public class LoopCatcher {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
 
-                    //mfe = rfa.getMFE(rnaSeq.getBytes());
-                    fold = new RNAfold(rnaSeq);
+                    mfe = rfa.getMFE(rnaSeq.getBytes());
+                    //fold = new RNAfold(rnaSeq);
 
-                    hairpinModel = //new String(mfe.structure);
-                            fold.getStructure();
+                    hairpinModel = new String(mfe.structure);
+                            //fold.getStructure();
 
                     if (rnaSeq.length() != hairpinModel.length()) {
                         out.println("Error NO COINCIDEN:" + rnaSeq + " - "
                                 + hairpinModel);
                     }
 
-                    if (fold.getMfe()/*mfe.mfe*/ == 0.0) {
+                    if (/*fold.getMfe()*/mfe.mfe == 0.0) {
                         isValidHairpin = false;
                     } else {
                         hairpinModel = isValidHairpin(hairpinModel, loopLength, loopPos, rnaSeq);
@@ -426,15 +426,16 @@ public class LoopCatcher {
                 slr.setSequenceLength(sequenceLength);
                 try{
                 slr.setAdditional5Seq( rnaSequence
-                        .substring(posAux - 1 -k, posAux - 1));
-                slr.setAdditional5Seq( rnaSequence.substring(posAux 
-                        + rnaSeq.length() + 1,posAux + rnaSeq.length() + 1 +k) );
+                        .substring(posAux -k, posAux));
+                slr.setAdditional3Seq( rnaSequence.substring(posAux 
+                        + rnaSeq.length(),posAux + rnaSeq.length() +k) );
                 } catch(IndexOutOfBoundsException e){
                     slr.setAdditional3Seq("");
                     slr.setAdditional5Seq("");
                 }
                 slr.checkPairments();
-                slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                slr.setMfe(/*new RNAfold(rnaSeq).getMfe()*/ 
+                    rfa.getMFE(rnaSeq.getBytes()).mfe);
                 slr.setPredecessorLoop(extIzq);
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();

@@ -410,7 +410,7 @@ public class StemLoop {
         mismatch = StringUtils.countMatches(this.structure, "(.(")
                 + StringUtils.countMatches(this.structure, ").)");
 
-        bulges = StringUtils.countMatches(this.structure, "..(")
+        bulge = StringUtils.countMatches(this.structure, "..(")
                 + StringUtils.countMatches(this.structure, ")..");
 
         try {
