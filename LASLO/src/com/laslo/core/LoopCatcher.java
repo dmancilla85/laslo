@@ -356,9 +356,14 @@ public class LoopCatcher {
         boolean isValidHairpin;
         String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
         final int sequenceLength = rnaSequence.length();
-        MFEData mfe = null;
+        /*MFEData mfe = null;
         rfa.setNoLonelyPairs(true);
-        //RNAfold fold = null;
+        rfa.setDangle(2);
+        rfa.setCircular(false);
+        rfa.setNoCloseGU(false);
+        rfa.setScale(1.0);
+        rfa.setFoldConstrained(false);*/
+        RNAfold fold;
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -382,18 +387,20 @@ public class LoopCatcher {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
 
-                    mfe = rfa.getMFE(rnaSeq.getBytes());
-                    //fold = new RNAfold(rnaSeq);
+                    //mfe = rfa.getMFE(rnaSeq.getBytes());
+                    fold = new RNAfold(rnaSeq);
 
-                    hairpinModel = new String(mfe.structure);
-                            //fold.getStructure();
+                    hairpinModel = //new String(mfe.structure);
+                            fold.getStructure();
 
                     if (rnaSeq.length() != hairpinModel.length()) {
                         out.println("Error NO COINCIDEN:" + rnaSeq + " - "
                                 + hairpinModel);
                     }
 
-                    if (/*fold.getMfe()*/mfe.mfe == 0.0) {
+                    if (fold.getMfe()
+                        //mfe.mfe 
+                            == 0.0) {
                         isValidHairpin = false;
                     } else {
                         hairpinModel = isValidHairpin(hairpinModel, loopLength, loopPos, rnaSeq);
@@ -435,8 +442,9 @@ public class LoopCatcher {
                     slr.setAdditional5Seq("");
                 }
                 slr.checkPairments();
-                slr.setMfe(/*new RNAfold(rnaSeq).getMfe()*/ 
-                    rfa.getMFE(rnaSeq.getBytes()).mfe);
+                slr.setMfe(new RNAfold(rnaSeq).getMfe() 
+                            //rfa.getMFE(rnaSeq.getBytes()).mfe
+                    );
                 slr.setPredecessorLoop(extIzq);
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
@@ -901,7 +909,9 @@ public class LoopCatcher {
                     }
                 }
 
-                if (i++ % 100 == 0) {
+                //out.println("Transcript:" + (i+1));
+                
+                if (i++ % 10 == 0) {
                     out.printf(bundle.getString("PERCENT_PROCESSED_SEQS"),
                             i, listSize, //$NON-NLS-1$
                             (i / (float) listSize) * 100);
@@ -920,8 +930,8 @@ public class LoopCatcher {
                     secuencias);
             out.flush();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(LoopCatcher.class.getName())
-                    .log(Level.SEVERE, null, ex);
+            /*Logger.getLogger(LoopCatcher.class.getName())
+                    .log(Level.SEVERE, null, ex);*/
             out.println(bundle.getString("CANT_OPEN_FILE"));
         } catch (IOException ex) {
             Logger.getLogger(LoopCatcher.class.getName())

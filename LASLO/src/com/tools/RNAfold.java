@@ -5,8 +5,10 @@
  */
 package com.tools;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -21,7 +23,7 @@ import java.util.regex.Pattern;
 public class RNAfold {
 
     private final static String COMMAND_RNAFOLD = "./ext/RNAfold.exe";
-    private final static String RNAFOLD_ARGS = " -d2 --noLP --noPS";
+    //private final static String RNAFOLD_ARGS = " -d2 --noLP --noPS";
     private String structure;
     private double mfe;
     
@@ -38,13 +40,19 @@ public class RNAfold {
      * @param sequence 
      */
     public RNAfold(String sequence){
-        String command = COMMAND_RNAFOLD + RNAFOLD_ARGS;
-        String aux = "";
-        String output = "";
-        int i = 1;
+        String command = COMMAND_RNAFOLD; // + RNAFOLD_ARGS;
+        //String aux = "";
+        //String output = "";
+        //int i = 1;
+        InputStreamReader isr;
+        BufferedReader br;
+        String line;
 
         try {
-            Process child = Runtime.getRuntime().exec(command);
+            Process child = 
+                    new ProcessBuilder(command, "-d2", "--noLP", "--noPS")
+                            .start();
+            //Runtime.getRuntime().exec(command);
             
             OutputStream out = child.getOutputStream();
             out.write(sequence.getBytes());
@@ -54,9 +62,14 @@ public class RNAfold {
             out.close();
             
             try (InputStream in = child.getInputStream()) {
-                int c;
-
-                while ((c = in.read()) != -1) {
+                //int c;
+                isr = new InputStreamReader(in);
+                br = new BufferedReader(isr);
+                br.readLine();
+                br.readLine();
+                line = br.readLine();
+                //System.out.println(line);
+                /*while ((c = in.read()) != -1) {
 
                     if (c != '\n') {
                         aux += (char) c;
@@ -68,14 +81,14 @@ public class RNAfold {
                     if(i == 2){
                         output = aux;
                     }
-                }
+                }*/
                 
                 //String result[] = output.split(" ");
                 
                 //if(result[0].length() > 0)
                 
-                this.structure = output.trim()
-                        .substring(0, sequence.length()) ;
+                this.structure = line.trim()
+                        .substring(0, sequence.length());
                 
                 /*if(result.length > 2){
                     for(int j = 2; j < result.length; j++)
@@ -83,18 +96,15 @@ public class RNAfold {
                 }*/
                 
                 Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)");
-                Matcher matcher = regex.matcher(output);
+                Matcher matcher = regex.matcher(line);
                 if(matcher.find()){
                     this.mfe = new Double(matcher.group(1));
                     this.mfe *= (-1);
                 }
-                
-                /*this.mfe = new Double(output.substring(output.) .
-                        replace(")", "").
-                        replace("(", "").
-                        replace('\r', ' '));*/
             }
             
+            child.destroy();
+            isr.close();
             out.close();
         } catch (IOException | NumberFormatException ex) {
             Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
