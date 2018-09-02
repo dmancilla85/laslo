@@ -357,6 +357,7 @@ public class LoopCatcher {
         String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
         final int sequenceLength = rnaSequence.length();
         MFEData mfe = null;
+        rfa.setNoLonelyPairs(true);
         //RNAfold fold = null;
 
         // Convert the original loop pattern to a regular expression
