@@ -687,7 +687,7 @@ public class GUIFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     protected Locale locale;
-    private   ResourceBundle bundle;
+    private   final ResourceBundle bundle;
     protected LoopCatcher loopCatcher;
     protected File[] listOfFiles;
     protected boolean isRunning;
@@ -839,6 +839,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected());
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
+        loopCatcher.setkLetRandoms(2);
         
         //loopCatcher.beginSearch();
         
