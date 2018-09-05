@@ -5,7 +5,7 @@ Multi-threaded application that searches for hairpin structures in cDNA / mRNA s
 It implements RNAfold to predict the structure of the sequence, and UShuffle to generate random sequences with conservation of the k-nucleotide frequency.
 
 # Requirements
-JAVA 8 - Last update.
-Is recommended to have a multi-core CPU.
+JAVA Runtime 8 - Latest update. https://www.java.com/en/download/
+It's recommended to have a multicore processor.
 
 # Instructions 
