@@ -29,7 +29,7 @@ public class LoopCatcherThread implements Runnable {
     protected Iterator<String> patternItr;
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
-    private final static Semaphore SEM = new Semaphore(20);
+    private final static Semaphore SEM = new Semaphore(4);
     private CountDownLatch latch;
 
     public void setLatch(CountDownLatch latch) {

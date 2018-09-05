@@ -3,7 +3,6 @@
  */
 package com.laslo.core;
 
-import static com.laslo.core.PairmentAnalizer.*;
 import com.tools.io.InputSequence;
 import static java.lang.System.out;
 import java.io.FileWriter;
@@ -13,17 +12,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import com.opencsv.CSVWriter;
-import com.tools.RNAfold;
 import com.tools.UShuffle;
 import com.tools.io.FASTACorrector;
 import com.tools.io.SourceFile;
-import static com.tools.io.SourceFile.CSV_EXT;
-import static com.tools.io.SourceFile.FASTA_EXT;
-import static com.tools.io.SourceFile.FASTA_EXT_2;
-import static com.tools.io.SourceFile.GENBANK_EXT;
+import static com.tools.io.SourceFile.*;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
@@ -426,13 +420,10 @@ public class LoopCatcher {
 
     public void processFile() {
 
-        //ArrayList<StemPosition> currentStems = null;
         CSVWriter writer;
         String fileName, fileOut;
-        //String auxParam;
-        //String rnaSequence = ""; //NOI18N
-        //RNAfold fold = new RNAfold();
-        int i, secuencias = 0;
+        final int MAX_HILOS = 4;
+        int secuencias = 0, nHilos = MAX_HILOS, i, count = 0;
         ExecutorService pool;
         CountDownLatch latch;
 
@@ -482,7 +473,7 @@ public class LoopCatcher {
             this.inputType = SourceFile.detectHeader(fasta.entrySet().iterator()
                     .next().getValue().getOriginalHeader());
             int listSize = fasta.size();
-            i = 1;
+            //i = 1;
 
             writer = new CSVWriter(new FileWriter(fileOut), ';',
                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
@@ -491,23 +482,51 @@ public class LoopCatcher {
             writer.writeNext(StemLoop.getHeader(this.inputType).split(";")); //NOI18N
 
             // II. Transcript level
-            pool = Executors.newFixedThreadPool(listSize);
-            latch = new CountDownLatch(listSize);
+            //pool = Executors.newFixedThreadPool(listSize);
+            //latch = new CountDownLatch(listSize);
 
+            if(listSize < nHilos)
+                nHilos = listSize;
+            
+            pool = Executors.newFixedThreadPool(nHilos);
+            latch = new CountDownLatch(nHilos);
+            i = 1;
+            
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
+                
                 DNASequence element = entry.getValue();               
                 Iterator<String> patternItr = loopPatterns.iterator();
+                count++;
                 
                 LoopCatcherThread thread = new LoopCatcherThread(extendedMode, 
                         additionalSequence, maxLength, minLength, element,
                         inputType, patternItr, writer);
 
-                thread.setLatch(latch);
-                pool.execute(thread);
+                if(i <= nHilos){
+                    thread.setLatch(latch);
+                    pool.execute(thread);
+                    i++;
+                } else {
+                    i = 1;
+                    
+                    if(count < nHilos)
+                        nHilos = count;
+                    
+                    out.println("Esperando hijos...");
+                    latch.await();
+                    out.println("Terminando pool");
+                    pool.awaitTermination(120, TimeUnit.SECONDS);
+                    pool.shutdown();
+                }
+                        
+                
+                
+                
             }
-
-            latch.await();
-            pool.shutdown();
+            //out.println("Esperando hijos...");
+            //latch.await();
+            //out.println("Terminando pool");
+            //pool.shutdown();
 
             writer.close();
             writer = null;
