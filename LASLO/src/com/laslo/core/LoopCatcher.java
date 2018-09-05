@@ -3,7 +3,6 @@
  */
 package com.laslo.core;
 
-import com.tools.ShuffleSeq;
 import static com.laslo.core.PairmentAnalizer.*;
 import com.tools.io.InputSequence;
 import static java.lang.System.out;
@@ -398,7 +397,7 @@ public class LoopCatcher {
             }
 
             File folder;
-            folder = new File(pathIn + ShuffleSeq.getRandomDir());
+            folder = new File(pathIn + UShuffle.getRandomDir());
             File[] randomFiles;
             randomFiles = folder.listFiles();
             fileList = unionFiles(fileList, randomFiles);
@@ -434,6 +433,8 @@ public class LoopCatcher {
         //String rnaSequence = ""; //NOI18N
         //RNAfold fold = new RNAfold();
         int i, secuencias = 0;
+        ExecutorService pool;
+        CountDownLatch latch;
 
         try {
             fileName = actualFile.getName();
@@ -490,12 +491,11 @@ public class LoopCatcher {
             writer.writeNext(StemLoop.getHeader(this.inputType).split(";")); //NOI18N
 
             // II. Transcript level
-            ExecutorService pool = Executors.newFixedThreadPool(listSize);
-            CountDownLatch latch = new CountDownLatch(listSize);
+            pool = Executors.newFixedThreadPool(listSize);
+            latch = new CountDownLatch(listSize);
 
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
-                DNASequence element = entry.getValue();
-                out.println("Processing " + entry.getKey().substring(0, 10));
+                DNASequence element = entry.getValue();               
                 Iterator<String> patternItr = loopPatterns.iterator();
                 
                 LoopCatcherThread thread = new LoopCatcherThread(extendedMode, 

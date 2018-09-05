@@ -29,6 +29,7 @@ public class LoopCatcherThread implements Runnable {
     protected Iterator<String> patternItr;
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
+    private final static Semaphore SEM = new Semaphore(20);
     private CountDownLatch latch;
 
     public void setLatch(CountDownLatch latch) {
@@ -66,6 +67,14 @@ public class LoopCatcherThread implements Runnable {
 
             String currentPattern = patternItr.next().trim().toUpperCase();
 
+            try {
+                SEM.acquire();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                SEM.release();
+            }
+            
             // 1. Stem research
             if (extendedMode) {
                 sequenceExtendedResearch(
@@ -78,7 +87,7 @@ public class LoopCatcherThread implements Runnable {
                 sequenceResearch(dnaElement, currentPattern, writer);
             }
         }
-
+        out.println("Threads remaining: " + latch.getCount());
         latch.countDown();
     }
 
@@ -398,14 +407,22 @@ public class LoopCatcherThread implements Runnable {
                             loopPos + loopLength + length);
                     hairpinModel = hairpinSeq.substring(loopPos - length,
                             loopPos + loopLength + length);
+                    
+                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length-1),
+                            rnaSeq.charAt(length + loopLength))
+                            || isComplementaryRNAWooble(rnaSeq.charAt(length-1),
+                                    rnaSeq.charAt(length + loopLength));
 
                     if (rnaSeq.length() != hairpinModel.length()) {
                         out.println("Error NO COINCIDEN:" + rnaSeq + " - "
                                 + hairpinModel);
                     }
 
-                    hairpinModel = isValidHairpin(hairpinModel, loopLength, loopPos, rnaSeq);
-                    isValidHairpin = hairpinModel.length() > 0;
+                    if(isValidHairpin){
+                        hairpinModel = isValidHairpin(hairpinModel, loopLength, 
+                                loopPos, rnaSeq);
+                        isValidHairpin = hairpinModel.length() > 0;
+                    }
 
                 } else {
                     isValidHairpin = false;

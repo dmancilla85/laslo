@@ -58,6 +58,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jFTpercMismatch.setValue(25);
         this.jftNumberOfRandoms.setValue(10);
+        this.jftkLet.setValue(2);
         this.jFTpercWooble.setValue(50);
         //this.jFTfieldSep.setVisible(false);
         //this.jFTnumCols.setVisible(false);
@@ -111,6 +112,8 @@ public class GUIFrame extends javax.swing.JFrame {
         jftNumberOfRandoms = new javax.swing.JFormattedTextField();
         jLabel9 = new javax.swing.JLabel();
         jftAdditionalSeq = new javax.swing.JFormattedTextField();
+        jLblNKlet = new javax.swing.JLabel();
+        jftkLet = new javax.swing.JFormattedTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
@@ -302,6 +305,13 @@ public class GUIFrame extends javax.swing.JFrame {
         jftAdditionalSeq.setToolTipText(bundle.getString("ADDITION_SEQ_TOOLTIP"));
         jftAdditionalSeq.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
 
+        jLblNKlet.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jLblNKlet.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
+        jLblNKlet.setEnabled(false);
+
+        jftkLet.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
+        jftkLet.setEnabled(false);
+
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
 
@@ -405,7 +415,11 @@ public class GUIFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -427,8 +441,10 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jcbMakeRandoms)
                     .addComponent(jLblNRand)
-                    .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLblNKlet)
+                    .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jcbExtended)
                     .addComponent(jLabel1)
@@ -462,6 +478,7 @@ public class GUIFrame extends javax.swing.JFrame {
         );
 
         jLblNRand.getAccessibleContext().setAccessibleName("");
+        jLblNKlet.getAccessibleContext().setAccessibleName("k-let");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -598,6 +615,8 @@ public class GUIFrame extends javax.swing.JFrame {
         boolean val = jcbMakeRandoms.isSelected();
         this.jLblNRand.setEnabled(val);
         this.jftNumberOfRandoms.setEnabled(val);
+        this.jLblNKlet.setEnabled(val);
+        this.jftkLet.setEnabled(val);
     }//GEN-LAST:event_jcbMakeRandomsActionPerformed
 
     private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
@@ -662,6 +681,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLblError;
+    private javax.swing.JLabel jLblNKlet;
     private javax.swing.JLabel jLblNRand;
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMIExit;
@@ -684,6 +704,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox jcbMakeRandoms;
     private javax.swing.JFormattedTextField jftAdditionalSeq;
     private javax.swing.JFormattedTextField jftNumberOfRandoms;
+    private javax.swing.JFormattedTextField jftkLet;
     // End of variables declaration//GEN-END:variables
 
     protected Locale locale;
@@ -741,7 +762,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
     public boolean validateParameters(int min, int max, int wooble,
             int mismatch, String pathIn, String pathOut,
-            ArrayList<String> loopList, int randoms) {
+            ArrayList<String> loopList, int randoms, int klet) {
         boolean isValid;
         isValid = true;
         String aux;
@@ -783,6 +804,13 @@ public class GUIFrame extends javax.swing.JFrame {
                 isValid = false;
             }
         }
+        
+        if (this.jcbMakeRandoms.isSelected()) {
+            if (klet <= 0 || klet > 10) {
+                this.jLblError.setText(bundle.getString("ERROR_INVALID_NBR_RANDOMS"));
+                isValid = false;
+            }
+        }
 
         return isValid;
     }
@@ -791,7 +819,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         //String inputValue;
         //inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
-        int max, min, wooble, mismatch, randoms;
+        int max, min, wooble, mismatch, randoms, klet;
         String pathOut = this.jTFPathOut.getText();
         String pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
@@ -812,13 +840,14 @@ public class GUIFrame extends javax.swing.JFrame {
         wooble = new Integer(this.jSpinWooble.getValue().toString());
         mismatch = new Integer(this.jSpinMismatch.getValue().toString());
         randoms = new Integer(this.jftNumberOfRandoms.getValue().toString());
-
+        klet = new Integer(this.jftkLet.getValue().toString());
+        
         // Loops
         loopList.addAll(Arrays.asList(loops));
 
         // 
         if (validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
-                loopList, randoms)) {
+                loopList, randoms, klet)) {
         } else {
             setIsRunning(false);
             return;
@@ -839,7 +868,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected());
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
-        loopCatcher.setkLetRandoms(2);
+        loopCatcher.setkLetRandoms(klet);
         
         //loopCatcher.beginSearch();
         
