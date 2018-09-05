@@ -29,7 +29,7 @@ public class LoopCatcherThread implements Runnable {
     protected Iterator<String> patternItr;
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
-    private final static Semaphore SEM = new Semaphore(4);
+    //private final static Semaphore SEM = new Semaphore(4);
     private CountDownLatch latch;
 
     public void setLatch(CountDownLatch latch) {
@@ -67,13 +67,13 @@ public class LoopCatcherThread implements Runnable {
 
             String currentPattern = patternItr.next().trim().toUpperCase();
 
-            try {
+            /*try {
                 SEM.acquire();
             } catch (InterruptedException ex) {
                 Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 SEM.release();
-            }
+            }*/
             
             // 1. Stem research
             if (extendedMode) {
@@ -227,11 +227,11 @@ public class LoopCatcherThread implements Runnable {
                         (rnaSequence.length() - rnaSequence.replace("U", "") //NOI18N
                         .length()) / (float) rnaSequence.length());
 
+                if(this.additionalSequence.length() > 0)
                 slr.setAdditionalSeqLocations(getPatternLocations(rnaSequence,
                         this.additionalSequence));
 
-                slr.setRelativePos((double) slr.getStartsAt()
-                        / (double) rnaSequence.length());
+                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
 
                 slrList.add(slr);
             }

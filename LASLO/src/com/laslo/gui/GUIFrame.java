@@ -857,7 +857,7 @@ public class GUIFrame extends javax.swing.JFrame {
         out.flush();
         loopCatcher.setBundle(bundle);
         loopCatcher.setLoopPatterns(loopList);
-        loopCatcher.setAdditionalSequence(this.jftAdditionalSeq.getText());
+        loopCatcher.setAdditionalSequence(this.jftAdditionalSeq.getText().trim());
         loopCatcher.setMaxLength(max);
         loopCatcher.setMinLength(min);
         loopCatcher.setMaxMismatch(mismatch);

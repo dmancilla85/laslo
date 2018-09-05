@@ -422,7 +422,7 @@ public class LoopCatcher {
 
         CSVWriter writer;
         String fileName, fileOut;
-        final int MAX_HILOS = 4;
+        final int MAX_HILOS = 100;
         int secuencias = 0, nHilos = MAX_HILOS, i, count = 0;
         ExecutorService pool;
         CountDownLatch latch;
@@ -515,8 +515,10 @@ public class LoopCatcher {
                     out.println("Esperando hijos...");
                     latch.await();
                     out.println("Terminando pool");
-                    pool.awaitTermination(120, TimeUnit.SECONDS);
                     pool.shutdown();
+                    pool = Executors.newFixedThreadPool(nHilos);
+                    latch = new CountDownLatch(nHilos);
+                    
                 }
                         
                 
