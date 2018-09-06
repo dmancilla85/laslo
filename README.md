@@ -14,7 +14,7 @@ It's recommended to have a multicore processor.
 
 * RNAfold 2.4.8 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html
 
-* UShuffle
+* UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. https://github.com/guma44/ushuffle
 
 # License
  Copyright (C) 2018  David A. Mancilla                                   
