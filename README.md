@@ -16,6 +16,8 @@ It's recommended to have a multicore processor.
 
 * UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. https://github.com/guma44/ushuffle
 
+* BioJava - Andreas Prlic; Andrew Yates; Spencer E. Bliven; Peter W. Rose; Julius Jacobsen; Peter V. Troshin; Mark Chapman; Jianjiong Gao; Chuan Hock Koh; Sylvain Foisy; Richard Holland; Gediminas Rimsa; Michael L. Heuer; H. Brandstatter-Muller; Philip E. Bourne; Scooter Willis. BioJava: an open-source framework for bioinformatics in 2012. Bioinformatics (2012) 28 (20): 2693-2695. 
+
 # License
  Copyright (C) 2018  David A. Mancilla                                   
  GNU General Public License <http://www.gnu.org/licenses/>. 
