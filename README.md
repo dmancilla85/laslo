@@ -12,6 +12,9 @@ It's recommended to have a multicore processor.
 
 # Credits
 
+* RNAfold 2.4.8 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html
+
+* UShuffle
 
 # License
  Copyright (C) 2018  David A. Mancilla                                   
