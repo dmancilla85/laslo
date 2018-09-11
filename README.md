@@ -6,13 +6,13 @@ It implements RNAfold to predict the structure of the sequence, and UShuffle to 
 
 # Requirements
 JAVA Runtime 8 - Latest update. https://www.java.com/en/download/
-It's recommended to have a multicore processor.
+It's highly recommended to have a multicore processor to process large sequences.
 
 # Instructions 
 
 # Credits and Acknowledgments
 
-* RNAfold 2.4.8 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html
+* RNAfold 2.4.9 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html
 
 * UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. 
 https://github.com/guma44/ushuffle
