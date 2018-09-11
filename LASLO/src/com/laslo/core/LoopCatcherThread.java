@@ -87,8 +87,10 @@ public class LoopCatcherThread implements Runnable {
                 sequenceResearch(dnaElement, currentPattern, writer);
             }
         }
+       
         out.println("Threads remaining: " + latch.getCount());
         latch.countDown();
+        
     }
 
     public List<Integer> getPatternLocations(String sequence, String pattern) {

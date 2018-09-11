@@ -506,6 +506,7 @@ public class LoopCatcher {
                     thread.setLatch(latch);
                     pool.execute(thread);
                     i++;
+                    count = 0;
                 } else {
                     i = 1;
                     
@@ -519,16 +520,14 @@ public class LoopCatcher {
                     pool = Executors.newFixedThreadPool(nHilos);
                     latch = new CountDownLatch(nHilos);
                     
-                }
-                        
-                
-                
-                
+                }     
             }
-            //out.println("Esperando hijos...");
-            //latch.await();
-            //out.println("Terminando pool");
-            //pool.shutdown();
+            
+            if(latch.getCount() > 0){
+            out.println("Esperando hijos...");
+            latch.await();
+            out.println("Terminando pool");
+            pool.shutdown();}
 
             writer.close();
             writer = null;
