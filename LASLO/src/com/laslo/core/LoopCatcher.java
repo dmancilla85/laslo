@@ -422,7 +422,7 @@ public class LoopCatcher {
 
         CSVWriter writer;
         String fileName, fileOut;
-        final int MAX_HILOS = 100;
+        final int MAX_HILOS = 10;
         int secuencias = 0, nHilos = MAX_HILOS, i, count = 0;
         ExecutorService pool;
         CountDownLatch latch;
@@ -450,11 +450,11 @@ public class LoopCatcher {
 
             // Generation of the iterator of {id,sequence}
             LinkedHashMap<String, DNASequence> fasta;
-
+            
             if (actualFile.getName().endsWith(GENBANK_EXT)) {
                 fasta = readGenbankDNASequence(actualFile, false);
             } else {
-                fasta = readFastaDNASequence(actualFile, false);
+                fasta = readFastaDNASequence(actualFile, true);
             }
 
             if (fasta.isEmpty()) {
@@ -490,7 +490,7 @@ public class LoopCatcher {
             
             pool = Executors.newFixedThreadPool(nHilos);
             latch = new CountDownLatch(nHilos);
-            i = 1;
+            i = 0;
             
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
                 
@@ -502,21 +502,19 @@ public class LoopCatcher {
                         additionalSequence, maxLength, minLength, element,
                         inputType, patternItr, writer);
 
-                if(i <= nHilos){
+                if(i++ <= nHilos){
                     thread.setLatch(latch);
                     pool.execute(thread);
-                    i++;
-                    count = 0;
                 } else {
-                    i = 1;
-                    
-                    if(count < nHilos)
-                        nHilos = count;
-                    
+                    i = 1;                    
                     out.println("Esperando hijos...");
                     latch.await();
                     out.println("Terminando pool");
                     pool.shutdown();
+                    
+                    if(fasta.size() - count < nHilos)
+                        nHilos = fasta.size() - count;
+                    
                     pool = Executors.newFixedThreadPool(nHilos);
                     latch = new CountDownLatch(nHilos);
                     

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import static com.laslo.core.PairmentAnalizer.*;
+import com.tools.OSValidator;
 import static java.lang.System.out;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -30,12 +31,17 @@ public class LoopCatcherThread implements Runnable {
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
     //private final static Semaphore SEM = new Semaphore(4);
+    private static Semaphore SEM;
     private CountDownLatch latch;
 
     public void setLatch(CountDownLatch latch) {
         this.latch = latch;
     }
 
+    public static void setCores(){
+        SEM = new Semaphore(OSValidator.getNumberOfCPUCores());
+    }
+    
     public LoopCatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
@@ -67,13 +73,13 @@ public class LoopCatcherThread implements Runnable {
 
             String currentPattern = patternItr.next().trim().toUpperCase();
 
-            /*try {
+            try {
                 SEM.acquire();
             } catch (InterruptedException ex) {
                 Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 SEM.release();
-            }*/
+            }
             
             // 1. Stem research
             if (extendedMode) {
