@@ -1,5 +1,6 @@
 package com.laslo.core;
 
+import static com.laslo.core.PairmentAnalizer.reverseIt;
 import com.tools.io.InputSequence;
 import com.tools.io.BioMartFastaID;
 import com.tools.io.GenericID;
@@ -49,6 +50,7 @@ public class StemLoop {
     protected double percC_sequence;
     protected double percU_sequence;
     protected double relativePos;
+    protected boolean reversed;
     protected double mfe;
     protected List<Integer> additionalSeqLocations;
 
@@ -67,9 +69,7 @@ public class StemLoop {
     public void setAdditional3Seq(String additional3Seq) {
         this.additional3Seq = additional3Seq;
     }
-    
-    
-    
+
     private String getFormattedNumber(Double number) {
         NumberFormat numberFormatter
                 = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -116,6 +116,7 @@ public class StemLoop {
         this.endsAt = 0;
         this.startsAt = 0;
         this.mismatches = 0;
+        this.reversed = false;
         this.bulges = 0;
         this.relativePos = 0.0;
         this.predecessorLoop = 0;
@@ -132,6 +133,14 @@ public class StemLoop {
 
     public int getMismatches() {
         return mismatches;
+    }
+
+    public void setReverse(boolean invert) {
+        this.reversed = invert;
+    }
+
+    public boolean getIsReversed() {
+        return reversed;
     }
 
     public void setMismatches(int mismatches) {
@@ -166,10 +175,10 @@ public class StemLoop {
             case BIOMART:
                 header = BioMartFastaID.getHeader();
                 break;
-                
+
             case GENBANK:
                 header = BioMartFastaID.getHeader();
-                break;    
+                break;
 
             case GENERIC:
                 header = GenericID.getHeader();
@@ -210,6 +219,7 @@ public class StemLoop {
                 + "PurinePercentStem" + SourceFile.ROW_DELIMITER
                 + "RnaFoldMFE" + SourceFile.ROW_DELIMITER
                 + "RelativePosition" + SourceFile.ROW_DELIMITER
+                + "IsReverse" + SourceFile.ROW_DELIMITER
                 + "AdditionalSeqMatches" + SourceFile.ROW_DELIMITER
                 + "AdditionalSeqPositions" + SourceFile.ROW_DELIMITER;
     }
@@ -454,6 +464,10 @@ public class StemLoop {
     public void setNLoop(int startPosLoop) {
         char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
 
+        if (reversed) {
+            rnaHairpinSequence = reverseIt(rnaHairpinSequence);
+        }
+
         if (this.rnaHairpinSequence != null) {
             n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
 
@@ -480,6 +494,10 @@ public class StemLoop {
         this.n6Loop = n6;
         this.n7Loop = n7;
         this.n8Loop = n8;
+
+        if (reversed) {
+            rnaHairpinSequence = reverseIt(rnaHairpinSequence);
+        }
     }
 
     public void setPercA_sequence(float percA_sequence) {
@@ -590,7 +608,7 @@ public class StemLoop {
 
         char precedes = ' ', precedes2 = ' ';
 
-        if (this.rnaHairpinSequence != null 
+        if (this.rnaHairpinSequence != null
                 && rnaHairpinSequence.length() > 0) {
             precedes = this.rnaHairpinSequence.charAt(irLength - 1);
             precedes2 = this.rnaHairpinSequence.charAt(irLength - 2);
@@ -635,6 +653,20 @@ public class StemLoop {
 
     public String toRowCSV() {
 
+        String isReverse = "N";
+        String seq = this.rnaHairpinSequence;
+        String mod1 = this.hairpinStructure;
+        String mod2 = this.viennaStructure;
+        String loopM = this.loop; 
+        
+        if(this.reversed){
+            isReverse = "S";
+            seq = reverseIt(seq);
+            mod1 = reverseIt(mod1);
+            mod2 = reverseIt(mod2);
+            loopM = reverseIt(loopM);
+        }
+        
         return this.id_fasta.toRowCSV()
                 + this.getLoopPattern() + SourceFile.ROW_DELIMITER
                 + this.getLoopID() + SourceFile.ROW_DELIMITER
@@ -646,12 +678,12 @@ public class StemLoop {
                 + this.n6Loop + SourceFile.ROW_DELIMITER
                 + this.n7Loop + SourceFile.ROW_DELIMITER
                 + this.n8Loop + SourceFile.ROW_DELIMITER
-                + this.loop + SourceFile.ROW_DELIMITER
-                + this.rnaHairpinSequence + SourceFile.ROW_DELIMITER
+                + loopM /*this.loop*/ + SourceFile.ROW_DELIMITER
+                + seq /*this.rnaHairpinSequence*/ + SourceFile.ROW_DELIMITER
                 + this.additional5Seq + SourceFile.ROW_DELIMITER
                 + this.additional3Seq + SourceFile.ROW_DELIMITER
-                + this.getHairpinStructure() + SourceFile.ROW_DELIMITER
-                + this.getStructure() + SourceFile.ROW_DELIMITER
+                + mod1 /*this.getHairpinStructure()*/ + SourceFile.ROW_DELIMITER
+                + mod2 /*this.getStructure()*/ + SourceFile.ROW_DELIMITER
                 + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
                 + this.getGUPairs() + SourceFile.ROW_DELIMITER
                 + this.getMismatches() + SourceFile.ROW_DELIMITER
@@ -669,6 +701,7 @@ public class StemLoop {
                 + getFormattedNumber(this.percent_AG) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.mfe) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.relativePos) + SourceFile.ROW_DELIMITER
+                + isReverse + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
     }

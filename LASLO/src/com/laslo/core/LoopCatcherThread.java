@@ -31,17 +31,14 @@ public class LoopCatcherThread implements Runnable {
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
     //private final static Semaphore SEM = new Semaphore(4);
-    private static Semaphore SEM;
+    private final static Semaphore SEM = new Semaphore(OSValidator.getNumberOfCPUCores());
+    ;
     private CountDownLatch latch;
 
     public void setLatch(CountDownLatch latch) {
         this.latch = latch;
     }
 
-    public static void setCores(){
-        SEM = new Semaphore(OSValidator.getNumberOfCPUCores());
-    }
-    
     public LoopCatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
@@ -73,14 +70,6 @@ public class LoopCatcherThread implements Runnable {
 
             String currentPattern = patternItr.next().trim().toUpperCase();
 
-            try {
-                SEM.acquire();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                SEM.release();
-            }
-            
             // 1. Stem research
             if (extendedMode) {
                 sequenceExtendedResearch(
@@ -88,15 +77,25 @@ public class LoopCatcherThread implements Runnable {
                         dnaElement.getOriginalHeader(),
                         fold.getStructure(),
                         currentPattern,
-                        writer);
+                        writer, false);
+                
+                sequenceExtendedResearch(
+                        rnaSequence,
+                        dnaElement.getOriginalHeader(),
+                        fold.getStructure(),
+                        currentPattern,
+                        writer, true);
             } else {
-                sequenceResearch(dnaElement, currentPattern, writer);
+                sequenceResearch(dnaElement, currentPattern, writer, false);
+                sequenceResearch(dnaElement, currentPattern, writer, true);
             }
         }
-       
-        out.println("Threads remaining: " + latch.getCount());
+
+        if (latch.getCount() < 3) {
+            out.println("Threads remaining: " + latch.getCount());
+        }
         latch.countDown();
-        
+
     }
 
     public List<Integer> getPatternLocations(String sequence, String pattern) {
@@ -121,7 +120,7 @@ public class LoopCatcherThread implements Runnable {
      * @return
      */
     public int sequenceResearch(DNASequence fastaSeq,
-            String stemLoopPattern, CSVWriter writer) {
+            String stemLoopPattern, CSVWriter writer, boolean invert) {
 
         List<StemLoop> slrList = new ArrayList<>();
         //List<Integer> mismatchs = new ArrayList<>();
@@ -134,7 +133,11 @@ public class LoopCatcherThread implements Runnable {
         String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
         final int sequenceLength = rnaSequence.length();
 
-        RNAfold fold;
+        if (invert) {
+            stemLoopPattern = reverseIt(stemLoopPattern);
+        }
+
+        RNAfold fold = new RNAfold();
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -158,13 +161,22 @@ public class LoopCatcherThread implements Runnable {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
 
-                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length-1),
+                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length - 1),
                             rnaSeq.charAt(length + loopLength))
-                            || isComplementaryRNAWooble(rnaSeq.charAt(length-1),
+                            || isComplementaryRNAWooble(rnaSeq.charAt(length - 1),
                                     rnaSeq.charAt(length + loopLength));
 
                     if (isValidHairpin) {
-                        fold = new RNAfold(rnaSeq);
+
+                        try {
+                            SEM.acquire();
+                            fold = new RNAfold(rnaSeq);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                        } finally {
+                            SEM.release();
+                        }
+
                         hairpinModel = fold.getStructure();
 
                         if (rnaSeq.length() != hairpinModel.length()) {
@@ -199,11 +211,6 @@ public class LoopCatcherThread implements Runnable {
                 posAux = rnaSequence.indexOf(rnaSeq);
 
                 // Fill the fields
-                slr.setRnaHairpinSequence(rnaSeq);
-                slr.setLoop(rnaLoop);
-                slr.setStartsAt(loopPos - extIzq);
-                slr.setStructure(hairpinModel);
-                slr.setSequenceLength(sequenceLength);
                 try {
                     slr.setAdditional5Seq(rnaSequence
                             .substring(posAux - k, posAux));
@@ -213,6 +220,21 @@ public class LoopCatcherThread implements Runnable {
                     slr.setAdditional3Seq("");
                     slr.setAdditional5Seq("");
                 }
+
+                if (invert) {
+                    rnaSeq = reverseIt(rnaSeq);
+                    hairpinModel = reverseIt(hairpinModel);
+                    stemLoopPattern = reverseIt(stemLoopPattern);
+                    slr.setReverse(true);
+                } else {
+                    slr.setReverse(false);
+                }
+
+                slr.setRnaHairpinSequence(rnaSeq);
+                slr.setLoop(rnaLoop);
+                slr.setStartsAt(loopPos - extIzq);
+                slr.setStructure(hairpinModel);
+                slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe()
                 //rfa.getMFE(rnaSeq.getBytes()).mfe
@@ -235,9 +257,10 @@ public class LoopCatcherThread implements Runnable {
                         (rnaSequence.length() - rnaSequence.replace("U", "") //NOI18N
                         .length()) / (float) rnaSequence.length());
 
-                if(this.additionalSequence.length() > 0)
-                slr.setAdditionalSeqLocations(getPatternLocations(rnaSequence,
-                        this.additionalSequence));
+                if (this.additionalSequence.length() > 0) {
+                    slr.setAdditionalSeqLocations(getPatternLocations(rnaSequence,
+                            this.additionalSequence));
+                }
 
                 slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
 
@@ -380,7 +403,7 @@ public class LoopCatcherThread implements Runnable {
     }
 
     public int sequenceExtendedResearch(String rnaSequence, String header,
-            String hairpinSeq, String stemLoopPattern, CSVWriter writer) {
+            String hairpinSeq, String stemLoopPattern, CSVWriter writer, boolean invert) {
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
         slr = null;
@@ -390,6 +413,10 @@ public class LoopCatcherThread implements Runnable {
         boolean isValidHairpin;
 
         final int sequenceLength = rnaSequence.length();
+
+        if (invert) {
+            stemLoopPattern = reverseIt(stemLoopPattern);
+        }
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoopPattern);
@@ -415,10 +442,10 @@ public class LoopCatcherThread implements Runnable {
                             loopPos + loopLength + length);
                     hairpinModel = hairpinSeq.substring(loopPos - length,
                             loopPos + loopLength + length);
-                    
-                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length-1),
+
+                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length - 1),
                             rnaSeq.charAt(length + loopLength))
-                            || isComplementaryRNAWooble(rnaSeq.charAt(length-1),
+                            || isComplementaryRNAWooble(rnaSeq.charAt(length - 1),
                                     rnaSeq.charAt(length + loopLength));
 
                     if (rnaSeq.length() != hairpinModel.length()) {
@@ -426,8 +453,8 @@ public class LoopCatcherThread implements Runnable {
                                 + hairpinModel);
                     }
 
-                    if(isValidHairpin){
-                        hairpinModel = isValidHairpin(hairpinModel, loopLength, 
+                    if (isValidHairpin) {
+                        hairpinModel = isValidHairpin(hairpinModel, loopLength,
                                 loopPos, rnaSeq);
                         isValidHairpin = hairpinModel.length() > 0;
                     }
@@ -449,11 +476,6 @@ public class LoopCatcherThread implements Runnable {
                 posAux = rnaSequence.indexOf(rnaSeq);
 
                 // Fill the fields
-                slr.setRnaHairpinSequence(rnaSeq);
-                slr.setLoop(rnaLoop);
-                slr.setStartsAt(loopPos - extIzq);
-                slr.setStructure(hairpinModel);
-                slr.setSequenceLength(sequenceLength);
                 try {
                     slr.setAdditional5Seq(rnaSequence
                             .substring(posAux - k, posAux));
@@ -463,6 +485,21 @@ public class LoopCatcherThread implements Runnable {
                     slr.setAdditional3Seq("");
                     slr.setAdditional5Seq("");
                 }
+
+                if (invert) {
+                    rnaSeq = reverseIt(rnaSeq);
+                    hairpinModel = reverseIt(hairpinModel);
+                    slr.setReverse(true);
+                } else {
+                    slr.setReverse(false);
+                }
+
+                // Fill the fields
+                slr.setRnaHairpinSequence(rnaSeq);
+                slr.setLoop(rnaLoop);
+                slr.setStartsAt(loopPos - extIzq);
+                slr.setStructure(hairpinModel);
+                slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe());
                 slr.setPredecessorLoop(extIzq);

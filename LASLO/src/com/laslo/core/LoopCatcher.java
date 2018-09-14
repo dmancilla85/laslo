@@ -422,7 +422,7 @@ public class LoopCatcher {
 
         CSVWriter writer;
         String fileName, fileOut;
-        final int MAX_HILOS = 10;
+        final int MAX_HILOS = 20;
         int secuencias = 0, nHilos = MAX_HILOS, i, count = 0;
         ExecutorService pool;
         CountDownLatch latch;
@@ -454,7 +454,8 @@ public class LoopCatcher {
             if (actualFile.getName().endsWith(GENBANK_EXT)) {
                 fasta = readGenbankDNASequence(actualFile, false);
             } else {
-                fasta = readFastaDNASequence(actualFile, true);
+                fasta = readFastaDNASequence(actualFile, 
+                        actualFile.length() > (52428800));
             }
 
             if (fasta.isEmpty()) {
@@ -507,7 +508,7 @@ public class LoopCatcher {
                     pool.execute(thread);
                 } else {
                     i = 1;                    
-                    out.println("Esperando hijos...");
+                    //out.println("Esperando hijos...");
                     latch.await();
                     out.println("Terminando pool");
                     pool.shutdown();
@@ -522,13 +523,14 @@ public class LoopCatcher {
             }
             
             if(latch.getCount() > 0){
-            out.println("Esperando hijos...");
+            out.println("Esperando threads...");
             latch.await();
             out.println("Terminando pool");
             pool.shutdown();}
 
             writer.close();
             writer = null;
+            fasta.clear();
             fasta = null;
 
             out.printf(bundle.getString("RESUME"),

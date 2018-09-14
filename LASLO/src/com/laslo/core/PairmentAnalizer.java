@@ -31,6 +31,17 @@ public class PairmentAnalizer {
         return isComplement;
     }
 
+    public static String reverseIt(String source) {
+        int i, len = source.length();
+        StringBuilder dest = new StringBuilder(len);
+
+        for (i = (len - 1); i >= 0; i--) {
+            dest.append(source.charAt(i));
+        }
+
+        return dest.toString();
+    }
+
     public static boolean isComplementaryRNA(char base1, char base2) {
         // ok
         boolean isComplement = false;
@@ -71,15 +82,15 @@ public class PairmentAnalizer {
         return isComplement;
     }
 
-    public static boolean isMismatch(char base1, char base2){
+    public static boolean isMismatch(char base1, char base2) {
         boolean isMismatch;
-        isMismatch = !isComplementaryDNA(base1, base2) &&
-                !isComplementaryRNA(base1, base2) &&
-                !isComplementaryRNAWooble(base1, base2);
-        
+        isMismatch = !isComplementaryDNA(base1, base2)
+                && !isComplementaryRNA(base1, base2)
+                && !isComplementaryRNAWooble(base1, base2);
+
         return isMismatch;
     }
-    
+
     public static boolean isComplementaryRNAWooble(char base1, char base2) {
         /**
          * *
