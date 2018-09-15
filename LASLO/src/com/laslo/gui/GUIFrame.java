@@ -621,14 +621,14 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
         // TODO add your handling code here:
-       this.jRBen_EN.setSelected(false);
-       this.locale = new Locale("es", "AR");
+        this.jRBen_EN.setSelected(false);
+        this.locale = new Locale("es", "AR");
     }//GEN-LAST:event_jRBes_ARActionPerformed
 
     private void jRBen_ENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
         // TODO add your handling code here:
         jRBes_AR.setSelected(false);
-        
+
         this.locale = new Locale("en", "US");
     }//GEN-LAST:event_jRBen_USActionPerformed
 
@@ -708,7 +708,7 @@ public class GUIFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     protected Locale locale;
-    private   final ResourceBundle bundle;
+    private final ResourceBundle bundle;
     protected LoopCatcher loopCatcher;
     protected File[] listOfFiles;
     protected boolean isRunning;
@@ -736,15 +736,14 @@ public class GUIFrame extends javax.swing.JFrame {
                 break;
             default:
                 origin = InputSequence.GENERIC;
-                //fs = this.jFTfieldSep.getText();
-                //cols = this.jFTnumCols.getText();
+            //fs = this.jFTfieldSep.getText();
+            //cols = this.jFTnumCols.getText();
         }
-        
+
         /*if(fs.length() != 0){
             this.jFTfieldSep.setValue(fs);
             this.jFTnumCols.setValue(cols);
         }*/
-
         this.loopCatcher.setInputType(origin);
     }
 
@@ -804,7 +803,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 isValid = false;
             }
         }
-        
+
         if (this.jcbMakeRandoms.isSelected()) {
             if (klet <= 0 || klet > 10) {
                 this.jLblError.setText(bundle.getString("ERROR_INVALID_NBR_RANDOMS"));
@@ -826,7 +825,7 @@ public class GUIFrame extends javax.swing.JFrame {
         ArrayList<String> loopList;
         loopList = new ArrayList<>();
         this.jLblError.setText("");
-        
+
         if (this.isRunning) {
             return;
         }
@@ -841,7 +840,7 @@ public class GUIFrame extends javax.swing.JFrame {
         mismatch = new Integer(this.jSpinMismatch.getValue().toString());
         randoms = new Integer(this.jftNumberOfRandoms.getValue().toString());
         klet = new Integer(this.jftkLet.getValue().toString());
-        
+
         // Loops
         loopList.addAll(Arrays.asList(loops));
 
@@ -869,15 +868,13 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
         loopCatcher.setkLetRandoms(klet);
-        
+
         //loopCatcher.beginSearch();
-        
         GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
                 this.jBStart, this.loopCatcher);
         worker.execute();
-        
+
         //loopCatcher.beginSearch();
-        
         setIsRunning(false);
     }
 }

@@ -2,7 +2,6 @@ package com.laslo.turner1999;
 
 import com.tools.BaseRelation;
 import java.util.ArrayList;
-import rnafold4j.*;
 
 class StackingEnergies{
 // STACKING ENERGIES: TERMINAL MISMATCHES AND BASE-PAIRS
@@ -375,14 +374,14 @@ public class FoldingFreeEnergyChange {
     byte[] seq = new String("GUGACGUGUGCAAAUGUGACGUGUGCAAAUGUGACGUGUGCAAAU").getBytes();
 		
     // Create a new instance of RNAFold4J
-    RNAFoldAPI rfa = new RNAFoldAPI();
+    //RNAFoldAPI rfa = new RNAFoldAPI();
     
     // Predict the MFE and corresponding structure
-    MFEData mfe = rfa.getMFE(seq);
-    System.out.println(String.format("Sequence:  %s\nStructure: %s \nMFE:       %f", new String(seq), new String(mfe.structure), mfe.mfe));
+    //MFEData mfe = rfa.getMFE(seq);
+    //System.out.println(String.format("Sequence:  %s\nStructure: %s \nMFE:       %f", new String(seq), new String(mfe.structure), mfe.mfe));
 
     // Predict the base pair probability matrix (equivalent to using the -p option).
     // Returns linearized upper trianguar matrix
-    double[] bppm = rfa.getBppm(seq);
+    //double[] bppm = rfa.getBppm(seq);
 	}
 }

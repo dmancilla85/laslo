@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2018 David A. Mancilla
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.laslo.core;
 
 import static com.laslo.core.PairmentAnalizer.reverseIt;
@@ -17,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * 13/12/2016
  *
+ * @author David A. Mancilla
  */
 public class StemLoop {
 
@@ -54,22 +72,43 @@ public class StemLoop {
     protected double mfe;
     protected List<Integer> additionalSeqLocations;
 
+    /**
+     *
+     * @return
+     */
     public String getAdditional5Seq() {
         return additional5Seq;
     }
 
+    /**
+     *
+     * @param additional5Seq
+     */
     public void setAdditional5Seq(String additional5Seq) {
         this.additional5Seq = additional5Seq;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAdditional3Seq() {
         return additional3Seq;
     }
 
+    /**
+     *
+     * @param additional3Seq
+     */
     public void setAdditional3Seq(String additional3Seq) {
         this.additional3Seq = additional3Seq;
     }
 
+    /**
+     *
+     * @param number
+     * @return
+     */
     private String getFormattedNumber(Double number) {
         NumberFormat numberFormatter
                 = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -77,6 +116,10 @@ public class StemLoop {
         return numberFormatter.format(number);
     }
 
+    /**
+     *
+     * @param mode
+     */
     public StemLoop(InputSequence mode) {
         super();
         this.mode = mode;
@@ -131,34 +174,67 @@ public class StemLoop {
         this.additionalSeqLocations = new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMismatches() {
         return mismatches;
     }
 
+    /**
+     *
+     * @param invert
+     */
     public void setReverse(boolean invert) {
         this.reversed = invert;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getIsReversed() {
         return reversed;
     }
 
+    /**
+     *
+     * @param mismatches
+     */
     public void setMismatches(int mismatches) {
         this.mismatches = mismatches;
     }
 
+    /**
+     *
+     * @param pattern
+     */
     public void setLoopPattern(String pattern) {
         this.loopPattern = pattern;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getRelativePos() {
         return this.relativePos;
     }
 
+    /**
+     *
+     * @param relativePos
+     */
     public void setRelativePos(double relativePos) {
         this.relativePos = relativePos;
     }
 
+    /**
+     *
+     * @param mode
+     * @return
+     */
     public static String getHeader(InputSequence mode) {
 
         String header = "";
@@ -189,6 +265,7 @@ public class StemLoop {
                 + "LoopPattern" + SourceFile.ROW_DELIMITER
                 + "LoopID" + SourceFile.ROW_DELIMITER
                 + "TerminalPair" + SourceFile.ROW_DELIMITER
+                + "Sense" + SourceFile.ROW_DELIMITER
                 + "N-2" + SourceFile.ROW_DELIMITER
                 + "N-1" + SourceFile.ROW_DELIMITER
                 + "N2" + SourceFile.ROW_DELIMITER
@@ -219,19 +296,30 @@ public class StemLoop {
                 + "PurinePercentStem" + SourceFile.ROW_DELIMITER
                 + "RnaFoldMFE" + SourceFile.ROW_DELIMITER
                 + "RelativePosition" + SourceFile.ROW_DELIMITER
-                + "IsReverse" + SourceFile.ROW_DELIMITER
                 + "AdditionalSeqMatches" + SourceFile.ROW_DELIMITER
                 + "AdditionalSeqPositions" + SourceFile.ROW_DELIMITER;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEndsAt() {
         return endsAt;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getGeneID() {
         return this.id_fasta.getGeneID();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getGeneSymbol() {
         if (this.id_fasta.getGeneSymbol() != null) {
             return this.id_fasta.getGeneSymbol();
@@ -240,100 +328,184 @@ public class StemLoop {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public String getGUPairs() {
         long pairs = Math.round(this.percent_GU * this.getPairments());
 
         return pairs + "";
     }
 
+    /**
+     *
+     * @return
+     */
     public String getHairpinStructure() {
         return hairpinStructure; //drawHairpinStructure();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getLoop() {
         return loop;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getLoopID() {
         String theLoop, terminal;
-        
+
         theLoop = this.loop;
         terminal = this.getTerminalPair();
-        
-        if(reversed){
+
+        if (reversed) {
             theLoop = reverseIt(theLoop);
             terminal = reverseIt(terminal);
         }
-        
+
         return this.predecessorLoop + theLoop
                 + "(" + terminal + ")|" + this.getPairments();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getLoopPattern() {
 
         return this.loopPattern;
     }
 
+    /**
+     *
+     * @return
+     */
     public InputSequence getMode() {
         return mode;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getN2Loop() {
         return n2Loop;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getN5Loop() {
         return n5Loop;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getN6Loop() {
         return n6Loop;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getN7Loop() {
         return n7Loop;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getN8Loop() {
         return n8Loop;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercA_sequence() {
         return percA_sequence;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercC_sequence() {
         return percC_sequence;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercent_AG() {
         return percent_AG;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercent_AU() {
         return percent_AU;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercent_CG() {
         return percent_CG;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercent_GU() {
         return percent_GU;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercG_sequence() {
         return percG_sequence;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPercU_sequence() {
         return percU_sequence;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getPredecessorLoop() {
         return predecessorLoop;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAdditionalSequenceCount() {
 
         Integer count = 0;
@@ -345,6 +517,10 @@ public class StemLoop {
         return count.toString();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAdditionalSequenceLocations() {
 
         String locations = ""; //$NON-NLS-1$
@@ -369,24 +545,44 @@ public class StemLoop {
         return locations;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getRnaHairpinSequence() {
         return rnaHairpinSequence;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSequenceLength() {
         return sequenceLength;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStartsAt() {
         return startsAt;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPairments() {
         int count = StringUtils.countMatches(viennaStructure, "(");;
 
         return count;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTerminalPair() {
         Character a = rnaHairpinSequence.charAt(viennaStructure.lastIndexOf("("));
         Character b = rnaHairpinSequence.charAt(viennaStructure.indexOf(")"));
@@ -394,18 +590,33 @@ public class StemLoop {
         return a.toString() + b.toString();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTranscriptID() {
         return this.id_fasta.getTranscriptID();
     }
 
+    /**
+     *
+     * @param endsAt
+     */
     public void setEndsAt(int endsAt) {
         this.endsAt = endsAt;
     }
 
+    /**
+     *
+     * @param loopPattern
+     */
     public void setLoop(String loopPattern) {
         this.loop = loopPattern;
     }
 
+    /**
+     *
+     */
     public void checkPairments() {
 
         String seq = this.rnaHairpinSequence;
@@ -469,14 +680,18 @@ public class StemLoop {
 
     }
 
+    /**
+     *
+     * @param startPosLoop
+     */
     public void setNLoop(int startPosLoop) {
         char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
 
-        if(reversed){
+        if (reversed) {
             this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
             startPosLoop = rnaHairpinSequence.indexOf(reverseIt(loop));
         }
-        
+
         if (this.rnaHairpinSequence != null) {
             n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
 
@@ -503,20 +718,31 @@ public class StemLoop {
         this.n6Loop = n6;
         this.n7Loop = n7;
         this.n8Loop = n8;
-        
-        if(reversed){
+
+        if (reversed) {
             this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
         }
     }
 
+    /**
+     *
+     * @param percA_sequence
+     */
     public void setPercA_sequence(float percA_sequence) {
         this.percA_sequence = percA_sequence;
     }
 
+    /**
+     *
+     * @param percC_sequence
+     */
     public void setPercC_sequence(float percC_sequence) {
         this.percC_sequence = percC_sequence;
     }
 
+    /**
+     *
+     */
     public void setPercent_AG() {
 
         float myPercent_AG = 0;
@@ -535,22 +761,41 @@ public class StemLoop {
         this.percent_AG = myPercent_AG;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getMfe() {
         return mfe;
     }
 
+    /**
+     *
+     * @param mfe
+     */
     public void setMfe(Double mfe) {
         this.mfe = mfe;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getStructure() {
         return viennaStructure;
     }
 
+    /**
+     *
+     * @param structure
+     */
     public void setStructure(String structure) {
         this.viennaStructure = structure;
     }
 
+    /**
+     *
+     */
     public void setPercent_AU() {
         float percentAU = 0;
         int count = 0;
@@ -571,6 +816,9 @@ public class StemLoop {
         this.percent_AU = percentAU;
     }
 
+    /**
+     *
+     */
     public void setPercent_CG() {
         float percentCG;
         percentCG = 0;
@@ -593,6 +841,10 @@ public class StemLoop {
         this.percent_CG = percentCG;
     }
 
+    /**
+     *
+     * @param wooble
+     */
     public void setPercent_GU(int wooble) {
         float percentGU;
         int size;
@@ -605,14 +857,26 @@ public class StemLoop {
         this.percent_GU = percentGU;
     }
 
+    /**
+     *
+     * @param percG_sequence
+     */
     public void setPercG_sequence(float percG_sequence) {
         this.percG_sequence = percG_sequence;
     }
 
+    /**
+     *
+     * @param percU_sequence
+     */
     public void setPercU_sequence(float percU_sequence) {
         this.percU_sequence = percU_sequence;
     }
 
+    /**
+     *
+     * @param irLength
+     */
     public void setPredecessorLoop(int irLength) {
 
         char precedes = ' ', precedes2 = ' ';
@@ -627,22 +891,42 @@ public class StemLoop {
         this.predecessor2Loop = precedes2;
     }
 
+    /**
+     *
+     * @param pumilioLocations
+     */
     public void setAdditionalSeqLocations(List<Integer> pumilioLocations) {
         this.additionalSeqLocations = pumilioLocations;
     }
 
+    /**
+     *
+     * @param rnaHairpinSequence
+     */
     public void setRnaHairpinSequence(String rnaHairpinSequence) {
         this.rnaHairpinSequence = rnaHairpinSequence;
     }
 
+    /**
+     *
+     * @param sequenceLength
+     */
     public void setSequenceLength(int sequenceLength) {
         this.sequenceLength = sequenceLength;
     }
 
+    /**
+     *
+     * @param startsAt
+     */
     public void setStartsAt(int startsAt) {
         this.startsAt = startsAt;
     }
 
+    /**
+     *
+     * @param id
+     */
     public void setTags(String id) {
         switch (this.mode) {
             case ENSEMBL:
@@ -660,20 +944,25 @@ public class StemLoop {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public String toRowCSV() {
 
-        String isReverse = "N";
-        String loopM = this.loop; 
-        
-        if(this.reversed){
-            isReverse = "S";
+        String isReverse = "+";
+        String loopM = this.loop;
+
+        if (this.reversed) {
+            isReverse = "-";
             loopM = reverseIt(loopM);
         }
-        
+
         return this.id_fasta.toRowCSV()
                 + this.getLoopPattern() + SourceFile.ROW_DELIMITER
                 + this.getLoopID() + SourceFile.ROW_DELIMITER
                 + this.getTerminalPair() + SourceFile.ROW_DELIMITER
+                + isReverse + SourceFile.ROW_DELIMITER
                 + this.predecessor2Loop + SourceFile.ROW_DELIMITER //n-2
                 + this.predecessorLoop + SourceFile.ROW_DELIMITER
                 + this.n2Loop + SourceFile.ROW_DELIMITER
@@ -704,7 +993,6 @@ public class StemLoop {
                 + getFormattedNumber(this.percent_AG) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.mfe) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.relativePos) + SourceFile.ROW_DELIMITER
-                + isReverse + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
     }

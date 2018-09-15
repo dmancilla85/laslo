@@ -16,18 +16,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package com.laslo.gui;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author David A. Mancilla
  */
-import javax.swing.JOptionPane;
+public class MessageBox {
 
-public class MessageBox
-{
-
-    public static void show(String infoMessage, String titleBar)
-    {
+    /**
+     * 
+     * @param infoMessage
+     * @param titleBar 
+     */
+    public static void show(String infoMessage, String titleBar) {
         JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
     }
 }

@@ -1,13 +1,38 @@
+/*
+ * Copyright (C) 2018 David A. Mancilla
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.tools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * 
+ * @author Unknown
+ */
 public class OSValidator {
 
     private static final String OS = System.getProperty("os.name").toLowerCase();
 
+    /**
+     * 
+     * @param args 
+     */
     public static void main(String[] args) {
 
         System.out.println(OS);
@@ -23,26 +48,46 @@ public class OSValidator {
         } else {
             System.out.println("Your OS is not support!!");
         }
-        
+
         System.out.println("Number of cores: " + getNumberOfCPUCores());
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static boolean isWindows() {
         return (OS.contains("win"));
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static boolean isMac() {
         return (OS.contains("mac"));
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static boolean isUnix() {
         return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix"));
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static boolean isSolaris() {
         return (OS.contains("sunos"));
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static String getOS() {
         if (isWindows()) {
             return "win";

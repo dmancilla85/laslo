@@ -1,5 +1,19 @@
-/**
+/*
+ * Copyright (C) 2018 David A. Mancilla
  *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package com.tools.io;
 
@@ -29,6 +43,9 @@ public class EnsemblFastaID extends SourceFile {
     protected String description;
     protected String spliceNumber;
 
+    /**
+     * 
+     */
     public EnsemblFastaID() {
         this.transcriptID = ""; //$NON-NLS-1$
         this.geneID = ""; //$NON-NLS-1$
@@ -40,38 +57,74 @@ public class EnsemblFastaID extends SourceFile {
 
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getGeneBiotype() {
         return geneBiotype;
     }
 
+    /**
+     * 
+     * @param geneBiotype 
+     */
     public void setGeneBiotype(String geneBiotype) {
         this.geneBiotype = geneBiotype;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getTranscriptBiotype() {
         return transcriptBiotype;
     }
 
+    /**
+     * 
+     * @param transcriptBiotype 
+     */
     public void setTranscriptBiotype(String transcriptBiotype) {
         this.transcriptBiotype = transcriptBiotype;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * 
+     * @param description 
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getSpliceNumber() {
         return spliceNumber;
     }
 
+    /**
+     * 
+     * @param spliceNumber 
+     */
     public void setSpliceNumber(String spliceNumber) {
         this.spliceNumber = spliceNumber;
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public String toString() {
         return "EnsemblFastaID [transcriptID=" + transcriptID + ", geneID=" + geneID + ", geneBiotype=" + geneBiotype //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -79,10 +132,18 @@ public class EnsemblFastaID extends SourceFile {
                 + description + ", spliceNumber=" + spliceNumber + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static String getHeader() {
         return EnsemblFastaID.HEADER;
     }
 
+    /**
+     * 
+     * @param idSequence 
+     */
     public void setEnsemblTags(String idSequence) {
 
         int index, index2;
@@ -194,6 +255,10 @@ public class EnsemblFastaID extends SourceFile {
 
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public String toRowCSV() {
         return geneID + ROW_DELIMITER

@@ -27,10 +27,18 @@ public enum ReturnValue {
 
     private int returnCode;
 
+    /**
+     * 
+     * @param returnCode 
+     */
     private ReturnValue(int returnCode) {
         this.returnCode = returnCode;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public int getReturnCode() {
         return returnCode;
     }

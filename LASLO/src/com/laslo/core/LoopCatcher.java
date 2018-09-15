@@ -1,5 +1,19 @@
-/**
+/*
+ * Copyright (C) 2018 David A. Mancilla
  *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package com.laslo.core;
 
@@ -29,13 +43,11 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
-
 
 /**
  * @author David
@@ -60,24 +72,52 @@ public class LoopCatcher {
     protected File actualFile;
     protected String additionalSequence;
 
+    /**
+     * 
+     * @return 
+     */
     public int getkLetRandoms() {
         return kLetRandoms;
     }
 
+    /**
+     * 
+     * @param kLetRandoms 
+     */
     public void setkLetRandoms(int kLetRandoms) {
         this.kLetRandoms = kLetRandoms;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getAdditionalSequence() {
         return additionalSequence;
     }
 
+    /**
+     * 
+     * @param additionalSequence 
+     */
     public void setAdditionalSequence(String additionalSequence) {
         this.additionalSequence = additionalSequence;
     }
 
-    // Create a new instance of RNAFold4J
-    //protected RNAFoldAPI rfa;
+    /**
+     * 
+     * @param pathOut
+     * @param pathIn
+     * @param loopPatterns
+     * @param additionalSequence
+     * @param inputType
+     * @param minLength
+     * @param maxLength
+     * @param maxWooble
+     * @param maxMismatch
+     * @param locale
+     * @param kLetRandoms 
+     */
     public LoopCatcher(String pathOut, String pathIn,
             ArrayList<String> loopPatterns, String additionalSequence,
             InputSequence inputType,
@@ -198,6 +238,10 @@ public class LoopCatcher {
         this.loopPatterns = loopPatterns;
     }
 
+    /**
+     * 
+     * @param bundle 
+     */
     public void setBundle(ResourceBundle bundle) {
         this.bundle = bundle;
     }
@@ -242,14 +286,26 @@ public class LoopCatcher {
         return maxLength;
     }
 
+    /**
+     * 
+     * @param maxLength 
+     */
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public int getMaxWooble() {
         return maxWooble;
     }
 
+    /**
+     * 
+     * @param maxWooble 
+     */
     public void setMaxWooble(int maxWooble) {
         this.maxWooble = maxWooble;
     }
@@ -308,36 +364,15 @@ public class LoopCatcher {
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-
+            out.println("ERROR: " + e.getMessage());
         }
     }
-
+    
     /**
-     *
-     * @param sequence
-     * @param pattern
-     * @return
-     */
-    /*public List<Integer> getPatternLocations(String sequence, String pattern) {
-        List<Integer> locations = new ArrayList<>();
-        String regExp = toRegularExpression(pattern);
-
-        Pattern p = Pattern.compile(regExp);
-        Matcher loopFinder = p.matcher(sequence);
-
-        while (loopFinder.find()) {
-            locations.add(loopFinder.start());
-        }
-
-        return locations;
-    }*/
-
-    // Union
-    /**
-     *
+     * 
      * @param a
      * @param b
-     * @return
+     * @return 
      */
     public File[] unionFiles(File[] a, File[] b) {
         Set<File> set;
@@ -355,7 +390,8 @@ public class LoopCatcher {
         Calendar ini, fin;
         ini = Calendar.getInstance();
         out.println(
-                java.text.MessageFormat.format(bundle.getString("START_TIME"), new Object[]{Calendar.getInstance().getTime()}));
+                java.text.MessageFormat.format(bundle.getString("START_TIME"), 
+                        new Object[]{Calendar.getInstance().getTime()}));
         out.flush();
 
         if (fileList == null) {
@@ -380,9 +416,9 @@ public class LoopCatcher {
                         }
 
                     } catch (IOException ex) {
-                        Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
+                        out.println("ERROR: " + ex.getMessage());
                     } catch (Exception ex) {
-                        Logger.getLogger(LoopCatcher.class.getName()).log(Level.SEVERE, null, ex);
+                        out.println("ERROR: " + ex.getMessage());
                     }
 
                     UShuffle.makeShuffleSequences(pathOut, currentFile.getName(),
@@ -409,7 +445,8 @@ public class LoopCatcher {
         }
 
         fin = Calendar.getInstance();
-        out.println(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"), new Object[]{((fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000)}) + " s.");
+        out.println(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"), 
+                new Object[]{((fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000)}) + " s.");
 
         out.flush();
 
@@ -418,6 +455,9 @@ public class LoopCatcher {
         return true;
     }
 
+    /**
+     * 
+     */
     public void processFile() {
 
         CSVWriter writer;
@@ -451,11 +491,11 @@ public class LoopCatcher {
 
             // Generation of the iterator of {id,sequence}
             LinkedHashMap<String, DNASequence> fasta;
-            
+
             if (actualFile.getName().endsWith(GENBANK_EXT)) {
                 fasta = readGenbankDNASequence(actualFile, false);
             } else {
-                fasta = readFastaDNASequence(actualFile, 
+                fasta = readFastaDNASequence(actualFile,
                         actualFile.length() > (52428800));
             }
 
@@ -484,53 +524,53 @@ public class LoopCatcher {
             writer.writeNext(StemLoop.getHeader(this.inputType).split(";")); //NOI18N
 
             // II. Transcript level
-            //pool = Executors.newFixedThreadPool(listSize);
-            //latch = new CountDownLatch(listSize);
-
-            if(listSize < nHilos)
+            if (listSize < nHilos) {
                 nHilos = listSize;
-            
+            }
+
             pool = Executors.newFixedThreadPool(nHilos);
             latch = new CountDownLatch(nHilos);
             i = 0;
-            
+
             ini = Calendar.getInstance();
             secuencias = 0;
-            
+
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
-                
-                DNASequence element = entry.getValue();               
+
+                DNASequence element = entry.getValue();
                 Iterator<String> patternItr = loopPatterns.iterator();
                 count++;
                 secuencias++;
-                LoopCatcherThread thread = new LoopCatcherThread(extendedMode, 
+                LoopCatcherThread thread = new LoopCatcherThread(extendedMode,
                         additionalSequence, maxLength, minLength, element,
                         inputType, patternItr, writer);
 
-                if(i++ <= nHilos){
+                if (i++ <= nHilos) {
                     thread.setLatch(latch);
                     pool.execute(thread);
                 } else {
-                    i = 1;                    
+                    i = 1;
                     //out.println("Esperando hijos...");
                     latch.await();
                     out.println("Terminando pool");
                     pool.shutdown();
-                    
-                    if(fasta.size() - count < nHilos)
+
+                    if (fasta.size() - count < nHilos) {
                         nHilos = fasta.size() - count;
-                    
+                    }
+
                     pool = Executors.newFixedThreadPool(nHilos);
                     latch = new CountDownLatch(nHilos);
-                    
-                }     
+
+                }
             }
-            
-            if(latch.getCount() > 0){
-           // out.println("Esperando threads...");
-            latch.await();
-            //out.println("Terminando pool");
-            pool.shutdown();}
+
+            if (latch.getCount() > 0) {
+                // out.println("Esperando threads...");
+                latch.await();
+                //out.println("Terminando pool");
+                pool.shutdown();
+            }
 
             writer.close();
             writer = null;
@@ -541,43 +581,56 @@ public class LoopCatcher {
                     this.minLength,
                     this.maxLength,
                     secuencias);*/
-            out.println("Secuencias: " + secuencias);            
+            out.println("Secuencias: " + secuencias);
             fin = Calendar.getInstance();
             out.println("Tiempo: " + (fin.getTimeInMillis()
-                    - ini.getTimeInMillis()) / 1000  + " s.");
+                    - ini.getTimeInMillis()) / 1000 + " s.");
             out.println();
-            
+
         } catch (FileNotFoundException ex) {
             /*Logger.getLogger(LoopCatcher.class.getName())
                     .log(Level.SEVERE, null, ex);*/
             out.println(bundle.getString("CANT_OPEN_FILE"));
         } catch (IOException ex) {
-            Logger.getLogger(LoopCatcher.class.getName())
-                    .log(Level.SEVERE, null, ex);
+            out.println("ERROR: " + ex.getMessage());
         } catch (Exception ex) {
-            Logger.getLogger(LoopCatcher.class.getName())
-                    .log(Level.SEVERE, null, ex);
+            out.println("ERROR: " + ex.getMessage());
         }
 
         writer = null;
         fileName = null;
         fileOut = null;
-
         System.gc();
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isMakeRandoms() {
         return makeRandoms;
     }
 
+    /**
+     * 
+     * @param makeRandoms 
+     */
     public void setMakeRandoms(boolean makeRandoms) {
         this.makeRandoms = makeRandoms;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public int getNumberOfRandoms() {
         return numberOfRandoms;
     }
 
+    /**
+     * 
+     * @param numberOfRandoms 
+     */
     public void setNumberOfRandoms(int numberOfRandoms) {
         this.numberOfRandoms = numberOfRandoms;
     }

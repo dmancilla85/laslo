@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2018 David A. Mancilla
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.tools.io;
 
 import java.io.IOException;
@@ -10,10 +27,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// 0. Una vez que funcione esto
-// 1. Aplicar file separator en todas las clases -- evitar uso de \\
-// 2. Empezar a usar internationalize strings
-// 3. Soporte para GenBank
+/**
+ * @author David
+ *
+ */
 public class FASTACorrector {
 
     protected final static String HEADER_START = ">";
@@ -21,6 +38,11 @@ public class FASTACorrector {
     protected final static String NEW_LINE = System.getProperty("line.separator");
     protected final static String HEADER_DESC = "Sequence ID";
 
+    /**
+     * 
+     * @param fileName
+     * @return 
+     */
     public static boolean formatFile(String fileName) {
         try {
             Path filePath = Paths.get(fileName);
@@ -49,9 +71,5 @@ public class FASTACorrector {
             Logger.getLogger(FASTACorrector.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-    }
-
-    public static void main(String[] args) {
-        formatFile("C:\\Users\\David\\Downloads\\mitoregulin.fa");
     }
 }

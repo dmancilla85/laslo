@@ -1,5 +1,19 @@
-/**
+/*
+ * Copyright (C) 2018 David A. Mancilla
  *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package com.laslo.core;
 
@@ -9,6 +23,12 @@ package com.laslo.core;
  */
 public class PairmentAnalizer {
 
+    /**
+     * 
+     * @param base1
+     * @param base2
+     * @return 
+     */
     public static boolean isComplementaryDNA(char base1, char base2) {
         // ok
         boolean isComplement = false;
@@ -31,6 +51,11 @@ public class PairmentAnalizer {
         return isComplement;
     }
 
+    /**
+     * 
+     * @param source
+     * @return 
+     */
     public static String reverseIt(String source) {
         int i, len = source.length();
         StringBuilder dest = new StringBuilder(len);
@@ -42,6 +67,12 @@ public class PairmentAnalizer {
         return dest.toString();
     }
 
+    /**
+     * 
+     * @param base1
+     * @param base2
+     * @return 
+     */
     public static boolean isComplementaryRNA(char base1, char base2) {
         // ok
         boolean isComplement = false;
@@ -82,6 +113,12 @@ public class PairmentAnalizer {
         return isComplement;
     }
 
+    /**
+     * 
+     * @param base1
+     * @param base2
+     * @return 
+     */
     public static boolean isMismatch(char base1, char base2) {
         boolean isMismatch;
         isMismatch = !isComplementaryDNA(base1, base2)
@@ -91,15 +128,30 @@ public class PairmentAnalizer {
         return isMismatch;
     }
 
+    /**
+     * The nucleic acid codes are: 
+     * A --> adenosine 
+     * M --> A C (amino) 
+     * C --> cytidine 
+     * S --> G C (strong) 
+     * G --> guanine 
+     * W --> A T (weak) 
+     * T --> thymidine 
+     * B --> G T C 
+     * U --> uridine 
+     * D --> G A T 
+     * R --> G A (purine) 
+     * H --> A C T 
+     * Y --> T C (pyrimidine) 
+     * V --> G C A 
+     * K --> G T (keto) 
+     * N --> A G C T (any) 
+     * - gap of indeterminate length
+     * @param base1
+     * @param base2
+     * @return 
+     */
     public static boolean isComplementaryRNAWooble(char base1, char base2) {
-        /**
-         * *
-         * The nucleic acid codes are: A --> adenosine M --> A C (amino) C -->
-         * cytidine S --> G C (strong) G --> guanine W --> A T (weak) T -->
-         * thymidine B --> G T C U --> uridine D --> G A T R --> G A (purine) H
-         * --> A C T Y --> T C (pyrimidine) V --> G C A K --> G T (keto) N --> A
-         * G C T (any) - gap of indeterminate length
-         */
 
         boolean isComplement = false;
 
@@ -135,6 +187,11 @@ public class PairmentAnalizer {
         return isComplement;
     }
 
+    /**
+     * 
+     * @param dnaSequence
+     * @return 
+     */
     public static String toComplementaryRNA(String dnaSequence) {
         String rnaSequence = ""; //$NON-NLS-1$
         int i;
@@ -154,35 +211,49 @@ public class PairmentAnalizer {
                     rnaSequence = rnaSequence.concat("G"); //$NON-NLS-1$
                     break;
                 default:
-                    rnaSequence = rnaSequence.concat(String.valueOf(dnaSequence.charAt(i))); // test
+                    rnaSequence = rnaSequence.concat(String.valueOf(
+                            dnaSequence.charAt(i))); // test
             }
         }
 
         return rnaSequence;
     }
 
+    /**
+     * 
+     * @param fastaPattern
+     * @return 
+     */
     public static String toRegularExpression(String fastaPattern) {
         String regExp = null;
         boolean extendedReplace = true;
 
-        regExp = fastaPattern.replaceAll("N", "[AUTGC]"); //$NON-NLS-1$ //$NON-NLS-2$
+        regExp = fastaPattern.replaceAll("N", "[AUTGC]"); //$NON-NLS-1$ 
 
         if (extendedReplace) {
-            regExp = regExp.replaceAll("W", "[AUT]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("S", "[CG]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("M", "[AC]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("K", "[GUT]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("R", "[GA]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("Y", "[CUT]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("B", "[GCUT]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("D", "[GUTA]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("H", "[CUTA]"); //$NON-NLS-1$ //$NON-NLS-2$
-            regExp = regExp.replaceAll("V", "[CGA]"); //$NON-NLS-1$ //$NON-NLS-2$
+            regExp = regExp.replaceAll("W", "[AUT]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("S", "[CG]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("M", "[AC]"); //$NON-NLS-1$
+            regExp = regExp.replaceAll("K", "[GUT]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("R", "[GA]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("Y", "[CUT]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("B", "[GCUT]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("D", "[GUTA]"); //$NON-NLS-1$
+            regExp = regExp.replaceAll("H", "[CUTA]"); //$NON-NLS-1$ 
+            regExp = regExp.replaceAll("V", "[CGA]"); //$NON-NLS-1$ 
         }
         return regExp;
     }
 
-    public static int findSlippageSequence(String rna, String sequence, int nMin) {
+    /**
+     * 
+     * @param rna
+     * @param sequence
+     * @param nMin
+     * @return 
+     */
+    public static int findSlippageSequence(String rna, String sequence, 
+            int nMin) {
         /**
          * To search for repeated tracts as CA[N]
          */
@@ -209,6 +280,11 @@ public class PairmentAnalizer {
         }
     }
 
+    /**
+     * 
+     * @param loop
+     * @return 
+     */
     public static boolean checkInternalPairments(String loop) {
         char base1, base2;
         boolean ret = true;
@@ -220,7 +296,8 @@ public class PairmentAnalizer {
                 base1 = loop.charAt(i);
                 base2 = loop.charAt(loop.length() - 1 - i);
 
-                if (PairmentAnalizer.isComplementaryRNAWooble(base1, base2) || PairmentAnalizer.isComplementaryRNA(base1, base2)) {
+                if (PairmentAnalizer.isComplementaryRNAWooble(base1, base2) || 
+                        PairmentAnalizer.isComplementaryRNA(base1, base2)) {
                     ret = false;
                 }
             }

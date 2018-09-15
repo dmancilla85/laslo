@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2018 David A. Mancilla
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.laslo.core;
 
 import com.opencsv.CSVWriter;
@@ -9,16 +26,17 @@ import java.util.List;
 import static com.laslo.core.PairmentAnalizer.*;
 import com.tools.OSValidator;
 import static java.lang.System.out;
-import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.biojava.nbio.core.sequence.DNASequence;
 
+/**
+ *
+ * @author David A. Mancilla
+ */
 public class LoopCatcherThread implements Runnable {
 
     protected boolean extendedMode;
@@ -31,14 +49,30 @@ public class LoopCatcherThread implements Runnable {
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
     //private final static Semaphore SEM = new Semaphore(4);
-    private final static Semaphore SEM = new Semaphore(OSValidator.getNumberOfCPUCores());
-    ;
+    private final static Semaphore SEM = new Semaphore(OSValidator
+            .getNumberOfCPUCores());
+
     private CountDownLatch latch;
 
+    /**
+     *
+     * @param latch
+     */
     public void setLatch(CountDownLatch latch) {
         this.latch = latch;
     }
 
+    /**
+     *
+     * @param extendedMode
+     * @param additionalSequence
+     * @param maxLength
+     * @param minLength
+     * @param dnaElement
+     * @param inputType
+     * @param patternItr
+     * @param writer
+     */
     public LoopCatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
@@ -53,6 +87,9 @@ public class LoopCatcherThread implements Runnable {
         this.writer = writer;
     }
 
+    /**
+     *
+     */
     @Override
     public void run() {
 
@@ -78,7 +115,7 @@ public class LoopCatcherThread implements Runnable {
                         fold.getStructure(),
                         currentPattern,
                         writer, false);
-                
+
                 sequenceExtendedResearch(
                         rnaSequence,
                         dnaElement.getOriginalHeader(),
@@ -98,6 +135,12 @@ public class LoopCatcherThread implements Runnable {
 
     }
 
+    /**
+     *
+     * @param sequence
+     * @param pattern
+     * @return
+     */
     public List<Integer> getPatternLocations(String sequence, String pattern) {
         List<Integer> locations = new ArrayList<>();
         String regExp = toRegularExpression(pattern);
@@ -112,14 +155,13 @@ public class LoopCatcherThread implements Runnable {
         return locations;
     }
 
-   
     /**
-     * 
+     *
      * @param fastaSeq
      * @param stemLoopPattern
      * @param writer
      * @param invert
-     * @return 
+     * @return
      */
     public int sequenceResearch(DNASequence fastaSeq,
             String stemLoopPattern, CSVWriter writer, boolean invert) {
@@ -163,10 +205,12 @@ public class LoopCatcherThread implements Runnable {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
 
-                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length - 1),
-                            rnaSeq.charAt(length + loopLength))
-                            || isComplementaryRNAWooble(rnaSeq.charAt(length - 1),
-                                    rnaSeq.charAt(length + loopLength));
+                    isValidHairpin = isComplementaryRNA(rnaSeq
+                            .charAt(length - 1), rnaSeq.charAt(length
+                            + loopLength))
+                            || isComplementaryRNAWooble(rnaSeq
+                                    .charAt(length - 1), rnaSeq.charAt(length
+                                    + loopLength));
 
                     if (isValidHairpin) {
 
@@ -174,7 +218,7 @@ public class LoopCatcherThread implements Runnable {
                             SEM.acquire();
                             fold = new RNAfold(rnaSeq);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                            out.println("ERROR: " + ex.getMessage());
                         } finally {
                             SEM.release();
                         }
@@ -191,7 +235,8 @@ public class LoopCatcherThread implements Runnable {
                                 == 0.0) {
                             isValidHairpin = false;
                         } else {
-                            hairpinModel = isValidHairpin(hairpinModel, loopLength, loopPos, rnaSeq);
+                            hairpinModel = isValidHairpin(hairpinModel,
+                                    loopLength, loopPos, rnaSeq);
                             isValidHairpin = hairpinModel.length() > 0;
                         }
                     }
@@ -201,7 +246,7 @@ public class LoopCatcherThread implements Runnable {
                 }
 
             } catch (Exception e) {
-                out.println(Arrays.toString(e.getStackTrace()));
+                out.println("ERROR: " + e.getMessage());
             }
 
             if (isValidHairpin) {
@@ -245,10 +290,10 @@ public class LoopCatcherThread implements Runnable {
                 slr.setLoopPattern(stemLoopPattern);
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("A", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("A", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercG_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("G", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("G", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
                         (rnaSequence.length() - rnaSequence.replace("C", "") //NOI18N
@@ -279,7 +324,7 @@ public class LoopCatcherThread implements Runnable {
                 MUTEX.acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                out.println("ERROR: " + ex.getMessage());
             } finally {
                 MUTEX.release();
             }
@@ -292,6 +337,14 @@ public class LoopCatcherThread implements Runnable {
         return size;
     }
 
+    /**
+     *
+     * @param hairpin
+     * @param loopLength
+     * @param loopPos
+     * @param seq
+     * @return
+     */
     @SuppressWarnings("empty-statement")
     public String isValidHairpin(String hairpin, int loopLength, int loopPos, String seq) {
         boolean ret, begin = true;
@@ -402,6 +455,16 @@ public class LoopCatcherThread implements Runnable {
         return hairpin;
     }
 
+    /**
+     *
+     * @param rnaSequence
+     * @param header
+     * @param hairpinSeq
+     * @param stemLoopPattern
+     * @param writer
+     * @param invert
+     * @return
+     */
     public int sequenceExtendedResearch(String rnaSequence, String header,
             String hairpinSeq, String stemLoopPattern, CSVWriter writer, boolean invert) {
         List<StemLoop> slrList = new ArrayList<>();
@@ -448,11 +511,6 @@ public class LoopCatcherThread implements Runnable {
                             || isComplementaryRNAWooble(rnaSeq.charAt(length - 1),
                                     rnaSeq.charAt(length + loopLength));
 
-                    if (rnaSeq.length() != hairpinModel.length()) {
-                        out.println("Error NO COINCIDEN:" + rnaSeq + " - "
-                                + hairpinModel);
-                    }
-
                     if (isValidHairpin) {
                         hairpinModel = isValidHairpin(hairpinModel, loopLength,
                                 loopPos, rnaSeq);
@@ -464,7 +522,7 @@ public class LoopCatcherThread implements Runnable {
                 }
 
             } catch (Exception e) {
-                out.println(Arrays.toString(e.getStackTrace()));
+                out.println("ERROR: " + e.getMessage());
             }
 
             if (isValidHairpin) {
@@ -487,8 +545,7 @@ public class LoopCatcherThread implements Runnable {
                 }
 
                 if (invert) {
-                    rnaSeq = reverseIt(rnaSeq);
-                    hairpinModel = reverseIt(hairpinModel);
+                    stemLoopPattern = reverseIt(stemLoopPattern);
                     slr.setReverse(true);
                 } else {
                     slr.setReverse(false);
@@ -539,7 +596,7 @@ public class LoopCatcherThread implements Runnable {
                 MUTEX.acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                Logger.getLogger(LoopCatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                out.println("ERROR: " + ex.getMessage());
             } finally {
                 MUTEX.release();
             }
