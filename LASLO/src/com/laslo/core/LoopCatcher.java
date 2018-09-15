@@ -423,9 +423,10 @@ public class LoopCatcher {
         CSVWriter writer;
         String fileName, fileOut;
         final int MAX_HILOS = 20;
-        int secuencias = 0, nHilos = MAX_HILOS, i, count = 0;
+        int secuencias, nHilos = MAX_HILOS, i, count = 0;
         ExecutorService pool;
         CountDownLatch latch;
+        Calendar ini, fin;
 
         try {
             fileName = actualFile.getName();
@@ -493,12 +494,15 @@ public class LoopCatcher {
             latch = new CountDownLatch(nHilos);
             i = 0;
             
+            ini = Calendar.getInstance();
+            secuencias = 0;
+            
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
                 
                 DNASequence element = entry.getValue();               
                 Iterator<String> patternItr = loopPatterns.iterator();
                 count++;
-                
+                secuencias++;
                 LoopCatcherThread thread = new LoopCatcherThread(extendedMode, 
                         additionalSequence, maxLength, minLength, element,
                         inputType, patternItr, writer);
@@ -523,9 +527,9 @@ public class LoopCatcher {
             }
             
             if(latch.getCount() > 0){
-            out.println("Esperando threads...");
+           // out.println("Esperando threads...");
             latch.await();
-            out.println("Terminando pool");
+            //out.println("Terminando pool");
             pool.shutdown();}
 
             writer.close();
@@ -533,11 +537,16 @@ public class LoopCatcher {
             fasta.clear();
             fasta = null;
 
-            out.printf(bundle.getString("RESUME"),
+            /*out.printf(bundle.getString("RESUME"),
                     this.minLength,
                     this.maxLength,
-                    secuencias);
-            out.flush();
+                    secuencias);*/
+            out.println("Secuencias: " + secuencias);            
+            fin = Calendar.getInstance();
+            out.println("Tiempo: " + (fin.getTimeInMillis()
+                    - ini.getTimeInMillis()) / 1000  + " s.");
+            out.println();
+            
         } catch (FileNotFoundException ex) {
             /*Logger.getLogger(LoopCatcher.class.getName())
                     .log(Level.SEVERE, null, ex);*/

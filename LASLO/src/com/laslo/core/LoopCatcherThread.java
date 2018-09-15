@@ -91,9 +91,9 @@ public class LoopCatcherThread implements Runnable {
             }
         }
 
-        if (latch.getCount() < 3) {
+        /*if (latch.getCount() < 3) {
             out.println("Threads remaining: " + latch.getCount());
-        }
+        }*/
         latch.countDown();
 
     }
@@ -112,12 +112,14 @@ public class LoopCatcherThread implements Runnable {
         return locations;
     }
 
+   
     /**
-     *
+     * 
      * @param fastaSeq
      * @param stemLoopPattern
      * @param writer
-     * @return
+     * @param invert
+     * @return 
      */
     public int sequenceResearch(DNASequence fastaSeq,
             String stemLoopPattern, CSVWriter writer, boolean invert) {
@@ -222,8 +224,6 @@ public class LoopCatcherThread implements Runnable {
                 }
 
                 if (invert) {
-                    rnaSeq = reverseIt(rnaSeq);
-                    hairpinModel = reverseIt(hairpinModel);
                     stemLoopPattern = reverseIt(stemLoopPattern);
                     slr.setReverse(true);
                 } else {

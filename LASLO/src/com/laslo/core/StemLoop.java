@@ -255,10 +255,18 @@ public class StemLoop {
     }
 
     public String getLoopID() {
-        /*return this.predecessorLoop + this.loop
-                + ":" + this.getGUPairs() + "|" + this.getPairments();*/
-        return this.predecessorLoop + this.loop
-                + "(" + this.getTerminalPair() + ")|" + this.getPairments();
+        String theLoop, terminal;
+        
+        theLoop = this.loop;
+        terminal = this.getTerminalPair();
+        
+        if(reversed){
+            theLoop = reverseIt(theLoop);
+            terminal = reverseIt(terminal);
+        }
+        
+        return this.predecessorLoop + theLoop
+                + "(" + terminal + ")|" + this.getPairments();
     }
 
     public String getLoopPattern() {
@@ -464,10 +472,11 @@ public class StemLoop {
     public void setNLoop(int startPosLoop) {
         char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
 
-        if (reversed) {
-            rnaHairpinSequence = reverseIt(rnaHairpinSequence);
+        if(reversed){
+            this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
+            startPosLoop = rnaHairpinSequence.indexOf(reverseIt(loop));
         }
-
+        
         if (this.rnaHairpinSequence != null) {
             n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
 
@@ -494,9 +503,9 @@ public class StemLoop {
         this.n6Loop = n6;
         this.n7Loop = n7;
         this.n8Loop = n8;
-
-        if (reversed) {
-            rnaHairpinSequence = reverseIt(rnaHairpinSequence);
+        
+        if(reversed){
+            this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
         }
     }
 
@@ -654,16 +663,10 @@ public class StemLoop {
     public String toRowCSV() {
 
         String isReverse = "N";
-        String seq = this.rnaHairpinSequence;
-        String mod1 = this.hairpinStructure;
-        String mod2 = this.viennaStructure;
         String loopM = this.loop; 
         
         if(this.reversed){
             isReverse = "S";
-            seq = reverseIt(seq);
-            mod1 = reverseIt(mod1);
-            mod2 = reverseIt(mod2);
             loopM = reverseIt(loopM);
         }
         
@@ -679,11 +682,11 @@ public class StemLoop {
                 + this.n7Loop + SourceFile.ROW_DELIMITER
                 + this.n8Loop + SourceFile.ROW_DELIMITER
                 + loopM /*this.loop*/ + SourceFile.ROW_DELIMITER
-                + seq /*this.rnaHairpinSequence*/ + SourceFile.ROW_DELIMITER
+                + this.rnaHairpinSequence + SourceFile.ROW_DELIMITER
                 + this.additional5Seq + SourceFile.ROW_DELIMITER
                 + this.additional3Seq + SourceFile.ROW_DELIMITER
-                + mod1 /*this.getHairpinStructure()*/ + SourceFile.ROW_DELIMITER
-                + mod2 /*this.getStructure()*/ + SourceFile.ROW_DELIMITER
+                + this.getHairpinStructure() + SourceFile.ROW_DELIMITER
+                + this.getStructure() + SourceFile.ROW_DELIMITER
                 + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
                 + this.getGUPairs() + SourceFile.ROW_DELIMITER
                 + this.getMismatches() + SourceFile.ROW_DELIMITER
