@@ -23,7 +23,19 @@ package com.tools;
  * @author David A. Mancilla
  */
 public enum BaseRelation {
-	WATSON_CRICK,
-	WOOBLE,
-	MISMATCH
+
+    /**
+     *
+     */
+    WATSON_CRICK,
+
+    /**
+     *
+     */
+    WOOBLE,
+
+    /**
+     *
+     */
+    MISMATCH
 }

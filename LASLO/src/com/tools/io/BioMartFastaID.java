@@ -23,8 +23,19 @@ package com.tools.io;
  */
 public class BioMartFastaID extends SourceFile {
 
+    /**
+     *
+     */
     protected static int nCols = 6;
+
+    /**
+     *
+     */
     protected static char fs = '|';
+
+    /**
+     *
+     */
     protected static String columns[] = new String[nCols];
 
     /**

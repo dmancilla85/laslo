@@ -164,6 +164,10 @@ public class RNAfold {
         this.mfe = mfe;
     }
   
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
        String sequence = "UAGAGAUCUCUAUGUAUUUCCC";

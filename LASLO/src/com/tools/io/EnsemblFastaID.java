@@ -23,10 +23,29 @@ package com.tools.io;
  */
 public class EnsemblFastaID extends SourceFile {
 
+    /**
+     *
+     */
     public final String GENE = "gene:"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String GENE_BIOTYPE = "gene_biotype:"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String TRANSCRIPT_BIOTYPE = "transcript_biotype:"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String GENE_SYMBOL = "gene_symbol:"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String DESCRIPTION = "description:"; //$NON-NLS-1$
 
     final static String HEADER = "GeneID" + ROW_DELIMITER //$NON-NLS-1$
@@ -38,9 +57,24 @@ public class EnsemblFastaID extends SourceFile {
             + "Description" + ROW_DELIMITER //$NON-NLS-1$
             ;
 
+    /**
+     *
+     */
     protected String geneBiotype;
+
+    /**
+     *
+     */
     protected String transcriptBiotype;
+
+    /**
+     *
+     */
     protected String description;
+
+    /**
+     *
+     */
     protected String spliceNumber;
 
     /**

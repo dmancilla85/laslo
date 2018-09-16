@@ -39,13 +39,44 @@ import org.biojava.nbio.core.sequence.DNASequence;
  */
 public class LoopCatcherThread implements Runnable {
 
+    /**
+     *
+     */
     protected boolean extendedMode;
+
+    /**
+     *
+     */
     protected String additionalSequence;
+
+    /**
+     *
+     */
     protected int maxLength;
+
+    /**
+     *
+     */
     protected int minLength;
+
+    /**
+     *
+     */
     protected DNASequence dnaElement;
+
+    /**
+     *
+     */
     protected InputSequence inputType;
+
+    /**
+     *
+     */
     protected Iterator<String> patternItr;
+
+    /**
+     *
+     */
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
     //private final static Semaphore SEM = new Semaphore(4);

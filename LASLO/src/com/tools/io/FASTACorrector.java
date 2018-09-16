@@ -33,9 +33,24 @@ import java.util.logging.Logger;
  */
 public class FASTACorrector {
 
+    /**
+     *
+     */
     protected final static String HEADER_START = ">";
+
+    /**
+     *
+     */
     protected final static String BLANK = " ";
+
+    /**
+     *
+     */
     protected final static String NEW_LINE = System.getProperty("line.separator");
+
+    /**
+     *
+     */
     protected final static String HEADER_DESC = "Sequence ID";
 
     /**

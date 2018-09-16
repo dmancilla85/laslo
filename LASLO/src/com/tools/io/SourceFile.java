@@ -24,17 +24,60 @@ package com.tools.io;
 public class SourceFile {
 
     final static String FIELD_DELIMITER = "|"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String ROW_DELIMITER = ";"; //$NON-NLS-1$
 
+    /**
+     *
+     */
     protected String transcriptID;
+
+    /**
+     *
+     */
     protected String geneID;
+
+    /**
+     *
+     */
     protected String geneSymbol;
+
+    /**
+     *
+     */
     protected String fieldDelimiter;
+
+    /**
+     *
+     */
     protected String rowDelimiter;
+
+    /**
+     *
+     */
     public static final String LOG_EXT = ".log";
+
+    /**
+     *
+     */
     public static final String CSV_EXT = ".csv";
+
+    /**
+     *
+     */
     public static final String FASTA_EXT = ".fasta";
+
+    /**
+     *
+     */
     public static final String FASTA_EXT_2 = ".fa";
+
+    /**
+     *
+     */
     public static final String GENBANK_EXT = ".gb";
 
     /**

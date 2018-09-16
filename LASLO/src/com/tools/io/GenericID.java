@@ -26,6 +26,9 @@ public class GenericID extends SourceFile {
 
     final static String HEADER = "SequenceID" + ROW_DELIMITER;
 
+    /**
+     *
+     */
     public GenericID() {
         this.geneID = "";
     }
@@ -35,10 +38,18 @@ public class GenericID extends SourceFile {
         return "GenericID [sequenceID=" + geneID + "]";
     }
 
+    /**
+     *
+     * @return
+     */
     public static String getHeader() {
         return GenericID.HEADER;
     }
 
+    /**
+     *
+     * @param id
+     */
     public void setGenericTags(String id) {
         // TODO Auto-generated method stub
         geneID = id.replace(';', '-');

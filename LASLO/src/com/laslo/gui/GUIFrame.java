@@ -707,12 +707,31 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jftkLet;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     *
+     */
     protected Locale locale;
     private final ResourceBundle bundle;
+
+    /**
+     *
+     */
     protected LoopCatcher loopCatcher;
+
+    /**
+     *
+     */
     protected File[] listOfFiles;
+
+    /**
+     *
+     */
     protected boolean isRunning;
 
+    /**
+     *
+     * @param value
+     */
     public void setInputSequence(String value) {
         InputSequence origin;
         String fs = "";
@@ -747,6 +766,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.loopCatcher.setInputType(origin);
     }
 
+    /**
+     *
+     * @param value
+     */
     public void setIsRunning(boolean value) {
         this.isRunning = value;
         this.jBStart.setEnabled(!value);
@@ -759,6 +782,19 @@ public class GUIFrame extends javax.swing.JFrame {
         }
     }
 
+    /**
+     *
+     * @param min
+     * @param max
+     * @param wooble
+     * @param mismatch
+     * @param pathIn
+     * @param pathOut
+     * @param loopList
+     * @param randoms
+     * @param klet
+     * @return
+     */
     public boolean validateParameters(int min, int max, int wooble,
             int mismatch, String pathIn, String pathOut,
             ArrayList<String> loopList, int randoms, int klet) {
@@ -814,6 +850,9 @@ public class GUIFrame extends javax.swing.JFrame {
         return isValid;
     }
 
+    /**
+     *
+     */
     public void start() {
 
         //String inputValue;

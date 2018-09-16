@@ -55,21 +55,72 @@ import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankD
  */
 public class LoopCatcher {
 
+    /**
+     *
+     */
     protected String pathOut;
+
+    /**
+     *
+     */
     protected String pathIn;
+
+    /**
+     *
+     */
     protected ArrayList<String> loopPatterns;
+
+    /**
+     *
+     */
     protected InputSequence inputType;
+
+    /**
+     *
+     */
     protected int minLength;
+
+    /**
+     *
+     */
     protected int maxLength;
+
+    /**
+     *
+     */
     protected int maxWooble;
+
+    /**
+     *
+     */
     protected ResourceBundle bundle;
+
+    /**
+     *
+     */
     protected int maxMismatch;
+
+    /**
+     *
+     */
     protected File[] fileList;
+
+    /**
+     *
+     */
     protected boolean extendedMode;
     private boolean makeRandoms;
     private int numberOfRandoms;
     private int kLetRandoms;
+
+    /**
+     *
+     */
     protected File actualFile;
+
+    /**
+     *
+     */
     protected String additionalSequence;
 
     /**
@@ -369,7 +420,7 @@ public class LoopCatcher {
     }
     
     /**
-     * 
+     * Union two lists of files
      * @param a
      * @param b
      * @return 
@@ -456,7 +507,7 @@ public class LoopCatcher {
     }
 
     /**
-     * 
+     * Process the files selected
      */
     public void processFile() {
 
@@ -552,7 +603,7 @@ public class LoopCatcher {
                     i = 1;
                     //out.println("Esperando hijos...");
                     latch.await();
-                    out.println("Terminando pool");
+                    //out.println("Terminando pool");
                     pool.shutdown();
 
                     if (fasta.size() - count < nHilos) {

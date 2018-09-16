@@ -51,6 +51,9 @@ public class FlyBaseFastaID extends SourceFile {
     String release;
     String species;
 
+    /**
+     *
+     */
     public FlyBaseFastaID() {
         this.transcriptID = "";
         this.geneID = "";
@@ -63,6 +66,10 @@ public class FlyBaseFastaID extends SourceFile {
         this.score = "";        //$NON-NLS-1$
     }
 
+    /**
+     *
+     * @return
+     */
     public static String getHeader() {
         return FlyBaseFastaID.HEADER;
     }
@@ -76,6 +83,10 @@ public class FlyBaseFastaID extends SourceFile {
                 + ", release=" + release + ", species=" + species + "]";
     }
 
+    /**
+     *
+     * @param idSequence
+     */
     public void setFlyBaseTags(String idSequence) {
 
         int index, index2;

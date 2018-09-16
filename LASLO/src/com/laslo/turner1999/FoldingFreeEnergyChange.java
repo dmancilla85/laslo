@@ -228,15 +228,45 @@ class Pair{
 	}
 }
 
+/**
+ *
+ * @author David
+ */
 public class FoldingFreeEnergyChange {
 
-	protected char strand;
-	protected String sequence;
-	protected int	loopStart;
-	protected int 	loopEnd;
-	public ArrayList<Pair> pairs = null;
+    /**
+     *
+     */
+    protected char strand;
+
+    /**
+     *
+     */
+    protected String sequence;
+
+    /**
+     *
+     */
+    protected int	loopStart;
+
+    /**
+     *
+     */
+    protected int 	loopEnd;
+
+    /**
+     *
+     */
+    public ArrayList<Pair> pairs = null;
 	
-	public FoldingFreeEnergyChange(char strand, String sequence, int loopStart, int loopEnd) {
+    /**
+     *
+     * @param strand
+     * @param sequence
+     * @param loopStart
+     * @param loopEnd
+     */
+    public FoldingFreeEnergyChange(char strand, String sequence, int loopStart, int loopEnd) {
 		super();
 		this.strand = strand;
 		this.sequence = sequence;
@@ -246,11 +276,19 @@ public class FoldingFreeEnergyChange {
 		makePairs();
 	}
 
-	public char getStrand() {
+    /**
+     *
+     * @return
+     */
+    public char getStrand() {
 		return strand;
 	}
 
-	public void setStrand(char strand) {
+    /**
+     *
+     * @param strand
+     */
+    public void setStrand(char strand) {
 		
 		if(strand != '+' && strand != '-')
 			this.strand = '*';
@@ -258,31 +296,59 @@ public class FoldingFreeEnergyChange {
 			this.strand = strand;
 	}
 
-	public String getSequence() {
+    /**
+     *
+     * @return
+     */
+    public String getSequence() {
 		return sequence;
 	}
 
-	public void setSequence(String sequence) {
+    /**
+     *
+     * @param sequence
+     */
+    public void setSequence(String sequence) {
 		this.sequence = sequence;
 	}
 
-	public int getLoopStart() {
+    /**
+     *
+     * @return
+     */
+    public int getLoopStart() {
 		return loopStart;
 	}
 
-	public void setLoopStart(int loopStart) {
+    /**
+     *
+     * @param loopStart
+     */
+    public void setLoopStart(int loopStart) {
 		this.loopStart = loopStart;
 	}
 
-	public int getLoopEnd() {
+    /**
+     *
+     * @return
+     */
+    public int getLoopEnd() {
 		return loopEnd;
 	}
 
-	public void setLoopEnd(int loopEnd) {
+    /**
+     *
+     * @param loopEnd
+     */
+    public void setLoopEnd(int loopEnd) {
 		this.loopEnd = loopEnd;
 	}
 	
-	public double getTerminalMismatchesEnergy(){
+    /**
+     *
+     * @return
+     */
+    public double getTerminalMismatchesEnergy(){
 		double value = 0.0;
 		
 		
@@ -290,7 +356,12 @@ public class FoldingFreeEnergyChange {
 		return value;
 	}
 	
-	public double formula(String sequence){
+    /**
+     *
+     * @param sequence
+     * @return
+     */
+    public double formula(String sequence){
 		/**
 		 *  ΔG°37 hairpin (>3 nucleotides in loop) = ΔG°37 initiation (n) + ΔG°37 (terminal mismatch) 
 		 *  + ΔG°37 (UU or GA first mismatch) + ΔG°37 (GG first mismatch) + ΔG°37 (special GU closure) 
@@ -318,7 +389,10 @@ public class FoldingFreeEnergyChange {
 		return deltaG37;
 	}
 	
-	public void makePairs(){
+    /**
+     *
+     */
+    public void makePairs(){
 		
 		ArrayList<Pair> pairs = new ArrayList<Pair>();
 		int pairsLength = sequence.length();
@@ -359,7 +433,11 @@ public class FoldingFreeEnergyChange {
 		this.pairs = pairs;
 	}
 	
-	public static void main(String[] args) {
+    /**
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
 		
 		String stemLoop = "CGCIGCUCUGGCGGCAGCG";
 		int start = 7;

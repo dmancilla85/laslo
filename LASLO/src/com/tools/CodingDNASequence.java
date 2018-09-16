@@ -25,14 +25,44 @@ import java.util.ArrayList;
  */
 public class CodingDNASequence {
 
+    /**
+     *
+     */
     public final static String START_CODON_MET = "AUG"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String START_CODON_LEU = "CUG"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String STOP_CODON_AMBER = "UAG"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String STOP_CODON_OCHRE = "UAA"; //$NON-NLS-1$
+
+    /**
+     *
+     */
     public final static String STOP_CODON_OPAL = "UGA"; //$NON-NLS-1$
 
+    /**
+     *
+     */
     protected int start;
+
+    /**
+     *
+     */
     protected int end;
+
+    /**
+     *
+     */
     protected String geneID;
 
     /**

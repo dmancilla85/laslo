@@ -22,7 +22,15 @@ package com.tools;
  * @author David A. Mancilla
  */
 public enum ReturnValue {
+
+    /**
+     *
+     */
     SUCCESS(0),
+
+    /**
+     *
+     */
     FAILURE(-1);
 
     private int returnCode;

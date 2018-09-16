@@ -38,38 +38,169 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StemLoop {
 
+    /**
+     *
+     */
     protected SourceFile id_fasta;
+
+    /**
+     *
+     */
     protected InputSequence mode;
+
+    /**
+     *
+     */
     protected String rnaHairpinSequence;
+
+    /**
+     *
+     */
     protected String loop;
+
+    /**
+     *
+     */
     protected String hairpinStructure;
+
+    /**
+     *
+     */
     protected String additional5Seq;
+
+    /**
+     *
+     */
     protected String additional3Seq;
+
+    /**
+     *
+     */
     protected String loopPattern;
+
+    /**
+     *
+     */
     protected String viennaStructure;
+
+    /**
+     *
+     */
     protected int sequenceLength;
+
+    /**
+     *
+     */
     protected int startsAt;
+
+    /**
+     *
+     */
     protected int endsAt;
+
+    /**
+     *
+     */
     protected int mismatches;
+
+    /**
+     *
+     */
     protected int bulges;
+
+    /**
+     *
+     */
     protected char predecessor2Loop;
+
+    /**
+     *
+     */
     protected char predecessorLoop;
+
+    /**
+     *
+     */
     protected char n2Loop;
+
+    /**
+     *
+     */
     protected char n5Loop;
+
+    /**
+     *
+     */
     protected char n6Loop;
+
+    /**
+     *
+     */
     protected char n7Loop;
+
+    /**
+     *
+     */
     protected char n8Loop;
+
+    /**
+     *
+     */
     protected double percent_AG;
+
+    /**
+     *
+     */
     protected double percent_GU;
+
+    /**
+     *
+     */
     protected double percent_CG;
+
+    /**
+     *
+     */
     protected double percent_AU;
+
+    /**
+     *
+     */
     protected double percA_sequence;
+
+    /**
+     *
+     */
     protected double percG_sequence;
+
+    /**
+     *
+     */
     protected double percC_sequence;
+
+    /**
+     *
+     */
     protected double percU_sequence;
+
+    /**
+     *
+     */
     protected double relativePos;
+
+    /**
+     *
+     */
     protected boolean reversed;
+
+    /**
+     *
+     */
     protected double mfe;
+
+    /**
+     *
+     */
     protected List<Integer> additionalSeqLocations;
 
     /**

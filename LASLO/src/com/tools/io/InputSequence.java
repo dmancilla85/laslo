@@ -23,9 +23,29 @@ package com.tools.io;
  *
  */
 public enum InputSequence {
-	ENSEMBL,
-	FLYBASE,
-	BIOMART,
-        GENBANK,
-	GENERIC
+
+    /**
+     *
+     */
+    ENSEMBL,
+
+    /**
+     *
+     */
+    FLYBASE,
+
+    /**
+     *
+     */
+    BIOMART,
+
+    /**
+     *
+     */
+    GENBANK,
+
+    /**
+     *
+     */
+    GENERIC
 }
