@@ -19,7 +19,7 @@ package com.laslo.gui;
 
 import com.tools.io.InputSequence;
 import com.laslo.core.LoopCatcher;
-import com.tools.ReturnValue;
+//import com.tools.ReturnValue;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
@@ -602,7 +602,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     + bundle.getString("PROCESS_IS_RUNNING"), bundle.getString("PROCESS_RUNNING_MSG_TITLE"));
 
         } else {
-            System.exit(ReturnValue.SUCCESS.getReturnCode());
+            System.exit(0);
         }
     }//GEN-LAST:event_formWindowClosing
 
