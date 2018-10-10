@@ -123,7 +123,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jMIAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("LASLO v0.9");
+        setTitle("LASLO v1.0");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         setIconImage(new ImageIcon(getClass().getResource("/resources/noun_655767_cc.png")).getImage());
         setLocationByPlatform(true);
@@ -855,6 +855,12 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     public void start() {
 
+        /*try {
+            Thread.sleep(3500);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        
         //String inputValue;
         //inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
         int max, min, wooble, mismatch, randoms, klet;
