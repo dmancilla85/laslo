@@ -24,6 +24,7 @@ import com.tools.io.GenericID;
 import com.tools.io.SourceFile;
 import com.tools.io.FlyBaseFastaID;
 import com.tools.io.EnsemblFastaID;
+import com.tools.io.GenBankID;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -271,6 +272,10 @@ public class StemLoop {
             case GENERIC:
                 this.id_fasta = new GenericID();
                 break;
+                
+            case GENBANK:
+                this.id_fasta = new GenBankID();
+                break;
 
         }
 
@@ -384,7 +389,7 @@ public class StemLoop {
                 break;
 
             case GENBANK:
-                header = BioMartFastaID.getHeader();
+                header = GenBankID.getHeader();
                 break;
 
             case GENERIC:
@@ -412,8 +417,8 @@ public class StemLoop {
                 + "ViennaBracketStr" + SourceFile.ROW_DELIMITER
                 + "Pairments" + SourceFile.ROW_DELIMITER
                 + "WooblePairs" + SourceFile.ROW_DELIMITER
-                + "Mismatches" + SourceFile.ROW_DELIMITER
                 + "Bulges" + SourceFile.ROW_DELIMITER
+                + "InternalLoops" + SourceFile.ROW_DELIMITER
                 + "SequenceLength" + SourceFile.ROW_DELIMITER
                 + "StartsAt" + SourceFile.ROW_DELIMITER
                 + "EndsAt" + SourceFile.ROW_DELIMITER
@@ -745,6 +750,10 @@ public class StemLoop {
         this.loop = loopPattern;
     }
 
+    public void setLocation(int pos){
+       ((GenBankID) id_fasta).setLocation(pos);
+    }
+    
     /**
      *
      */
@@ -1073,6 +1082,21 @@ public class StemLoop {
                 ((GenericID) id_fasta).setGenericTags(id);
                 break;
         }
+    }
+    
+    /**
+     * 
+     * @param gene
+     * @param transcript
+     * @param description
+     * @param cds 
+     */
+    public void setTags(String gene, String transcript, String description,
+            String cds) {
+        id_fasta.setGeneID(gene);
+        id_fasta.setTranscriptID(transcript);
+        ((GenBankID) id_fasta).setDescription(description);
+        ((GenBankID) id_fasta).setCDS(cds);
     }
 
     /**

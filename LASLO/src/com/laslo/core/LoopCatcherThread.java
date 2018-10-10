@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.biojava.nbio.core.sequence.DNASequence;
+import org.biojava.nbio.core.sequence.features.TextFeature;
 
 /**
  *
@@ -201,8 +202,9 @@ public class LoopCatcherThread implements Runnable {
         //List<Integer> mismatchs = new ArrayList<>();
         StemLoop slr;
         slr = null;
-        int size, posAux, k = 3;
+        int size, posAux, k = 1;
         size = 0;
+        
         int loopPos = 0, loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
         String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
@@ -229,7 +231,17 @@ public class LoopCatcherThread implements Runnable {
 
             int length = this.maxLength;
             slr = new StemLoop(this.inputType);
-            slr.setTags(fastaSeq.getOriginalHeader());
+            
+            if(this.inputType != InputSequence.GENBANK)
+                slr.setTags(fastaSeq.getOriginalHeader());
+            else {
+                slr.setTags(fastaSeq.getAccession().getID(),
+                        fastaSeq.getAccession().getVersion().toString(), 
+                        fastaSeq.getDescription(), 
+                        ((TextFeature)fastaSeq.getFeaturesByType("CDS")
+                                .toArray()[0]).getSource() );
+            }
+                
             try {
                 if ((loopPos - length) > 0
                         && (loopPos + loopLength + length) < sequenceLength) {
@@ -306,6 +318,9 @@ public class LoopCatcherThread implements Runnable {
                     slr.setReverse(false);
                 }
 
+                if(this.inputType == InputSequence.GENBANK)
+                    slr.setLocation(loopPos - extIzq);
+                        
                 slr.setRnaHairpinSequence(rnaSeq);
                 slr.setLoop(rnaLoop);
                 slr.setStartsAt(loopPos - extIzq);

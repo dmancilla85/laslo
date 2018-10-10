@@ -43,9 +43,9 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
+import org.biojava.nbio.core.sequence.features.FeatureInterface;
+import org.biojava.nbio.core.sequence.features.TextFeature;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
 
@@ -496,7 +496,7 @@ public class LoopCatcher {
         }
 
         fin = Calendar.getInstance();
-        out.println(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"), 
+        out.print(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"), 
                 new Object[]{((fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000)}) + " s.");
 
         out.flush();
@@ -512,6 +512,7 @@ public class LoopCatcher {
     public void processFile() {
 
         CSVWriter writer;
+        boolean genbank;
         String fileName, fileOut;
         final int MAX_HILOS = 20;
         int secuencias, nHilos = MAX_HILOS, i, count = 0;
@@ -521,6 +522,7 @@ public class LoopCatcher {
 
         try {
             fileName = actualFile.getName();
+            genbank = false;
             out.println(java.text.MessageFormat.format(bundle
                     .getString("FILE_PRINT"), new Object[]{fileName})); //$NON-NLS-1$
             out.flush();
@@ -545,9 +547,11 @@ public class LoopCatcher {
 
             if (actualFile.getName().endsWith(GENBANK_EXT)) {
                 fasta = readGenbankDNASequence(actualFile, false);
+                genbank = true;
             } else {
                 fasta = readFastaDNASequence(actualFile,
                         actualFile.length() > (52428800));
+                genbank = false;
             }
 
             if (fasta.isEmpty()) {
@@ -563,11 +567,18 @@ public class LoopCatcher {
                 }
             }
 
-            this.inputType = SourceFile.detectHeader(fasta.entrySet().iterator()
+            if(!genbank)
+                this.inputType = SourceFile.detectHeader(fasta.entrySet().iterator()
                     .next().getValue().getOriginalHeader());
+            else
+                this.inputType = InputSequence.GENBANK;
+            
             int listSize = fasta.size();
-            //i = 1;
 
+            // Get the CDS
+            /*fasta.entrySet().iterator()
+                    .next().getValue().getFeatures().get(2).getSource();*/
+            
             writer = new CSVWriter(new FileWriter(fileOut), ';',
                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
                     CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -601,9 +612,7 @@ public class LoopCatcher {
                     pool.execute(thread);
                 } else {
                     i = 1;
-                    //out.println("Esperando hijos...");
                     latch.await();
-                    //out.println("Terminando pool");
                     pool.shutdown();
 
                     if (fasta.size() - count < nHilos) {
@@ -617,9 +626,7 @@ public class LoopCatcher {
             }
 
             if (latch.getCount() > 0) {
-                // out.println("Esperando threads...");
                 latch.await();
-                //out.println("Terminando pool");
                 pool.shutdown();
             }
 
@@ -632,9 +639,9 @@ public class LoopCatcher {
                     this.minLength,
                     this.maxLength,
                     secuencias);*/
-            out.println("Secuencias: " + secuencias);
+            out.print(" Secuencias: " + secuencias);
             fin = Calendar.getInstance();
-            out.println("Tiempo: " + (fin.getTimeInMillis()
+            out.print(" Tiempo: " + (fin.getTimeInMillis()
                     - ini.getTimeInMillis()) / 1000 + " s.");
             out.println();
 

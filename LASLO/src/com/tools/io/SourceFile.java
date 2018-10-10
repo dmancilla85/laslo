@@ -89,6 +89,10 @@ public class SourceFile {
 
         InputSequence out = InputSequence.GENERIC;
 
+        if(header.contains("genbank")){
+            return InputSequence.GENBANK;
+        }
+        
         if (header.contains("gene:")
                 && header.contains("gene_biotype:")
                 && header.contains("transcript_biotype:")
