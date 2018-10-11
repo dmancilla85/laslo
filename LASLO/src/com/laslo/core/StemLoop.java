@@ -39,169 +39,38 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StemLoop {
 
-    /**
-     *
-     */
     protected SourceFile id_fasta;
-
-    /**
-     *
-     */
     protected InputSequence mode;
-
-    /**
-     *
-     */
     protected String rnaHairpinSequence;
-
-    /**
-     *
-     */
     protected String loop;
-
-    /**
-     *
-     */
     protected String hairpinStructure;
-
-    /**
-     *
-     */
     protected String additional5Seq;
-
-    /**
-     *
-     */
     protected String additional3Seq;
-
-    /**
-     *
-     */
     protected String loopPattern;
-
-    /**
-     *
-     */
     protected String viennaStructure;
-
-    /**
-     *
-     */
     protected int sequenceLength;
-
-    /**
-     *
-     */
     protected int startsAt;
-
-    /**
-     *
-     */
     protected int endsAt;
-
-    /**
-     *
-     */
     protected int mismatches;
-
-    /**
-     *
-     */
     protected int bulges;
-
-    /**
-     *
-     */
     protected char predecessor2Loop;
-
-    /**
-     *
-     */
     protected char predecessorLoop;
-
-    /**
-     *
-     */
     protected char n2Loop;
-
-    /**
-     *
-     */
     protected char n5Loop;
-
-    /**
-     *
-     */
     protected char n6Loop;
-
-    /**
-     *
-     */
     protected char n7Loop;
-
-    /**
-     *
-     */
     protected char n8Loop;
-
-    /**
-     *
-     */
     protected double percent_AG;
-
-    /**
-     *
-     */
     protected double percent_GU;
-
-    /**
-     *
-     */
     protected double percent_CG;
-
-    /**
-     *
-     */
     protected double percent_AU;
-
-    /**
-     *
-     */
     protected double percA_sequence;
-
-    /**
-     *
-     */
     protected double percG_sequence;
-
-    /**
-     *
-     */
     protected double percC_sequence;
-
-    /**
-     *
-     */
     protected double percU_sequence;
-
-    /**
-     *
-     */
     protected double relativePos;
-
-    /**
-     *
-     */
     protected boolean reversed;
-
-    /**
-     *
-     */
     protected double mfe;
-
-    /**
-     *
-     */
     protected List<Integer> additionalSeqLocations;
 
     /**
@@ -330,7 +199,7 @@ public class StemLoop {
      *
      * @return
      */
-    public boolean getIsReversed() {
+    public boolean getReversed() {
         return reversed;
     }
 
@@ -444,6 +313,13 @@ public class StemLoop {
         return endsAt;
     }
 
+    public String isReverse(){
+        if(!this.reversed)
+            return "+";
+        else
+            return "-";
+    }
+    
     /**
      *
      * @return
@@ -487,7 +363,14 @@ public class StemLoop {
      * @return
      */
     public String getLoop() {
-        return loop;
+        
+        String theLoop = this.loop;
+        
+        if (reversed) {
+            theLoop = reverseIt(theLoop);
+        }
+        
+        return theLoop;
     }
 
     /**
@@ -710,8 +593,7 @@ public class StemLoop {
      * @return
      */
     public int getPairments() {
-        int count = StringUtils.countMatches(viennaStructure, "(");;
-
+        int count = StringUtils.countMatches(viennaStructure, "(");
         return count;
     }
 
@@ -1092,19 +974,11 @@ public class StemLoop {
      */
     public String toRowCSV() {
 
-        String isReverse = "+";
-        String loopM = this.loop;
-
-        if (this.reversed) {
-            isReverse = "-";
-            loopM = reverseIt(loopM);
-        }
-
         return this.id_fasta.toRowCSV()
                 + this.getLoopPattern() + SourceFile.ROW_DELIMITER
                 + this.getLoopID() + SourceFile.ROW_DELIMITER
                 + this.getTerminalPair() + SourceFile.ROW_DELIMITER
-                + isReverse + SourceFile.ROW_DELIMITER
+                + this.isReverse() + SourceFile.ROW_DELIMITER
                 + this.predecessor2Loop + SourceFile.ROW_DELIMITER //n-2
                 + this.predecessorLoop + SourceFile.ROW_DELIMITER
                 + this.n2Loop + SourceFile.ROW_DELIMITER
@@ -1112,7 +986,7 @@ public class StemLoop {
                 + this.n6Loop + SourceFile.ROW_DELIMITER
                 + this.n7Loop + SourceFile.ROW_DELIMITER
                 + this.n8Loop + SourceFile.ROW_DELIMITER
-                + loopM /*this.loop*/ + SourceFile.ROW_DELIMITER
+                + this.getLoop() + SourceFile.ROW_DELIMITER
                 + this.rnaHairpinSequence + SourceFile.ROW_DELIMITER
                 + this.additional5Seq + SourceFile.ROW_DELIMITER
                 + this.additional3Seq + SourceFile.ROW_DELIMITER

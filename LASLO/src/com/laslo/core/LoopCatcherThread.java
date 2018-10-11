@@ -286,12 +286,7 @@ public class LoopCatcherThread implements Runnable {
                     slr.setAdditional5Seq("");
                 }
 
-                if (invert) {
-                    stemLoopPattern = reverseIt(stemLoopPattern);
-                    slr.setReverse(true);
-                } else {
-                    slr.setReverse(false);
-                }
+                slr.setReverse(invert);
 
                 if(this.inputType == InputSequence.GENBANK)
                     slr.setLocation(loopPos - extIzq);
@@ -307,7 +302,12 @@ public class LoopCatcherThread implements Runnable {
 
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
-                slr.setLoopPattern(stemLoopPattern);
+                
+                if(!invert)
+                    slr.setLoopPattern(stemLoopPattern);
+                else
+                    slr.setLoopPattern(reverseIt(stemLoopPattern));
+                
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "")
