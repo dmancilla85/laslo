@@ -17,24 +17,37 @@
  */
 package com.laslo.gui;
 
-import com.tools.io.InputSequence;
 import com.laslo.core.LoopCatcher;
-//import com.tools.ReturnValue;
+import com.tools.io.InputSequence;
+import static com.tools.io.InputSequence.BIOMART;
+import static com.tools.io.InputSequence.ENSEMBL;
+import static com.tools.io.InputSequence.FLYBASE;
+import static com.tools.io.InputSequence.GENERIC;
+import static java.awt.EventQueue.invokeLater;
 import java.awt.event.WindowEvent;
+import static java.awt.event.WindowEvent.WINDOW_CLOSING;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.io.PrintStream;
+import static java.lang.System.exit;
 import static java.lang.System.out;
-import java.util.Arrays;
+import static java.lang.System.setErr;
+import static java.lang.System.setOut;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Logger.getLogger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+import static javax.swing.JFileChooser.DIRECTORIES_ONLY;
+import static javax.swing.JFileChooser.FILES_AND_DIRECTORIES;
 import javax.swing.JFrame;
+import static javax.swing.UIManager.getInstalledLookAndFeels;
+import static javax.swing.UIManager.setLookAndFeel;
 
 /**
  *
@@ -60,19 +73,20 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
         this.jFTpercWooble.setValue(50);
-        //this.jFTfieldSep.setVisible(false);
-        //this.jFTnumCols.setVisible(false);
         this.jFTpercMismatch.setVisible(false);
         this.jFTpercWooble.setVisible(false);
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLabel2.setVisible(false);
         this.jLabel5.setVisible(false);
+        this.jcbSearchInverse.setSelected(false);
+        this.jcbExtended.setSelected(false);
+        this.jcbMakeRandoms.setSelected(false);
 
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
         PrintStream ps = new PrintStream(taos);
-        System.setOut(ps);
-        System.setErr(ps);
+        setOut(ps);
+        setErr(ps);
     }
 
     /**
@@ -114,6 +128,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jftAdditionalSeq = new javax.swing.JFormattedTextField();
         jLblNKlet = new javax.swing.JLabel();
         jftkLet = new javax.swing.JFormattedTextField();
+        jcbSearchInverse = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
@@ -312,6 +327,14 @@ public class GUIFrame extends javax.swing.JFrame {
         jftkLet.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
         jftkLet.setEnabled(false);
 
+        jcbSearchInverse.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jcbSearchInverse.setText("Search for inversed patterns too ");
+        jcbSearchInverse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbSearchInverseActionPerformed(evt);
+            }
+        });
+
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
 
@@ -361,13 +384,12 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
                             .addComponent(jScrollPane2)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel4)
                                     .addComponent(jLabel6))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(89, 89, 89)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jTFPathIn)
                                     .addComponent(jTFPathOut))
@@ -382,45 +404,51 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(4, 4, 4)
-                                        .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jcbExtended))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jSpinMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jFTpercMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel3)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jcbMakeRandoms)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jSpinWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(jcbExtended))
+                                        .addGap(4, 4, 4)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jcbSearchInverse)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jcbMakeRandoms)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addGap(10, 10, 10)
+                                                .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jSpinMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jFTpercMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(10, 10, 10))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -439,17 +467,18 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jButtonOut, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jcbMakeRandoms)
                     .addComponent(jLblNRand)
                     .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLblNKlet)
-                    .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jcbMakeRandoms))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jcbExtended)
-                    .addComponent(jLabel1)
-                    .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -461,9 +490,11 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addComponent(jFTpercWooble, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jcbSearchInverse, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
@@ -477,6 +508,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jLabel3.getAccessibleContext().setAccessibleName("");
         jLblNRand.getAccessibleContext().setAccessibleName("");
         jLblNKlet.getAccessibleContext().setAccessibleName("k-let");
 
@@ -498,10 +530,10 @@ public class GUIFrame extends javax.swing.JFrame {
         File folder = null;
 
         // In response to a button click:
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setFileSelectionMode(DIRECTORIES_ONLY);
         int returnVal = fc.showDialog(myFrame, bundle.getString("DESTINATION_FC_MSG"));
 
-        if (JFileChooser.APPROVE_OPTION == returnVal) {
+        if (APPROVE_OPTION == returnVal) {
             folder = fc.getSelectedFile();
         }
 
@@ -512,7 +544,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jMIExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIExitActionPerformed
         // TODO add your handling code here:
-        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+        this.dispatchEvent(new WindowEvent(this, WINDOW_CLOSING));
     }//GEN-LAST:event_jMIExitActionPerformed
 
     private void jBStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBStartActionPerformed
@@ -572,10 +604,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.listOfFiles = null;
 
         // In response to a button click:
-        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fc.setFileSelectionMode(FILES_AND_DIRECTORIES);
         int returnVal = fc.showDialog(myFrame, bundle.getString("PATH_FC_MSG"));
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == APPROVE_OPTION) {
             file = fc.getSelectedFile();
             isFolder = file.isDirectory();
         } else {
@@ -602,7 +634,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     + bundle.getString("PROCESS_IS_RUNNING"), bundle.getString("PROCESS_RUNNING_MSG_TITLE"));
 
         } else {
-            System.exit(0);
+            exit(0);
         }
     }//GEN-LAST:event_formWindowClosing
 
@@ -632,6 +664,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.locale = new Locale("en", "US");
     }//GEN-LAST:event_jRBen_USActionPerformed
 
+    private void jcbSearchInverseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbSearchInverseActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jcbSearchInverseActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -642,14 +678,14 @@ public class GUIFrame extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            for (javax.swing.UIManager.LookAndFeelInfo info : getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    setLookAndFeel(info.getClassName());
                     break;
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            getLogger(GUIFrame.class.getName()).log(SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
@@ -658,11 +694,11 @@ public class GUIFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
+        invokeLater(() -> {
             try {
                 new GUIFrame().setVisible(true);
             } catch (IOException ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(GUIFrame.class.getName()).log(SEVERE, null, ex);
             }
         });
     }
@@ -702,6 +738,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTFPathOut;
     private javax.swing.JCheckBox jcbExtended;
     private javax.swing.JCheckBox jcbMakeRandoms;
+    private javax.swing.JCheckBox jcbSearchInverse;
     private javax.swing.JFormattedTextField jftAdditionalSeq;
     private javax.swing.JFormattedTextField jftNumberOfRandoms;
     private javax.swing.JFormattedTextField jftkLet;
@@ -739,23 +776,24 @@ public class GUIFrame extends javax.swing.JFrame {
 
         switch (value) {
             case "Ensembl":
-                origin = InputSequence.ENSEMBL;
+                origin = ENSEMBL;
                 fs = ";";
                 cols = "10";
                 break;
             case "FlyBase":
-                origin = InputSequence.FLYBASE;
+                origin = FLYBASE;
                 fs = ",";
                 cols = "8";
                 break;
             case "BioMart":
-                origin = InputSequence.BIOMART;
+                origin = BIOMART;
                 fs = "|";
                 cols = "6";
                 break;
             default:
-                origin = InputSequence.GENERIC;
+                origin = GENERIC;
             //fs = this.jFTfieldSep.getText();
+            //cols = this.jFTnumCols.getText();            //fs = this.jFTfieldSep.getText();
             //cols = this.jFTnumCols.getText();
         }
 
@@ -854,12 +892,6 @@ public class GUIFrame extends javax.swing.JFrame {
      *
      */
     public void start() {
-
-        /*try {
-            Thread.sleep(3500);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
         
         //String inputValue;
         //inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
@@ -876,7 +908,6 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         this.setIsRunning(true);
-        //this.setInputSequence(inputValue);
 
         // Values
         min = new Integer(this.jSpinMinLength.getValue().toString());
@@ -887,12 +918,11 @@ public class GUIFrame extends javax.swing.JFrame {
         klet = new Integer(this.jftkLet.getValue().toString());
 
         // Loops
-        loopList.addAll(Arrays.asList(loops));
+        loopList.addAll(asList(loops));
 
-        // 
-        if (validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
+        // Validar parámetros
+        if(!validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
                 loopList, randoms, klet)) {
-        } else {
             setIsRunning(false);
             return;
         }
@@ -913,13 +943,12 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
         loopCatcher.setkLetRandoms(klet);
+        loopCatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
 
-        //loopCatcher.beginSearch();
         GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
                 this.jBStart, this.loopCatcher);
         worker.execute();
 
-        //loopCatcher.beginSearch();
         setIsRunning(false);
     }
 }

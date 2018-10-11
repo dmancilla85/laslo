@@ -53,7 +53,7 @@ class GUISwingWorker extends
      */
     @Override
     protected Integer doInBackground() throws Exception {
-        this.ok = this.loop.beginSearch();
+        this.ok = this.loop.startReadingFiles();
         return 1;
     }
 

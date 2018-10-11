@@ -17,24 +17,24 @@
  */
 package com.laslo.core;
 
-import com.tools.io.InputSequence;
-import static java.lang.System.out;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
 import com.opencsv.CSVWriter;
 import com.tools.UShuffle;
 import com.tools.io.FASTACorrector;
+import com.tools.io.InputSequence;
 import com.tools.io.SourceFile;
 import static com.tools.io.SourceFile.*;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import static java.lang.System.out;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -44,8 +44,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.biojava.nbio.core.sequence.DNASequence;
-import org.biojava.nbio.core.sequence.features.FeatureInterface;
-import org.biojava.nbio.core.sequence.features.TextFeature;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
 
@@ -55,108 +53,26 @@ import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankD
  */
 public class LoopCatcher {
 
-    /**
-     *
-     */
     protected String pathOut;
-
-    /**
-     *
-     */
     protected String pathIn;
-
-    /**
-     *
-     */
     protected ArrayList<String> loopPatterns;
-
-    /**
-     *
-     */
     protected InputSequence inputType;
-
-    /**
-     *
-     */
     protected int minLength;
-
-    /**
-     *
-     */
     protected int maxLength;
-
-    /**
-     *
-     */
     protected int maxWooble;
-
-    /**
-     *
-     */
     protected ResourceBundle bundle;
-
-    /**
-     *
-     */
     protected int maxMismatch;
-
-    /**
-     *
-     */
     protected File[] fileList;
-
-    /**
-     *
-     */
     protected boolean extendedMode;
     private boolean makeRandoms;
     private int numberOfRandoms;
     private int kLetRandoms;
-
-    /**
-     *
-     */
     protected File actualFile;
+    protected String additionalSequence;
+    protected boolean searchReverse;
 
     /**
      *
-     */
-    protected String additionalSequence;
-
-    /**
-     * 
-     * @return 
-     */
-    public int getkLetRandoms() {
-        return kLetRandoms;
-    }
-
-    /**
-     * 
-     * @param kLetRandoms 
-     */
-    public void setkLetRandoms(int kLetRandoms) {
-        this.kLetRandoms = kLetRandoms;
-    }
-
-    /**
-     * 
-     * @return 
-     */
-    public String getAdditionalSequence() {
-        return additionalSequence;
-    }
-
-    /**
-     * 
-     * @param additionalSequence 
-     */
-    public void setAdditionalSequence(String additionalSequence) {
-        this.additionalSequence = additionalSequence;
-    }
-
-    /**
-     * 
      * @param pathOut
      * @param pathIn
      * @param loopPatterns
@@ -167,14 +83,16 @@ public class LoopCatcher {
      * @param maxWooble
      * @param maxMismatch
      * @param locale
-     * @param kLetRandoms 
+     * @param kLetRandoms
+     * @param searchReverse
      */
     public LoopCatcher(String pathOut, String pathIn,
             ArrayList<String> loopPatterns, String additionalSequence,
             InputSequence inputType,
             int minLength, int maxLength,
-            int maxWooble, int maxMismatch, Locale locale,
-            int kLetRandoms) {
+            int maxWooble, int maxMismatch,
+            Locale locale, int kLetRandoms,
+            boolean searchReverse) {
         this.pathOut = pathOut;
         this.loopPatterns = loopPatterns;
         this.inputType = inputType;
@@ -190,6 +108,7 @@ public class LoopCatcher {
         this.additionalSequence = additionalSequence;
         this.kLetRandoms = kLetRandoms;
         this.bundle = getBundle("resources/Bundle", locale);
+        this.searchReverse = searchReverse;
     }
 
     /**
@@ -198,7 +117,55 @@ public class LoopCatcher {
     public LoopCatcher() {
         this("", "", new ArrayList<>(), BiologyPatterns.PUM1,
                 InputSequence.ENSEMBL, //NOI18N
-                4, 16, 2, 0, new Locale("es", "AR"), 2);
+                4, 16, 2, 0, new Locale("es", "AR"), 2, false);
+    }
+
+    public boolean isExtendedMode() {
+        return extendedMode;
+    }
+
+    public void setExtendedMode(boolean extendedMode) {
+        this.extendedMode = extendedMode;
+    }
+
+    public boolean isSearchReverse() {
+        return searchReverse;
+    }
+
+    public void setSearchReverse(boolean searchReverse) {
+        this.searchReverse = searchReverse;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getkLetRandoms() {
+        return kLetRandoms;
+    }
+
+    /**
+     *
+     * @param kLetRandoms
+     */
+    public void setkLetRandoms(int kLetRandoms) {
+        this.kLetRandoms = kLetRandoms;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getAdditionalSequence() {
+        return additionalSequence;
+    }
+
+    /**
+     *
+     * @param additionalSequence
+     */
+    public void setAdditionalSequence(String additionalSequence) {
+        this.additionalSequence = additionalSequence;
     }
 
     /**
@@ -290,8 +257,8 @@ public class LoopCatcher {
     }
 
     /**
-     * 
-     * @param bundle 
+     *
+     * @param bundle
      */
     public void setBundle(ResourceBundle bundle) {
         this.bundle = bundle;
@@ -338,24 +305,24 @@ public class LoopCatcher {
     }
 
     /**
-     * 
-     * @param maxLength 
+     *
+     * @param maxLength
      */
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public int getMaxWooble() {
         return maxWooble;
     }
 
     /**
-     * 
-     * @param maxWooble 
+     *
+     * @param maxWooble
      */
     public void setMaxWooble(int maxWooble) {
         this.maxWooble = maxWooble;
@@ -418,12 +385,13 @@ public class LoopCatcher {
             out.println("ERROR: " + e.getMessage());
         }
     }
-    
+
     /**
      * Union two lists of files
+     *
      * @param a
      * @param b
-     * @return 
+     * @return
      */
     public File[] unionFiles(File[] a, File[] b) {
         Set<File> set;
@@ -436,12 +404,12 @@ public class LoopCatcher {
      *
      * @return
      */
-    public boolean beginSearch() {
+    public boolean startReadingFiles() {
         // To check the elapsed time
         Calendar ini, fin;
         ini = Calendar.getInstance();
         out.println(
-                java.text.MessageFormat.format(bundle.getString("START_TIME"), 
+                java.text.MessageFormat.format(bundle.getString("START_TIME"),
                         new Object[]{Calendar.getInstance().getTime()}));
         out.flush();
 
@@ -491,12 +459,12 @@ public class LoopCatcher {
                     || currentFile.toString().endsWith(GENBANK_EXT))) {
 
                 this.actualFile = currentFile;
-                processFile();
+                callProcessThreads();
             }
         }
 
         fin = Calendar.getInstance();
-        out.print(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"), 
+        out.print(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"),
                 new Object[]{((fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000)}) + " s.");
 
         out.flush();
@@ -509,7 +477,7 @@ public class LoopCatcher {
     /**
      * Process the files selected
      */
-    public void processFile() {
+    public void callProcessThreads() {
 
         CSVWriter writer;
         boolean genbank;
@@ -567,18 +535,15 @@ public class LoopCatcher {
                 }
             }
 
-            if(!genbank)
+            if (!genbank) {
                 this.inputType = SourceFile.detectHeader(fasta.entrySet().iterator()
-                    .next().getValue().getOriginalHeader());
-            else
+                        .next().getValue().getOriginalHeader());
+            } else {
                 this.inputType = InputSequence.GENBANK;
-            
+            }
+
             int listSize = fasta.size();
 
-            // Get the CDS
-            /*fasta.entrySet().iterator()
-                    .next().getValue().getFeatures().get(2).getSource();*/
-            
             writer = new CSVWriter(new FileWriter(fileOut), ';',
                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
                     CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -605,7 +570,7 @@ public class LoopCatcher {
                 secuencias++;
                 LoopCatcherThread thread = new LoopCatcherThread(extendedMode,
                         additionalSequence, maxLength, minLength, element,
-                        inputType, patternItr, writer);
+                        inputType, patternItr, writer, searchReverse);
 
                 if (i++ <= nHilos) {
                     thread.setLatch(latch);
@@ -635,10 +600,6 @@ public class LoopCatcher {
             fasta.clear();
             fasta = null;
 
-            /*out.printf(bundle.getString("RESUME"),
-                    this.minLength,
-                    this.maxLength,
-                    secuencias);*/
             out.print(" Secuencias: " + secuencias);
             fin = Calendar.getInstance();
             out.print(" Tiempo: " + (fin.getTimeInMillis()
@@ -662,32 +623,32 @@ public class LoopCatcher {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public boolean isMakeRandoms() {
         return makeRandoms;
     }
 
     /**
-     * 
-     * @param makeRandoms 
+     *
+     * @param makeRandoms
      */
     public void setMakeRandoms(boolean makeRandoms) {
         this.makeRandoms = makeRandoms;
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public int getNumberOfRandoms() {
         return numberOfRandoms;
     }
 
     /**
-     * 
-     * @param numberOfRandoms 
+     *
+     * @param numberOfRandoms
      */
     public void setNumberOfRandoms(int numberOfRandoms) {
         this.numberOfRandoms = numberOfRandoms;

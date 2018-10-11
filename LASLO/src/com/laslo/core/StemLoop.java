@@ -826,15 +826,18 @@ public class StemLoop {
      */
     public void setNLoop(int startPosLoop) {
         char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
+        char precedes = ' ', precedes2 = ' ';
 
         if (reversed) {
             this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
             startPosLoop = rnaHairpinSequence.indexOf(reverseIt(loop));
         }
-
+        
         if (this.rnaHairpinSequence != null) {
             n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
-
+            precedes = this.rnaHairpinSequence.charAt(startPosLoop - 1);
+            precedes2 = this.rnaHairpinSequence.charAt(startPosLoop - 2);
+            
             if (this.loop.length() > 4) {
                 n5 = this.rnaHairpinSequence.charAt(startPosLoop + 4);
 
@@ -858,6 +861,8 @@ public class StemLoop {
         this.n6Loop = n6;
         this.n7Loop = n7;
         this.n8Loop = n8;
+        this.predecessorLoop = precedes;
+        this.predecessor2Loop = precedes2;
 
         if (reversed) {
             this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
@@ -1011,24 +1016,6 @@ public class StemLoop {
      */
     public void setPercU_sequence(float percU_sequence) {
         this.percU_sequence = percU_sequence;
-    }
-
-    /**
-     *
-     * @param irLength
-     */
-    public void setPredecessorLoop(int irLength) {
-
-        char precedes = ' ', precedes2 = ' ';
-
-        if (this.rnaHairpinSequence != null
-                && rnaHairpinSequence.length() > 0) {
-            precedes = this.rnaHairpinSequence.charAt(irLength - 1);
-            precedes2 = this.rnaHairpinSequence.charAt(irLength - 2);
-        }
-
-        this.predecessorLoop = precedes;
-        this.predecessor2Loop = precedes2;
     }
 
     /**

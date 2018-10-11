@@ -40,62 +40,24 @@ import org.biojava.nbio.core.sequence.features.TextFeature;
  */
 public class LoopCatcherThread implements Runnable {
 
-    /**
-     *
-     */
     protected boolean extendedMode;
-
-    /**
-     *
-     */
+    protected boolean searchReverse;
     protected String additionalSequence;
-
-    /**
-     *
-     */
     protected int maxLength;
-
-    /**
-     *
-     */
     protected int minLength;
-
-    /**
-     *
-     */
     protected DNASequence dnaElement;
-
-    /**
-     *
-     */
     protected InputSequence inputType;
-
-    /**
-     *
-     */
     protected Iterator<String> patternItr;
-
-    /**
-     *
-     */
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
     //private final static Semaphore SEM = new Semaphore(4);
     private final static Semaphore SEM = new Semaphore(OSValidator
             .getNumberOfCPUCores());
-
     private CountDownLatch latch;
 
-    /**
-     *
-     * @param latch
-     */
-    public void setLatch(CountDownLatch latch) {
-        this.latch = latch;
-    }
 
     /**
-     *
+     * 
      * @param extendedMode
      * @param additionalSequence
      * @param maxLength
@@ -104,11 +66,12 @@ public class LoopCatcherThread implements Runnable {
      * @param inputType
      * @param patternItr
      * @param writer
+     * @param searchReverse 
      */
     public LoopCatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
-            CSVWriter writer) {
+            CSVWriter writer, boolean searchReverse) {
         this.extendedMode = extendedMode;
         this.additionalSequence = additionalSequence;
         this.maxLength = maxLength;
@@ -117,6 +80,15 @@ public class LoopCatcherThread implements Runnable {
         this.inputType = inputType;
         this.patternItr = patternItr;
         this.writer = writer;
+        this.searchReverse = searchReverse;
+    }
+    
+    /**
+     *
+     * @param latch
+     */
+    public void setLatch(CountDownLatch latch) {
+        this.latch = latch;
     }
 
     /**
@@ -148,6 +120,7 @@ public class LoopCatcherThread implements Runnable {
                         currentPattern,
                         writer, false);
 
+                if(searchReverse)
                 sequenceExtendedResearch(
                         rnaSequence,
                         dnaElement.getOriginalHeader(),
@@ -156,7 +129,9 @@ public class LoopCatcherThread implements Runnable {
                         writer, true);
             } else {
                 sequenceResearch(dnaElement, currentPattern, writer, false);
-                sequenceResearch(dnaElement, currentPattern, writer, true);
+                
+                if(searchReverse)
+                    sequenceResearch(dnaElement, currentPattern, writer, true);
             }
         }
 
@@ -328,9 +303,8 @@ public class LoopCatcherThread implements Runnable {
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe()
-                //rfa.getMFE(rnaSeq.getBytes()).mfe
                 );
-                slr.setPredecessorLoop(extIzq);
+
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
                 slr.setLoopPattern(stemLoopPattern);
@@ -605,7 +579,6 @@ public class LoopCatcherThread implements Runnable {
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe());
-                slr.setPredecessorLoop(extIzq);
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
                 slr.setLoopPattern(stemLoopPattern);
