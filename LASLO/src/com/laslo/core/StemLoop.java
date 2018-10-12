@@ -709,13 +709,23 @@ public class StemLoop {
     public void setNLoop(int startPosLoop) {
         char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
         char precedes = ' ', precedes2 = ' ';
+        int matchFirst, matchLast;
 
         if (reversed) {
             this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
-            startPosLoop = rnaHairpinSequence.indexOf(reverseIt(loop));
+            
+            matchFirst = rnaHairpinSequence.indexOf(reverseIt(loop));
+            matchLast = rnaHairpinSequence.lastIndexOf(reverseIt(loop));
+            
+            if(matchFirst == matchLast)
+                startPosLoop = matchFirst;
+            else
+                startPosLoop = matchLast;
+            
         }
         
         if (this.rnaHairpinSequence != null) {
+            
             n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
             precedes = this.rnaHairpinSequence.charAt(startPosLoop - 1);
             precedes2 = this.rnaHairpinSequence.charAt(startPosLoop - 2);

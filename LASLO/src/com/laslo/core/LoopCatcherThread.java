@@ -50,14 +50,12 @@ public class LoopCatcherThread implements Runnable {
     protected Iterator<String> patternItr;
     protected CSVWriter writer;
     private final static Semaphore MUTEX = new Semaphore(1);
-    //private final static Semaphore SEM = new Semaphore(4);
-    private final static Semaphore SEM = new Semaphore(OSValidator
-            .getNumberOfCPUCores());
+    private static Semaphore SEM;
+    private static boolean started = false;
     private CountDownLatch latch;
 
-
     /**
-     * 
+     *
      * @param extendedMode
      * @param additionalSequence
      * @param maxLength
@@ -66,12 +64,14 @@ public class LoopCatcherThread implements Runnable {
      * @param inputType
      * @param patternItr
      * @param writer
-     * @param searchReverse 
+     * @param searchReverse
      */
     public LoopCatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse) {
+
+        int count = 0;
         this.extendedMode = extendedMode;
         this.additionalSequence = additionalSequence;
         this.maxLength = maxLength;
@@ -81,8 +81,21 @@ public class LoopCatcherThread implements Runnable {
         this.patternItr = patternItr;
         this.writer = writer;
         this.searchReverse = searchReverse;
+
+        if (!started) {
+
+            count = OSValidator.getNumberOfCPUCores();
+
+            if (count > 1) {
+                count = count - 1;
+            }
+
+            out.println("[Using " + count + " CPU cores.]");
+            SEM = new Semaphore(count);
+            started = true;
+        }
     }
-    
+
     /**
      *
      * @param latch
@@ -97,14 +110,12 @@ public class LoopCatcherThread implements Runnable {
     @Override
     public void run() {
 
-        String rnaSequence = "";
         RNAfold fold = new RNAfold();
 
         // sólo para modo dos
-        if (extendedMode) {
-            rnaSequence = dnaElement.getRNASequence().getSequenceAsString();
-            fold = new RNAfold(rnaSequence);
-        }
+        if (extendedMode) 
+            fold = new RNAfold(dnaElement.getRNASequence()
+                    .getSequenceAsString());
 
         // III. Loop level
         while (patternItr.hasNext()) {
@@ -113,31 +124,39 @@ public class LoopCatcherThread implements Runnable {
 
             // 1. Stem research
             if (extendedMode) {
-                sequenceExtendedResearch(
-                        rnaSequence,
-                        dnaElement.getOriginalHeader(),
-                        fold.getStructure(),
-                        currentPattern,
-                        writer, false);
 
-                if(searchReverse)
-                sequenceExtendedResearch(
-                        rnaSequence,
-                        dnaElement.getOriginalHeader(),
-                        fold.getStructure(),
-                        currentPattern,
-                        writer, true);
+                try {
+                    SEM.acquire();
+                    sequenceExtendedResearch(dnaElement, fold.getStructure(),
+                            currentPattern, writer, false);
+                } catch (InterruptedException ex) {
+                    out.println("ERROR: " + ex.getMessage());
+                } finally {
+                    SEM.release();
+                }
+
+                if (searchReverse) {
+                    try {
+                        SEM.acquire();
+                        sequenceExtendedResearch(dnaElement,
+                                fold.getStructure(), currentPattern, writer,
+                                true);
+                    } catch (InterruptedException ex) {
+                        out.println("ERROR: " + ex.getMessage());
+                    } finally {
+                        SEM.release();
+                    }
+                }
+
             } else {
                 sequenceResearch(dnaElement, currentPattern, writer, false);
-                
-                if(searchReverse)
+
+                if (searchReverse) {
                     sequenceResearch(dnaElement, currentPattern, writer, true);
+                }
             }
         }
 
-        /*if (latch.getCount() < 3) {
-            out.println("Threads remaining: " + latch.getCount());
-        }*/
         latch.countDown();
 
     }
@@ -170,16 +189,15 @@ public class LoopCatcherThread implements Runnable {
      * @param invert
      * @return
      */
-    public int sequenceResearch(DNASequence fastaSeq,
-            String stemLoopPattern, CSVWriter writer, boolean invert) {
+    public int sequenceResearch(DNASequence fastaSeq, String stemLoopPattern,
+            CSVWriter writer, boolean invert) {
 
         List<StemLoop> slrList = new ArrayList<>();
-        //List<Integer> mismatchs = new ArrayList<>();
         StemLoop slr;
         slr = null;
         int size, posAux, k = 1;
         size = 0;
-        
+
         int loopPos = 0, loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
         String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
@@ -206,17 +224,17 @@ public class LoopCatcherThread implements Runnable {
 
             int length = this.maxLength;
             slr = new StemLoop(this.inputType);
-            
-            if(this.inputType != InputSequence.GENBANK)
+
+            if (this.inputType != InputSequence.GENBANK) {
                 slr.setTags(fastaSeq.getOriginalHeader());
-            else {
+            } else {
                 slr.setTags(fastaSeq.getAccession().getID(),
-                        fastaSeq.getAccession().getVersion().toString(), 
-                        fastaSeq.getDescription(), 
-                        ((TextFeature)fastaSeq.getFeaturesByType("CDS")
-                                .toArray()[0]).getSource() );
+                        fastaSeq.getAccession().getVersion().toString(),
+                        fastaSeq.getDescription(),
+                        ((TextFeature) fastaSeq.getFeaturesByType("CDS")
+                                .toArray()[0]).getSource());
             }
-                
+
             try {
                 if ((loopPos - length) > 0
                         && (loopPos + loopLength + length) < sequenceLength) {
@@ -248,9 +266,7 @@ public class LoopCatcherThread implements Runnable {
                                     + hairpinModel);
                         }
 
-                        if (fold.getMfe()
-                                //mfe.mfe 
-                                == 0.0) {
+                        if (fold.getMfe() == 0.0) {
                             isValidHairpin = false;
                         } else {
                             hairpinModel = isValidHairpin(hairpinModel,
@@ -272,7 +288,6 @@ public class LoopCatcherThread implements Runnable {
                 int extDer = hairpinModel.length() - extIzq - loopLength;
                 rnaSeq = rnaSequence.substring(loopPos - extIzq, loopPos
                         + loopLength + extDer);
-
                 posAux = rnaSequence.indexOf(rnaSeq);
 
                 // Fill the fields
@@ -288,26 +303,26 @@ public class LoopCatcherThread implements Runnable {
 
                 slr.setReverse(invert);
 
-                if(this.inputType == InputSequence.GENBANK)
+                if (this.inputType == InputSequence.GENBANK) {
                     slr.setLocation(loopPos - extIzq);
-                        
+                }
+
                 slr.setRnaHairpinSequence(rnaSeq);
                 slr.setLoop(rnaLoop);
                 slr.setStartsAt(loopPos - extIzq);
                 slr.setStructure(hairpinModel);
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
-                slr.setMfe(new RNAfold(rnaSeq).getMfe()
-                );
-
+                slr.setMfe(new RNAfold(rnaSeq).getMfe());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
-                
-                if(!invert)
+
+                if (!invert) {
                     slr.setLoopPattern(stemLoopPattern);
-                else
+                } else {
                     slr.setLoopPattern(reverseIt(stemLoopPattern));
-                
+                }
+
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "")
@@ -316,18 +331,20 @@ public class LoopCatcherThread implements Runnable {
                         (rnaSequence.length() - rnaSequence.replace("G", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("C", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("C", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercU_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("U", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("U", "")
                         .length()) / (float) rnaSequence.length());
 
                 if (this.additionalSequence.length() > 0) {
-                    slr.setAdditionalSeqLocations(getPatternLocations(rnaSequence,
-                            this.additionalSequence));
+                    slr.setAdditionalSeqLocations(
+                            getPatternLocations(rnaSequence,
+                                    additionalSequence));
                 }
 
-                slr.setRelativePos((double) slr.getStartsAt() / (double) rnaSequence.length());
+                slr.setRelativePos((double) slr.getStartsAt()
+                        / (double) rnaSequence.length());
 
                 slrList.add(slr);
             }
@@ -366,7 +383,8 @@ public class LoopCatcherThread implements Runnable {
      * @return
      */
     @SuppressWarnings("empty-statement")
-    public String isValidHairpin(String hairpin, int loopLength, int loopPos, String seq) {
+    public String isValidHairpin(String hairpin, int loopLength, int loopPos,
+            String seq) {
         boolean ret, begin = true;
         String extremoIzq = "", extremoDer = ""; //NOI18N
         int stemLength = (hairpin.length() - loopLength) / 2;
@@ -389,14 +407,15 @@ public class LoopCatcherThread implements Runnable {
 
         // 2. Analizar lado izq. y derecho del stem desde extremo 5',
         if (ret) {
-            // 2.a 	Si encuentra un . o un ) en el extremo izquierdo, remover 
+            // 2.a 	Si encuentra un . o un ) en el ext izquierdo, remover 
             // 		base (stemLength-1)
             // Repetir 2.a hasta que complete el recorrido. 
             extremoIzq = hairpin.substring(0, stemLength);
 
             try {
                 for (int i = 0; i < stemLength; i++) {
-                    if (extremoIzq.charAt(i) == '.' || extremoIzq.charAt(i) == ')') {
+                    if (extremoIzq.charAt(i) == '.'
+                            || extremoIzq.charAt(i) == ')') {
                         if (begin) {
                             newLength--;
                             begin = true;
@@ -414,7 +433,7 @@ public class LoopCatcherThread implements Runnable {
                         hairpin.length() - (stemLength - newLength));
                 stemLength = newLength;
 
-                // 2.b 	Si encuentra un . o un ( en el extremo derecho, remover base 
+                // 2.b 	Si encuentra un . o un ( en el ext derecho, remover base 
                 //		(stemLength-1)
                 // Repetir 2.b hasta que complete el recorrido. 	
                 extremoDer = hairpin.substring(stemLength + loopLength,
@@ -422,7 +441,8 @@ public class LoopCatcherThread implements Runnable {
                 begin = true;
 
                 for (int i = stemLength - 1; i >= 0; i--) {
-                    if (extremoDer.charAt(i) == '.' || extremoDer.charAt(i) == '(') {
+                    if (extremoDer.charAt(i) == '.'
+                            || extremoDer.charAt(i) == '(') {
                         if (begin) {
                             newLength--;
                             begin = true;
@@ -464,8 +484,7 @@ public class LoopCatcherThread implements Runnable {
 
         if (ret) {
             ret = StringUtils.countMatches(hairpin, "(") >= minLength
-                    && //NOI18N
-                    StringUtils.countMatches(hairpin, ")") >= minLength; //NOI18N
+                    && StringUtils.countMatches(hairpin, ")") >= minLength;
         }
         // Si la longitud es menor a la esperada, rechazar.
         if (!ret) {
@@ -477,24 +496,25 @@ public class LoopCatcherThread implements Runnable {
 
     /**
      *
-     * @param rnaSequence
-     * @param header
+     * @param fastaSeq
      * @param hairpinSeq
      * @param stemLoopPattern
      * @param writer
      * @param invert
      * @return
      */
-    public int sequenceExtendedResearch(String rnaSequence, String header,
-            String hairpinSeq, String stemLoopPattern, CSVWriter writer, boolean invert) {
+    public int sequenceExtendedResearch(DNASequence fastaSeq, String hairpinSeq,
+            String stemLoopPattern, CSVWriter writer, boolean invert) {
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
         slr = null;
         int size;
         size = 0;
+        int length = this.maxLength, posAux, k = 1;
         int loopPos = 0, loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
 
+        String rnaSequence = fastaSeq.getRNASequence().getSequenceAsString();
         final int sequenceLength = rnaSequence.length();
 
         if (invert) {
@@ -511,12 +531,20 @@ public class LoopCatcherThread implements Runnable {
         // As exists loop matches
         while (loopFinder.find()) {
             loopPos = loopFinder.start();
-            //mismatchs.clear();
             isValidHairpin = true;
             rnaLoop = rnaSequence.substring(loopPos, loopFinder.end());
-            int length = this.maxLength, posAux, k = 3;
             slr = new StemLoop(this.inputType);
-            slr.setTags(header);
+
+            if (this.inputType != InputSequence.GENBANK) {
+                slr.setTags(fastaSeq.getOriginalHeader());
+            } else {
+                slr.setTags(fastaSeq.getAccession().getID(),
+                        fastaSeq.getAccession().getVersion().toString(),
+                        fastaSeq.getDescription(),
+                        ((TextFeature) fastaSeq.getFeaturesByType("CDS")
+                                .toArray()[0]).getSource());
+            }
+
             try {
                 if ((loopPos - length) > 0
                         && (loopPos + loopLength + length) < sequenceLength) {
@@ -526,10 +554,8 @@ public class LoopCatcherThread implements Runnable {
                     hairpinModel = hairpinSeq.substring(loopPos - length,
                             loopPos + loopLength + length);
 
-                    isValidHairpin = isComplementaryRNA(rnaSeq.charAt(length - 1),
-                            rnaSeq.charAt(length + loopLength))
-                            || isComplementaryRNAWooble(rnaSeq.charAt(length - 1),
-                                    rnaSeq.charAt(length + loopLength));
+                    isValidHairpin = isRNAPair(rnaSeq.charAt(length - 1),
+                            rnaSeq.charAt(length + loopLength));
 
                     if (isValidHairpin) {
                         hairpinModel = isValidHairpin(hairpinModel, loopLength,
@@ -564,14 +590,12 @@ public class LoopCatcherThread implements Runnable {
                     slr.setAdditional5Seq("");
                 }
 
-                if (invert) {
-                    stemLoopPattern = reverseIt(stemLoopPattern);
-                    slr.setReverse(true);
-                } else {
-                    slr.setReverse(false);
+                slr.setReverse(invert);
+
+                if (this.inputType == InputSequence.GENBANK) {
+                    slr.setLocation(loopPos - extIzq);
                 }
 
-                // Fill the fields
                 slr.setRnaHairpinSequence(rnaSeq);
                 slr.setLoop(rnaLoop);
                 slr.setStartsAt(loopPos - extIzq);
@@ -581,24 +605,33 @@ public class LoopCatcherThread implements Runnable {
                 slr.setMfe(new RNAfold(rnaSeq).getMfe());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
-                slr.setLoopPattern(stemLoopPattern);
+
+                if (!invert) {
+                    slr.setLoopPattern(stemLoopPattern);
+                } else {
+                    slr.setLoopPattern(reverseIt(stemLoopPattern));
+                }
+
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("A", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("A", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercG_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("G", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("G", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("C", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("C", "")
                         .length()) / (float) rnaSequence.length());
                 slr.setPercU_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("U", "") //NOI18N
+                        (rnaSequence.length() - rnaSequence.replace("U", "")
                         .length()) / (float) rnaSequence.length());
 
-                // Other signals in cDNA
-                slr.setAdditionalSeqLocations(getPatternLocations(rnaSequence,
-                        this.additionalSequence));
+                if (this.additionalSequence.length() > 0) {
+                    slr.setAdditionalSeqLocations(
+                            getPatternLocations(rnaSequence,
+                                    this.additionalSequence));
+                }
+
                 slr.setRelativePos((double) slr.getStartsAt()
                         / (double) rnaSequence.length());
 

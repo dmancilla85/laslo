@@ -67,6 +67,15 @@ public class PairmentAnalizer {
         return dest.toString();
     }
 
+    
+    public static boolean isRNAPair(char base1, char base2){
+        
+        if(!isComplementaryRNA(base1, base2))
+            return isComplementaryRNAWooble(base1, base2);
+        else
+            return true;
+    }
+    
     /**
      * 
      * @param base1
