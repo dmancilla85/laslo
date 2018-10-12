@@ -486,6 +486,7 @@ public class LoopCatcherThread implements Runnable {
             ret = StringUtils.countMatches(hairpin, "(") >= minLength
                     && StringUtils.countMatches(hairpin, ")") >= minLength;
         }
+        
         // Si la longitud es menor a la esperada, rechazar.
         if (!ret) {
             return ""; //NOI18N
