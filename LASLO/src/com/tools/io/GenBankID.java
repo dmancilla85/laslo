@@ -25,11 +25,13 @@ public class GenBankID extends SourceFile{
     protected int cdsStart;
     protected int cdsEnd;
     protected String location;
+    protected String synonym;
     
     private final static String HEADER = 
+            "Gen" + ROW_DELIMITER +
+            "GeneSynonym" + ROW_DELIMITER +
+            "Note" + ROW_DELIMITER +
             "AccessionID" + ROW_DELIMITER +
-            "Version" + ROW_DELIMITER +
-            "Description" + ROW_DELIMITER +
             "CDS_Start" + ROW_DELIMITER +
             "CDS_End" + ROW_DELIMITER + 
             "Location" + ROW_DELIMITER;
@@ -40,10 +42,19 @@ public class GenBankID extends SourceFile{
         this.cdsEnd = 0;
     }
     
-    public GenBankID(String description, int cdsStart, int cdsEnd) {
+    public GenBankID(String synonym, String description, int cdsStart, int cdsEnd) {
         this.description = description;
         this.cdsStart = cdsStart;
         this.cdsEnd = cdsEnd;
+        this.synonym = synonym;
+    }
+
+    public String getSynonym() {
+        return synonym;
+    }
+
+    public void setSynonym(String synonym) {
+        this.synonym = synonym.replace(';',',');
     }
 
     public String getDescription() {
@@ -51,7 +62,7 @@ public class GenBankID extends SourceFile{
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description.replace(';',',');
     }
 
     public String getLocation() {
@@ -61,9 +72,9 @@ public class GenBankID extends SourceFile{
     public void setLocation(int pos) {
         if(this.cdsEnd != 0){
             if(pos < cdsStart){
-                location = "5UTR";
+                location = "5'UTR";
             } else if(pos > cdsEnd){
-                location = "3UTR";
+                location = "3'UTR";
             } else location = "CDS";
         }
     }
@@ -96,8 +107,9 @@ public class GenBankID extends SourceFile{
     
     @Override
     public String toRowCSV() {
-        return geneID + ROW_DELIMITER
-                + transcriptID + ROW_DELIMITER
+        return  geneID.replace(';', ',') + ROW_DELIMITER
+                + synonym + ROW_DELIMITER
+                + transcriptID.replace(';', ',') + ROW_DELIMITER
                 + description + ROW_DELIMITER
                 + cdsStart + ROW_DELIMITER
                 + cdsEnd + ROW_DELIMITER

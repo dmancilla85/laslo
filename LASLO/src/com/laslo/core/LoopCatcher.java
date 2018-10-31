@@ -52,7 +52,7 @@ import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankD
  *
  */
 public class LoopCatcher {
-
+    
     protected String pathOut;
     protected String pathIn;
     protected ArrayList<String> loopPatterns;
@@ -119,19 +119,19 @@ public class LoopCatcher {
                 InputSequence.ENSEMBL, //NOI18N
                 4, 16, 2, 0, new Locale("es", "AR"), 2, false);
     }
-
+    
     public boolean isExtendedMode() {
         return extendedMode;
     }
-
+    
     public void setExtendedMode(boolean extendedMode) {
         this.extendedMode = extendedMode;
     }
-
+    
     public boolean isSearchReverse() {
         return searchReverse;
     }
-
+    
     public void setSearchReverse(boolean searchReverse) {
         this.searchReverse = searchReverse;
     }
@@ -229,14 +229,14 @@ public class LoopCatcher {
      * @param pathIn
      */
     public void setPathIn(String pathIn) {
-
+        
         File aux = new File(pathIn);
-
+        
         if (aux.isDirectory()) {
             this.pathIn = pathIn;
         } else {
             this.pathIn = aux.getParent();
-
+            
         }
     }
 
@@ -352,34 +352,34 @@ public class LoopCatcher {
      */
     public void writeCSV(String sFileName, List<StemLoop> stemResearch,
             String headerList) {
-
+        
         CSVWriter writer;
-
+        
         if (stemResearch.isEmpty() && headerList == null) {
             return;
         }
-
+        
         try {
             writer = new CSVWriter(new FileWriter(sFileName), ';',
                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
                     CSVWriter.DEFAULT_ESCAPE_CHARACTER,
                     CSVWriter.DEFAULT_LINE_END);
-
+            
             if (headerList != null) {
                 String[] header;
                 header = headerList.split(";"); //NOI18N
                 writer.writeNext(header);
             }
-
+            
             for (int i = 0; i < stemResearch.size(); i++) {
                 String[] data;
                 data = stemResearch.get(i).toRowCSV().split(";"); //NOI18N
                 writer.writeNext(data);
                 //allData.add(data);
             }
-
+            
             writer.close();
-
+            
         } catch (IOException e) {
             // TODO Auto-generated catch block
             out.println("ERROR: " + e.getMessage());
@@ -412,11 +412,11 @@ public class LoopCatcher {
                 java.text.MessageFormat.format(bundle.getString("START_TIME"),
                         new Object[]{Calendar.getInstance().getTime()}));
         out.flush();
-
+        
         if (fileList == null) {
             return false;
         }
-
+        
         if (this.makeRandoms) {
             for (File currentFile : fileList) {
                 if (currentFile.isFile()
@@ -426,25 +426,25 @@ public class LoopCatcher {
 
                     //fileName = currentFile.getName();
                     LinkedHashMap<String, DNASequence> fasta = null;
-
+                    
                     try {
                         if (currentFile.toString().endsWith(GENBANK_EXT)) {
                             fasta = readGenbankDNASequence(currentFile, false);
                         } else {
                             fasta = readFastaDNASequence(currentFile, false);
                         }
-
+                        
                     } catch (IOException ex) {
                         out.println("ERROR: " + ex.getMessage());
                     } catch (Exception ex) {
                         out.println("ERROR: " + ex.getMessage());
                     }
-
+                    
                     UShuffle.makeShuffleSequences(pathOut, currentFile.getName(),
                             fasta, numberOfRandoms, kLetRandoms);
                 }
             }
-
+            
             File folder;
             folder = new File(pathIn + UShuffle.getRandomDir());
             File[] randomFiles;
@@ -457,16 +457,16 @@ public class LoopCatcher {
             if (currentFile.isFile() && (currentFile.toString().endsWith(FASTA_EXT)
                     || currentFile.toString().endsWith(FASTA_EXT_2)
                     || currentFile.toString().endsWith(GENBANK_EXT))) {
-
+                
                 this.actualFile = currentFile;
                 callProcessThreads();
             }
         }
-
+        
         fin = Calendar.getInstance();
         out.print(java.text.MessageFormat.format(bundle.getString("TOTAL_TIME"),
                 new Object[]{((fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000)}) + " s.");
-
+        
         out.flush();
 
         // Memory cleaning
@@ -478,16 +478,16 @@ public class LoopCatcher {
      * Process the files selected
      */
     public void callProcessThreads() {
-
+        
         CSVWriter writer;
         boolean genbank;
         String fileName, fileOut;
-        final int MAX_HILOS = 20;
+        final int MAX_HILOS = 10;
         int secuencias, nHilos = MAX_HILOS, i, count = 0;
         ExecutorService pool;
         CountDownLatch latch;
         Calendar ini, fin;
-
+        
         try {
             fileName = actualFile.getName();
             genbank = false;
@@ -500,19 +500,19 @@ public class LoopCatcher {
             if (new File(fileOut).exists()) {
                 try {
                     (new File(fileOut)).delete();
-
+                    
                 } catch (Exception io) {
                     out.println(io.getMessage());
                     out.flush();
                     return;
                 }
             }
-
+            
             Calendar.getInstance();
 
             // Generation of the iterator of {id,sequence}
             LinkedHashMap<String, DNASequence> fasta;
-
+            
             if (actualFile.getName().endsWith(GENBANK_EXT)) {
                 fasta = readGenbankDNASequence(actualFile, false);
                 genbank = true;
@@ -521,7 +521,7 @@ public class LoopCatcher {
                         actualFile.length() > (52428800));
                 genbank = false;
             }
-
+            
             if (fasta.isEmpty()) {
                 out.println(bundle.getString("INVALID_FILE_FORMAT"));
                 out.println(bundle.getString("TRYING_TO_FIX"));
@@ -534,16 +534,16 @@ public class LoopCatcher {
                     return;
                 }
             }
-
+            
             if (!genbank) {
                 this.inputType = SourceFile.detectHeader(fasta.entrySet().iterator()
                         .next().getValue().getOriginalHeader());
             } else {
                 this.inputType = InputSequence.GENBANK;
             }
-
+            
             int listSize = fasta.size();
-
+            
             writer = new CSVWriter(new FileWriter(fileOut), ';',
                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
                     CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -554,16 +554,16 @@ public class LoopCatcher {
             if (listSize < nHilos) {
                 nHilos = listSize;
             }
-
-            pool = Executors.newFixedThreadPool(nHilos);
-            latch = new CountDownLatch(nHilos);
+            
+            pool = Executors.newFixedThreadPool(listSize);
+            latch = new CountDownLatch(listSize);
             i = 0;
-
+            
             ini = Calendar.getInstance();
             secuencias = 0;
-
+            
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
-
+                
                 DNASequence element = entry.getValue();
                 Iterator<String> patternItr = loopPatterns.iterator();
                 count++;
@@ -571,41 +571,30 @@ public class LoopCatcher {
                 LoopCatcherThread thread = new LoopCatcherThread(extendedMode,
                         additionalSequence, maxLength, minLength, element,
                         inputType, patternItr, writer, searchReverse);
-
-                if (i++ <= nHilos) {
-                    thread.setLatch(latch);
-                    pool.execute(thread);
-                } else {
-                    i = 1;
-                    latch.await();
-                    pool.shutdown();
-
-                    if (fasta.size() - count < nHilos) {
-                        nHilos = fasta.size() - count;
-                    }
-
-                    pool = Executors.newFixedThreadPool(nHilos);
-                    latch = new CountDownLatch(nHilos);
-
-                }
+                
+                thread.setLatch(latch);
+                pool.execute(thread);
+                
             }
-
+            
             if (latch.getCount() > 0) {
                 latch.await();
                 pool.shutdown();
             }
-
+            
+            pool.shutdown();
+            
             writer.close();
             writer = null;
             fasta.clear();
             fasta = null;
-
+            
             out.print(" Secuencias: " + secuencias);
             fin = Calendar.getInstance();
             out.print(" Tiempo: " + (fin.getTimeInMillis()
                     - ini.getTimeInMillis()) / 1000 + " s.");
             out.println();
-
+            
         } catch (FileNotFoundException ex) {
             /*Logger.getLogger(LoopCatcher.class.getName())
                     .log(Level.SEVERE, null, ex);*/
@@ -615,7 +604,7 @@ public class LoopCatcher {
         } catch (Exception ex) {
             out.println("ERROR: " + ex.getMessage());
         }
-
+        
         writer = null;
         fileName = null;
         fileOut = null;

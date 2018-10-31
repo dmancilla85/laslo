@@ -17,7 +17,7 @@
  */
 package com.laslo.core;
 
-import static com.laslo.core.PairmentAnalizer.reverseIt;
+import static com.laslo.core.SequenceAnalizer.reverseIt;
 import com.tools.io.InputSequence;
 import com.tools.io.BioMartFastaID;
 import com.tools.io.GenericID;
@@ -110,11 +110,15 @@ public class StemLoop {
      * @param number
      * @return
      */
-    private String getFormattedNumber(Double number) {
+    private String getFormattedNumber(Double number, int digits) {
         NumberFormat numberFormatter
                 = NumberFormat.getNumberInstance(Locale.getDefault());
-        numberFormatter.setMinimumFractionDigits(3);
+        numberFormatter.setMinimumFractionDigits(digits);
         return numberFormatter.format(number);
+    }
+    
+    private String getFormattedNumber(Double number) {
+        return getFormattedNumber(number,3);
     }
 
     /**
@@ -669,7 +673,7 @@ public class StemLoop {
                     }
 
                     if (viennaStructure.charAt(firstDer) == ')') {
-                        if (PairmentAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))) {
+                        if (SequenceAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))) {
                             aux.setCharAt(i, '{');
                             aux.setCharAt(firstDer, '}');
                             woobleCount++;
@@ -966,16 +970,19 @@ public class StemLoop {
     /**
      * 
      * @param gene
+     * @param synonym
      * @param transcript
      * @param description
      * @param cds 
      */
-    public void setTags(String gene, String transcript, String description,
+    public void setTags(String gene, String synonym, String transcript, 
+            String description,
             String cds) {
         id_fasta.setGeneID(gene);
         id_fasta.setTranscriptID(transcript);
         ((GenBankID) id_fasta).setDescription(description);
         ((GenBankID) id_fasta).setCDS(cds);
+        ((GenBankID) id_fasta).setSynonym(synonym);
     }
 
     /**
@@ -1017,7 +1024,7 @@ public class StemLoop {
                 + getFormattedNumber(this.percent_CG) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.percent_GU) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.percent_AG) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.mfe) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.mfe,5) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.relativePos) + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
