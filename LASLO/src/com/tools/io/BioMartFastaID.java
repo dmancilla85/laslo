@@ -23,26 +23,20 @@ package com.tools.io;
  */
 public class BioMartFastaID extends SourceFile {
 
-    /**
-     *
-     */
     protected static int nCols = 6;
-
-    /**
-     *
-     */
     protected static char fs = '|';
+    protected String columns[];
 
-    /**
-     *
-     */
-    protected static String columns[] = new String[nCols];
-
+    
+    public BioMartFastaID(){
+        columns = new String[nCols];
+    }
+    
     /**
      *
      * @return
      */
-    public static int getNumColumns() {
+    public int getNumColumns() {
         return columns.length;
     }
 
@@ -50,7 +44,7 @@ public class BioMartFastaID extends SourceFile {
      *
      * @param cols
      */
-    public static void setColumns(String cols[]) {
+    public void setColumns(String cols[]) {
         columns = cols;
     }
 

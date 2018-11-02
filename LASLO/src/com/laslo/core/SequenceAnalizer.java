@@ -17,6 +17,8 @@
  */
 package com.laslo.core;
 
+import static com.laslo.core.LoopCatcherThread.MUTEX;
+import static com.laslo.core.LoopCatcherThread.SEM;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.io.InputSequence;
@@ -50,7 +52,7 @@ public class SequenceAnalizer {
      * @param additionalSeq
      * @return
      */
-    public static synchronized int sequenceResearch(DNASequence fastaSeq, String stemLoopPattern,
+    public static /*synchronized*/ int sequenceResearch(DNASequence fastaSeq, String stemLoopPattern,
             CSVWriter writer, boolean invert, int maxLength, int minLength,
             InputSequence inputType, String additionalSeq) {
 
@@ -126,14 +128,14 @@ public class SequenceAnalizer {
 
                     if (isValidHairpin) {
 
-                        /*try {
-                            SEM.acquire();*/
+                        try {
+                            SEM.acquire();
                         fold = new RNAfold(rnaSeq);
-                        /* } catch (InterruptedException ex) {
+                         } catch (InterruptedException ex) {
                             out.println("ERROR: " + ex.getMessage());
                         } finally {
                             SEM.release();
-                        }*/
+                        }
 
                         hairpinModel = fold.getStructure();
 
@@ -234,14 +236,14 @@ public class SequenceAnalizer {
         while (itr.hasNext()) {
             StemLoop element = itr.next();
 
-            /*try {
-                MUTEX.acquire();*/
+            try {
+                MUTEX.acquire();
             writer.writeNext(element.toRowCSV().split(";")); //NOI18N
-            /*} catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                     out.println("ERROR: " + ex.getMessage());
                 } finally {
                     MUTEX.release();
-                }*/
+                }
         }
 
         size = slrList.size();
@@ -365,6 +367,192 @@ public class SequenceAnalizer {
         return hairpin;
     }
 
+    /**
+     * 
+     * @param fastaSeq
+     * @param hairpinSeq
+     * @param stemLoopPattern
+     * @param writer
+     * @param invert
+     * @param maxLength
+     * @param minLength
+     * @param inputType
+     * @param additionalSequence
+     * @return 
+     */
+    public static int sequenceExtendedResearch(DNASequence fastaSeq, String hairpinSeq,
+            String stemLoopPattern, CSVWriter writer, boolean invert,
+            int maxLength, int minLength, InputSequence inputType,
+            String additionalSequence) {
+        List<StemLoop> slrList = new ArrayList<>();
+        StemLoop slr;
+        slr = null;
+        int size;
+        size = 0;
+        int length = maxLength, posAux, k = 1;
+        int loopPos = 0, loopLength = stemLoopPattern.length();
+        boolean isValidHairpin;
+        String gene = "", synonym = "", note = "";
+
+        String rnaSequence = fastaSeq.getSequenceAsString().replace('T', 'U');
+        int sequenceLength = rnaSequence.length();
+
+        if (invert) {
+            stemLoopPattern = reverseIt(stemLoopPattern);
+        }
+
+        // Convert the original loop pattern to a regular expression
+        String regExp = toRegularExpression(stemLoopPattern);
+        Pattern p = Pattern.compile(regExp);
+        Matcher loopFinder = p.matcher(rnaSequence);
+
+        String rnaLoop = "", rnaSeq = "", hairpinModel = ""; //NOI18N
+
+        // As exists loop matches
+        while (loopFinder.find()) {
+            loopPos = loopFinder.start();
+            isValidHairpin = true;
+            rnaLoop = rnaSequence.substring(loopPos, loopFinder.end());
+            slr = new StemLoop(inputType);
+
+            if (inputType != InputSequence.GENBANK) {
+                slr.setTags(fastaSeq.getOriginalHeader());
+            } else {
+
+                Map qual = ((TextFeature) fastaSeq.getFeaturesByType("gene")
+                        .toArray()[0]).getQualifiers();
+
+                if (!qual.isEmpty()) {
+                    gene = ((Qualifier) ((ArrayList) (qual.get("gene"))).get(0))
+                            .getValue();
+                    synonym = ((Qualifier) ((ArrayList) (qual.get("gene_synonym"))).get(0))
+                            .getValue();
+                    note = ((Qualifier) ((ArrayList) (qual.get("note"))).get(0))
+                            .getValue();
+                }
+
+                slr.setTags(gene, synonym, fastaSeq.getAccession().getID(),
+                        note,
+                        ((TextFeature) fastaSeq.getFeaturesByType("CDS")
+                                .toArray()[0]).getSource());
+            }
+
+            try {
+                if ((loopPos - length) > 0
+                        && (loopPos + loopLength + length) < sequenceLength) {
+
+                    rnaSeq = rnaSequence.substring(loopPos - length,
+                            loopPos + loopLength + length);
+                    hairpinModel = hairpinSeq.substring(loopPos - length,
+                            loopPos + loopLength + length);
+
+                    isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
+                            rnaSequence.charAt(loopPos + rnaLoop.length()));
+
+                    if (isValidHairpin) {
+                        hairpinModel = SequenceAnalizer.isValidHairpin(
+                                maxLength, minLength,hairpinModel, loopLength,
+                                loopPos, rnaSeq);
+                        isValidHairpin = hairpinModel.length() > 0;
+                    }
+
+                } else {
+                    isValidHairpin = false;
+                }
+
+            } catch (Exception e) {
+                out.println("ERROR: " + e.getMessage());
+            }
+
+            if (isValidHairpin) {
+                int extIzq = hairpinModel.lastIndexOf("(") + 1; //NOI18N
+                int extDer = hairpinModel.length() - extIzq - loopLength;
+                rnaSeq = rnaSequence.substring(loopPos - extIzq, loopPos
+                        + loopLength + extDer);
+
+                posAux = rnaSequence.indexOf(rnaSeq);
+
+                // Fill the fields
+                try {
+                    slr.setAdditional5Seq(rnaSequence
+                            .substring(posAux - k, posAux));
+                    slr.setAdditional3Seq(rnaSequence.substring(posAux
+                            + rnaSeq.length(), posAux + rnaSeq.length() + k));
+                } catch (IndexOutOfBoundsException e) {
+                    slr.setAdditional3Seq("");
+                    slr.setAdditional5Seq("");
+                }
+
+                slr.setReverse(invert);
+
+                if (inputType == InputSequence.GENBANK) {
+                    slr.setLocation(loopPos - extIzq);
+                }
+
+                slr.setRnaHairpinSequence(rnaSeq);
+                slr.setLoop(rnaLoop);
+                slr.setStartsAt(loopPos - extIzq);
+                slr.setStructure(hairpinModel);
+                slr.setSequenceLength(sequenceLength);
+                slr.checkPairments();
+                slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                slr.setNLoop(extIzq);
+                slr.setPercent_AG();
+
+                if (!invert) {
+                    slr.setLoopPattern(stemLoopPattern);
+                } else {
+                    slr.setLoopPattern(reverseIt(stemLoopPattern));
+                }
+
+                slr.setEndsAt(loopFinder.end() + extDer);
+                slr.setPercA_sequence(
+                        (rnaSequence.length() - rnaSequence.replace("A", "")
+                        .length()) / (float) rnaSequence.length());
+                slr.setPercG_sequence(
+                        (rnaSequence.length() - rnaSequence.replace("G", "")
+                        .length()) / (float) rnaSequence.length());
+                slr.setPercC_sequence(
+                        (rnaSequence.length() - rnaSequence.replace("C", "")
+                        .length()) / (float) rnaSequence.length());
+                slr.setPercU_sequence(
+                        (rnaSequence.length() - rnaSequence.replace("U", "")
+                        .length()) / (float) rnaSequence.length());
+
+                if (additionalSequence.length() > 0) {
+                    slr.setAdditionalSeqLocations(
+                            getPatternLocations(rnaSequence,additionalSequence));
+                }
+
+                slr.setRelativePos((double) slr.getStartsAt()
+                        / (double) rnaSequence.length());
+
+                slrList.add(slr);
+            }
+        }
+
+        slr = null;
+        Iterator<StemLoop> itr = slrList.iterator();
+
+        while (itr.hasNext()) {
+            StemLoop element = itr.next();
+            try {
+                MUTEX.acquire();
+                writer.writeNext(element.toRowCSV().split(";")); //NOI18N
+            } catch (InterruptedException ex) {
+                out.println("ERROR: " + ex.getMessage());
+            } finally {
+                MUTEX.release();
+            }
+        }
+
+        size = slrList.size();
+        slrList.clear();
+        slrList = null;
+
+        return size;
+    }
+    
     /**
      *
      * @param sequence
