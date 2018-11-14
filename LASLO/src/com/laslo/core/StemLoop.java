@@ -25,12 +25,22 @@ import com.tools.io.SourceFile;
 import com.tools.io.FlyBaseFastaID;
 import com.tools.io.EnsemblFastaID;
 import com.tools.io.GenBankID;
+import static java.lang.System.out;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
+
+class PosComparator implements Comparator<Integer>{
+    
+    @Override
+    public int compare(Integer a, Integer b){
+        return a > b ? -1 :(a < b ? 1 : 0);
+    }
+}
 
 /**
  * 13/12/2016
@@ -51,8 +61,8 @@ public class StemLoop {
     protected int sequenceLength;
     protected int startsAt;
     protected int endsAt;
-    protected int mismatches;
-    protected int bulges;
+    protected int bulge;
+    protected int internalLoops;
     protected char predecessor2Loop;
     protected char predecessorLoop;
     protected char n2Loop;
@@ -167,9 +177,9 @@ public class StemLoop {
         this.loopPattern = "";
         this.endsAt = 0;
         this.startsAt = 0;
-        this.mismatches = 0;
+        this.bulge = 0;
         this.reversed = false;
-        this.bulges = 0;
+        this.internalLoops = 0;
         this.relativePos = 0.0;
         this.predecessorLoop = 0;
         this.predecessor2Loop = 0;
@@ -188,7 +198,7 @@ public class StemLoop {
      * @return
      */
     public int getMismatches() {
-        return mismatches;
+        return bulge;
     }
 
     /**
@@ -212,7 +222,7 @@ public class StemLoop {
      * @param mismatches
      */
     public void setMismatches(int mismatches) {
-        this.mismatches = mismatches;
+        this.bulge = mismatches;
     }
 
     /**
@@ -646,21 +656,21 @@ public class StemLoop {
     public void checkPairments() {
 
         String seq = this.rnaHairpinSequence;
-        int woobleCount = 0, mismatch = 0, bulge = 0;
+        int woobleCount = 0;
         int CG = 0, AU = 0;
         StringBuilder aux = new StringBuilder(this.viennaStructure);
         int firstIzq = 1;
-
+        
         if (this.loop.isEmpty() || this.viennaStructure.isEmpty()) {
             return;
         }
 
-        // Count mismatchs and bulges
-        mismatch = StringUtils.countMatches(this.viennaStructure, "(.(")
+        // Count internal loops and internalLoops
+        /*mismatch = StringUtils.countMatches(this.viennaStructure, "(.(")
                 + StringUtils.countMatches(this.viennaStructure, ").)");
 
         bulge = StringUtils.countMatches(this.viennaStructure, "..(")
-                + StringUtils.countMatches(this.viennaStructure, ")..");
+                + StringUtils.countMatches(this.viennaStructure, ")..");*/
 
         try {
             firstIzq = this.viennaStructure.lastIndexOf('(');
@@ -701,9 +711,35 @@ public class StemLoop {
         this.percent_AU = (double) AU / (double) (AU + CG + woobleCount);
         this.percent_CG = (double) CG / (double) (AU + CG + woobleCount);
         this.percent_GU = (double) woobleCount / (double) (AU + CG + woobleCount);
-        this.setMismatches(mismatch);
-        this.bulges = bulge;
+        //this.setMismatches(mismatch);
+        //this.internalLoops = bulge;
 
+    }
+    
+    /**
+     * 
+     */
+    public void checkInternalLoops(){   
+        this.internalLoops = 0;
+        this.bulge = 0;
+        String auxStruct = this.viennaStructure;
+        int len;
+        auxStruct = auxStruct.replaceAll("\\.", "a");
+        auxStruct = auxStruct.replaceAll("([a-z])\\1+", "$1");
+        len = auxStruct.length()/2;
+        
+        for(int i = 0; i < len; i++ ){
+            if( auxStruct.charAt(i) == 'a' && 
+                    auxStruct.charAt(len - i) == 'a' ){
+                this.internalLoops++;
+            } else if((auxStruct.charAt(i) == 'a' && 
+                    auxStruct.charAt(len -  i) != 'a') ||
+                    (auxStruct.charAt(i) != 'a' && 
+                    auxStruct.charAt(len - i) == 'a')){
+                this.bulge++;
+            }
+        }
+        
     }
 
     /**
@@ -1012,7 +1048,7 @@ public class StemLoop {
                 + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
                 + this.getGUPairs() + SourceFile.ROW_DELIMITER
                 + this.getMismatches() + SourceFile.ROW_DELIMITER
-                + this.bulges + SourceFile.ROW_DELIMITER
+                + this.internalLoops + SourceFile.ROW_DELIMITER
                 + this.sequenceLength + SourceFile.ROW_DELIMITER
                 + this.startsAt + SourceFile.ROW_DELIMITER
                 + this.endsAt + SourceFile.ROW_DELIMITER

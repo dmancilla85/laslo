@@ -191,6 +191,7 @@ public class SequenceAnalizer {
                 slr.setStructure(hairpinModel);
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
+                slr.checkInternalLoops();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
@@ -495,6 +496,7 @@ public class SequenceAnalizer {
                 slr.setStructure(hairpinModel);
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
+                slr.checkInternalLoops();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
