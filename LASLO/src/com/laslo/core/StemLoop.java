@@ -716,6 +716,21 @@ public class StemLoop {
 
     }
     
+    /*public static void main(String []args){
+       String a =  "((.((...(((.........)))...)).))";
+       String b =   "((((.(((((((.((....)).)))))))))))";
+       String c =   "((((((((...((((....))))...))))))))";
+       String d =   "(((((((..(((((.....))))))))))))";
+       String e =   "(((((((.....)))).)))";
+
+       StemLoop sl = new StemLoop(InputSequence.BIOMART);
+       sl.viennaStructure = e;
+       sl.checkInternalLoops();
+       
+       out.println("Internal: " + sl.internalLoops);
+       out.println("Bulges: " + sl.bulge);
+    }*/
+    
     /**
      * 
      */
@@ -723,19 +738,30 @@ public class StemLoop {
         this.internalLoops = 0;
         this.bulge = 0;
         String auxStruct = this.viennaStructure;
-        int len;
+        int len, aux, auxI;
         auxStruct = auxStruct.replaceAll("\\.", "a");
         auxStruct = auxStruct.replaceAll("([a-z])\\1+", "$1");
-        len = auxStruct.length()/2;
         
-        for(int i = 0; i < len; i++ ){
-            if( auxStruct.charAt(i) == 'a' && 
-                    auxStruct.charAt(len - i) == 'a' ){
+        len = auxStruct.length();
+        aux = auxStruct.indexOf(")");
+        auxI = auxStruct.lastIndexOf("(");
+        
+        //out.println(auxStruct);
+        //out.println(auxStruct.length());
+ 
+        for(int i = 0; (auxI - i) >= 0 && (aux + i) < len; i++ ){
+            
+            if( auxStruct.charAt(auxI - i) == 'a' && 
+                    auxStruct.charAt(aux + i) == 'a' ){
                 this.internalLoops++;
-            } else if((auxStruct.charAt(i) == 'a' && 
-                    auxStruct.charAt(len -  i) != 'a') ||
-                    (auxStruct.charAt(i) != 'a' && 
-                    auxStruct.charAt(len - i) == 'a')){
+            } else if((auxStruct.charAt(auxI - i) == 'a' && 
+                    auxStruct.charAt(aux + i) != 'a') ||
+                    (auxStruct.charAt(auxI - i) != 'a' && 
+                    auxStruct.charAt(aux + i) == 'a')){
+                /*out.println("auxI-i: " + (auxI - i) + " : " 
+                        + auxStruct.charAt(auxI-i) );
+                out.println("aux+i: " +(aux + i)+ ": " 
+                        + auxStruct.charAt(aux + i) );*/
                 this.bulge++;
             }
         }

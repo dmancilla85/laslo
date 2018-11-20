@@ -556,13 +556,50 @@ public class LoopCatcher {
             }
             
             pool = Executors.newFixedThreadPool(listSize);
-            latch = new CountDownLatch(listSize);
-            i = 0;
+            latch = new CountDownLatch(nHilos);
+            i = 1;
             
             ini = Calendar.getInstance();
             secuencias = 0;
             
-            for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
+                       for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
+ 
+                 DNASequence element = entry.getValue();
+                 Iterator<String> patternItr = loopPatterns.iterator();
+                 count++;
+                 secuencias++;
+                 LoopCatcherThread thread = new LoopCatcherThread(extendedMode,
+                         additionalSequence, maxLength, minLength, element,
+                         inputType, patternItr, writer, searchReverse);
+ 
+                 if (i++ <= nHilos) {
+                     thread.setLatch(latch);
+                     pool.execute(thread);
+                 } else {
+                    i = 1;
+                    //out.println("Esperando hijos...");
+                    latch.await();
+                    //out.println("Terminando pool");
+                    //out.println("Terminando pool");
+                    pool.shutdown();
+                     if (fasta.size() - count < nHilos) {
+                         nHilos = fasta.size() - count;
+                     }
+ 
+                     pool = Executors.newFixedThreadPool(nHilos);
+                     latch = new CountDownLatch(nHilos);
+ 
+                 }
+             }
+ 
+             if (latch.getCount() > 0) {
+                 // out.println("Esperando threads...");
+                 latch.await();
+                 //out.println("Terminando pool");
+                 pool.shutdown();
+             }
+            
+            /*for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
                 
                 DNASequence element = entry.getValue();
                 Iterator<String> patternItr = loopPatterns.iterator();
@@ -575,7 +612,7 @@ public class LoopCatcher {
                 thread.setLatch(latch);
                 pool.execute(thread);
                 
-            }
+            */
             
             if (latch.getCount() > 0) {
                 latch.await();
