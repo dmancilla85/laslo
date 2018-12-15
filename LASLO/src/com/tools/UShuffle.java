@@ -76,7 +76,7 @@ public class UShuffle {
      *
      * @param path Path of the file to shuffle
      * @param filename Name of the file to shuffle
-     * @param fasta 
+     * @param fasta
      * @param nRandoms Number of random sequences to generate
      * @param k Value of k-let permutations
      * @param isGenBank It tells if it's a GenBank file
@@ -85,11 +85,11 @@ public class UShuffle {
             LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k,
             boolean isGenBank) {
         Runtime rt;
-        char sep = '|';
+        char sep = '@';
         String aux = "", gene, synonym, note;
         rt = Runtime.getRuntime();
         String fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
-        String destiny = "", sequence = "", header = "";
+        String destiny = "", sequence = "", header = "", id = "", cds = "";
         boolean mkdirs, delete;
         mkdirs = new File(path + RANDOM_PATH).mkdirs();
 
@@ -125,12 +125,12 @@ public class UShuffle {
                                     .getValue();
                             note = ((Qualifier) ((ArrayList) (qual.get("note"))).get(0))
                                     .getValue();
-                            
-                            header = gene + sep + synonym +  sep + 
-                                    element.getAccession().getID() + sep +
-                                    note + ((TextFeature) element
-                                            .getFeaturesByType("CDS")
-                                .toArray()[0]).getSource();
+                            id = element.getAccession().getID();
+                            cds = ((TextFeature) element.getFeaturesByType("CDS")
+                                    .toArray()[0]).getSource();
+
+                            header = gene + sep + synonym + sep
+                                    + note + sep + id + sep + cds;
                         }
                     }
 

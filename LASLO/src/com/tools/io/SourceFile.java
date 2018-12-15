@@ -93,6 +93,10 @@ public class SourceFile {
             return InputSequence.GENBANK;
         }
         
+        if(header.contains("@")){
+            return InputSequence.GENBANK;
+        }
+        
         if (header.contains("gene:")
                 && header.contains("gene_biotype:")
                 && header.contains("transcript_biotype:")

@@ -47,5 +47,10 @@ public enum InputSequence {
     /**
      *
      */
-    GENERIC
+    GENERIC,
+    
+    /**
+     * 
+     */
+    GENBANK_RND
 }

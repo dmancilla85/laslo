@@ -61,7 +61,7 @@ public class SequenceAnalizer {
         slr = null;
         int size, posAux, k = 1;
         size = 0;
-        String gene = "", note = "", synonym = "";
+        String gene = "", note = "", synonym = "", id = "", cds = "";
         int loopPos = 0, loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
         String rnaSequence = fastaSeq.getSequenceAsString().replace('T', 'U');
@@ -94,22 +94,32 @@ public class SequenceAnalizer {
                 slr.setTags(fastaSeq.getOriginalHeader());
             } else {
 
-                Map qual = ((TextFeature) fastaSeq.getFeaturesByType("gene")
-                        .toArray()[0]).getQualifiers();
+                if (!fastaSeq.getOriginalHeader().contains("@")) {
+                    Map qual = ((TextFeature) fastaSeq.getFeaturesByType("gene")
+                            .toArray()[0]).getQualifiers();
 
-                if (!qual.isEmpty()) {
-                    gene = ((Qualifier) ((ArrayList) (qual.get("gene"))).get(0))
-                            .getValue();
-                    synonym = ((Qualifier) ((ArrayList) (qual.get("gene_synonym"))).get(0))
-                            .getValue();
-                    note = ((Qualifier) ((ArrayList) (qual.get("note"))).get(0))
-                            .getValue();
+                    if (!qual.isEmpty()) {
+                        gene = ((Qualifier) ((ArrayList) (qual.get("gene"))).get(0))
+                                .getValue();
+                        synonym = ((Qualifier) ((ArrayList) (qual.get("gene_synonym"))).get(0))
+                                .getValue();
+                        note = ((Qualifier) ((ArrayList) (qual.get("note"))).get(0))
+                                .getValue();
+                        id = fastaSeq.getAccession().getID();
+                        cds = ((TextFeature) fastaSeq.getFeaturesByType("CDS")
+                        .toArray()[0]).getSource();
+                    }
+                } else {
+                    String auxH[] = fastaSeq.getOriginalHeader().split("@");
+                    
+                    gene = auxH[0];
+                    synonym = auxH[1];
+                    note = auxH[2];
+                    id = auxH[3];
+                    cds = auxH[4];
                 }
-
-                slr.setTags(gene, synonym, fastaSeq.getAccession().getID(),
-                        note,
-                        ((TextFeature) fastaSeq.getFeaturesByType("CDS")
-                                .toArray()[0]).getSource());
+                
+                slr.setTags(gene, synonym, id, note, cds);
             }
 
             try {
@@ -130,8 +140,8 @@ public class SequenceAnalizer {
 
                         try {
                             SEM.acquire();
-                        fold = new RNAfold(rnaSeq);
-                         } catch (InterruptedException ex) {
+                            fold = new RNAfold(rnaSeq);
+                        } catch (InterruptedException ex) {
                             out.println("ERROR: " + ex.getMessage());
                         } finally {
                             SEM.release();
@@ -239,12 +249,12 @@ public class SequenceAnalizer {
 
             try {
                 MUTEX.acquire();
-            writer.writeNext(element.toRowCSV().split(";")); //NOI18N
+                writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                    out.println("ERROR: " + ex.getMessage());
-                } finally {
-                    MUTEX.release();
-                }
+                out.println("ERROR: " + ex.getMessage());
+            } finally {
+                MUTEX.release();
+            }
         }
 
         size = slrList.size();
@@ -292,10 +302,8 @@ public class SequenceAnalizer {
                         if (begin) {
                             newLength--;
                             begin = true;
-                        } else {
-                            if (extremoIzq.charAt(i) == ')') {
-                                ret = false;
-                            }
+                        } else if (extremoIzq.charAt(i) == ')') {
+                            ret = false;
                         }
                     } else {
                         begin = false;
@@ -319,11 +327,9 @@ public class SequenceAnalizer {
                         if (begin) {
                             newLength--;
                             begin = true;
-                        } else {
-                            if (extremoDer.charAt(i) == '(') {
-                                ret = false;
-                                //newLength--;
-                            }
+                        } else if (extremoDer.charAt(i) == '(') {
+                            ret = false;
+                            //newLength--;
                         }
                     } else {
                         begin = false;
@@ -369,7 +375,7 @@ public class SequenceAnalizer {
     }
 
     /**
-     * 
+     *
      * @param fastaSeq
      * @param hairpinSeq
      * @param stemLoopPattern
@@ -379,7 +385,7 @@ public class SequenceAnalizer {
      * @param minLength
      * @param inputType
      * @param additionalSequence
-     * @return 
+     * @return
      */
     public static int sequenceExtendedResearch(DNASequence fastaSeq, String hairpinSeq,
             String stemLoopPattern, CSVWriter writer, boolean invert,
@@ -435,7 +441,7 @@ public class SequenceAnalizer {
                 slr.setTags(gene, synonym, fastaSeq.getAccession().getID(),
                         note,
                         ((TextFeature) fastaSeq.getFeaturesByType("CDS")
-                                .toArray()[0]).getSource());
+                        .toArray()[0]).getSource());
             }
 
             try {
@@ -452,7 +458,7 @@ public class SequenceAnalizer {
 
                     if (isValidHairpin) {
                         hairpinModel = SequenceAnalizer.isValidHairpin(
-                                maxLength, minLength,hairpinModel, loopLength,
+                                maxLength, minLength, hairpinModel, loopLength,
                                 loopPos, rnaSeq);
                         isValidHairpin = hairpinModel.length() > 0;
                     }
@@ -523,7 +529,7 @@ public class SequenceAnalizer {
 
                 if (additionalSequence.length() > 0) {
                     slr.setAdditionalSeqLocations(
-                            getPatternLocations(rnaSequence,additionalSequence));
+                            getPatternLocations(rnaSequence, additionalSequence));
                 }
 
                 slr.setRelativePos((double) slr.getStartsAt()
@@ -554,7 +560,7 @@ public class SequenceAnalizer {
 
         return size;
     }
-    
+
     /**
      *
      * @param sequence
