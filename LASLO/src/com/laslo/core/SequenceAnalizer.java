@@ -52,7 +52,7 @@ public class SequenceAnalizer {
      * @param additionalSeq
      * @return
      */
-    public static /*synchronized*/ int sequenceResearch(DNASequence fastaSeq, String stemLoopPattern,
+    public static synchronized int sequenceResearch(DNASequence fastaSeq, String stemLoopPattern,
             CSVWriter writer, boolean invert, int maxLength, int minLength,
             InputSequence inputType, String additionalSeq) {
 

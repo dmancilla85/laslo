@@ -46,6 +46,9 @@ import java.util.concurrent.Executors;
 import org.biojava.nbio.core.sequence.DNASequence;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
+import static java.util.ResourceBundle.getBundle;
+import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
+import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
 
 /**
  * @author David
@@ -407,6 +410,7 @@ public class LoopCatcher {
     public boolean startReadingFiles() {
         // To check the elapsed time
         Calendar ini, fin;
+        boolean isGenBank = false;
         ini = Calendar.getInstance();
         out.println(
                 java.text.MessageFormat.format(bundle.getString("START_TIME"),
@@ -425,13 +429,14 @@ public class LoopCatcher {
                         || currentFile.toString().endsWith(GENBANK_EXT))) {
 
                     //fileName = currentFile.getName();
-                    LinkedHashMap<String, DNASequence> fasta = null;
+                    LinkedHashMap<String, DNASequence> dnaFile = null;
                     
                     try {
                         if (currentFile.toString().endsWith(GENBANK_EXT)) {
-                            fasta = readGenbankDNASequence(currentFile, false);
+                            dnaFile = readGenbankDNASequence(currentFile, false);
+                            isGenBank = true;
                         } else {
-                            fasta = readFastaDNASequence(currentFile, false);
+                            dnaFile = readFastaDNASequence(currentFile, false);
                         }
                         
                     } catch (IOException ex) {
@@ -441,7 +446,7 @@ public class LoopCatcher {
                     }
                     
                     UShuffle.makeShuffleSequences(pathOut, currentFile.getName(),
-                            fasta, numberOfRandoms, kLetRandoms);
+                            dnaFile, numberOfRandoms, kLetRandoms, isGenBank);
                 }
             }
             
@@ -514,7 +519,7 @@ public class LoopCatcher {
             LinkedHashMap<String, DNASequence> fasta;
             
             if (actualFile.getName().endsWith(GENBANK_EXT)) {
-                fasta = readGenbankDNASequence(actualFile, false);
+                fasta = readGenbankDNASequence(actualFile);
                 genbank = true;
             } else {
                 fasta = readFastaDNASequence(actualFile,
@@ -599,7 +604,7 @@ public class LoopCatcher {
                  pool.shutdown();
              }
             
-            /*for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
+            /*for (Map.Entry<String, DNASequence> entry : dnaFile.entrySet()) {
                 
                 DNASequence element = entry.getValue();
                 Iterator<String> patternItr = loopPatterns.iterator();

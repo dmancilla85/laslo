@@ -22,11 +22,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
+import org.biojava.nbio.core.sequence.features.Qualifier;
+import org.biojava.nbio.core.sequence.features.TextFeature;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 
 /**
@@ -57,7 +60,7 @@ public class UShuffle {
         } catch (IOException ex) {
             Logger.getLogger(UShuffle.class.getName()).log(Level.SEVERE, null, ex);
         }
-        makeShuffleSequences(path, fileName, fasta, 5, 2);
+        makeShuffleSequences(path, fileName, fasta, 5, 2, false);
 
     }
 
@@ -71,16 +74,19 @@ public class UShuffle {
 
     /**
      *
-     * @param path
-     * @param filename
-     * @param fasta
-     * @param nRandoms
-     * @param k
+     * @param path Path of the file to shuffle
+     * @param filename Name of the file to shuffle
+     * @param fasta 
+     * @param nRandoms Number of random sequences to generate
+     * @param k Value of k-let permutations
+     * @param isGenBank It tells if it's a GenBank file
      */
     public static void makeShuffleSequences(String path, String filename,
-            LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k) {
+            LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k,
+            boolean isGenBank) {
         Runtime rt;
-        String aux = "";
+        char sep = '|';
+        String aux = "", gene, synonym, note;
         rt = Runtime.getRuntime();
         String fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
         String destiny = "", sequence = "", header = "";
@@ -105,7 +111,29 @@ public class UShuffle {
                 int j = 1;
                 for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
                     DNASequence element = entry.getValue();
-                    header = element.getOriginalHeader();
+
+                    if (!isGenBank) {
+                        header = element.getOriginalHeader();
+                    } else {
+                        Map qual = ((TextFeature) element.getFeaturesByType("gene")
+                                .toArray()[0]).getQualifiers();
+
+                        if (!qual.isEmpty()) {
+                            gene = ((Qualifier) ((ArrayList) (qual.get("gene"))).get(0))
+                                    .getValue();
+                            synonym = ((Qualifier) ((ArrayList) (qual.get("gene_synonym"))).get(0))
+                                    .getValue();
+                            note = ((Qualifier) ((ArrayList) (qual.get("note"))).get(0))
+                                    .getValue();
+                            
+                            header = gene + sep + synonym +  sep + 
+                                    element.getAccession().getID() + sep +
+                                    note + ((TextFeature) element
+                                            .getFeaturesByType("CDS")
+                                .toArray()[0]).getSource();
+                        }
+                    }
+
                     sequence = element.getSequenceAsString();
                     String cmd = COMMAND_SHUFFLE + sequence
                             + " -n 1 -k " + k;

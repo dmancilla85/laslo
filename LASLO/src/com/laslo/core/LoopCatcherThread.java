@@ -20,20 +20,13 @@ package com.laslo.core;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.io.InputSequence;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import static com.laslo.core.SequenceAnalizer.*;
 import com.tools.OSValidator;
 import static java.lang.System.out;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.biojava.nbio.core.sequence.DNASequence;
-import org.biojava.nbio.core.sequence.features.Qualifier;
-import org.biojava.nbio.core.sequence.features.TextFeature;
 
 /**
  *
