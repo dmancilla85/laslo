@@ -518,7 +518,7 @@ public class LoopCatcher {
                 genbank = true;
             } else {
                 fasta = readFastaDNASequence(actualFile,
-                        actualFile.length() > (52428800));
+                        false);//actualFile.length() > (52428800));
                 genbank = false;
             }
             
