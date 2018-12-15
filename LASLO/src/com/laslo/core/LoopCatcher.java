@@ -422,6 +422,7 @@ public class LoopCatcher {
         }
         
         if (this.makeRandoms) {
+            out.print("Making random sequences... ");
             for (File currentFile : fileList) {
                 if (currentFile.isFile()
                         && (currentFile.toString().endsWith(FASTA_EXT)
@@ -444,11 +445,11 @@ public class LoopCatcher {
                     } catch (Exception ex) {
                         out.println("ERROR: " + ex.getMessage());
                     }
-                    
                     UShuffle.makeShuffleSequences(pathOut, currentFile.getName(),
                             dnaFile, numberOfRandoms, kLetRandoms, isGenBank);
                 }
             }
+            out.print("Done.\n");
             
             File folder;
             folder = new File(pathIn + UShuffle.getRandomDir());

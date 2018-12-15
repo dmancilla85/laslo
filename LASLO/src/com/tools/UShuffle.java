@@ -74,18 +74,20 @@ public class UShuffle {
 
     /**
      *
-     * @param path Path of the file to shuffle
-     * @param filename Name of the file to shuffle
-     * @param fasta
-     * @param nRandoms Number of random sequences to generate
-     * @param k Value of k-let permutations
+     * @param path      Path of the file to shuffle
+     * @param filename  Name of the file to shuffle
+     * @param fasta     Hashmap of DNASequence's from BioJava
+     * @param nRandoms  Number of random sequences to generate
+     * @param k         Value of k-let permutations
      * @param isGenBank It tells if it's a GenBank file
+     * @return          Last process exit value (an integer)
      */
-    public static void makeShuffleSequences(String path, String filename,
+    public static int makeShuffleSequences(String path, String filename,
             LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k,
             boolean isGenBank) {
         Runtime rt;
         char sep = '@';
+        int exitVal = 0;
         String aux = "", gene, synonym, note;
         rt = Runtime.getRuntime();
         String fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
@@ -158,7 +160,7 @@ public class UShuffle {
                         }
                     }
 
-                    int exitVal = pr.waitFor();
+                    exitVal = pr.waitFor();
 
                     /*System.out.println(destiny + ": Sequence " + j++
                         + " - ["+ exitVal + "]");*/
@@ -172,6 +174,7 @@ public class UShuffle {
                 System.out.println("Error: " + ex.getMessage());
             }
         }
-
+        
+        return exitVal;
     }
 }
