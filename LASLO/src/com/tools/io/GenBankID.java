@@ -16,32 +16,45 @@
  */
 package com.tools.io;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.biojava.nbio.core.sequence.DNASequence;
+import org.biojava.nbio.core.sequence.io.GenbankReaderHelper;
+import org.biojava.nbio.core.sequence.io.GenbankWriterHelper;
+
 /**
  *
  * @author David A. Mancilla
  */
-public class GenBankID extends SourceFile{
+public class GenBankID extends SourceFile {
+
     protected String description;
     protected int cdsStart;
     protected int cdsEnd;
     protected String location;
     protected String synonym;
-    
-    private final static String HEADER = 
-            "Gen" + ROW_DELIMITER +
-            "GeneSynonym" + ROW_DELIMITER +
-            "Note" + ROW_DELIMITER +
-            "AccessionID" + ROW_DELIMITER +
-            "CDS_Start" + ROW_DELIMITER +
-            "CDS_End" + ROW_DELIMITER + 
-            "Location" + ROW_DELIMITER;
+
+    private final static String HEADER
+            = "Gen" + ROW_DELIMITER
+            + "GeneSynonym" + ROW_DELIMITER
+            + "Note" + ROW_DELIMITER
+            + "AccessionID" + ROW_DELIMITER
+            + "CDS_Start" + ROW_DELIMITER
+            + "CDS_End" + ROW_DELIMITER
+            + "Location" + ROW_DELIMITER;
 
     public GenBankID() {
         this.description = "";
         this.cdsStart = 0;
         this.cdsEnd = 0;
     }
-    
+
     public GenBankID(String synonym, String description, int cdsStart, int cdsEnd) {
         this.description = description;
         this.cdsStart = cdsStart;
@@ -49,12 +62,65 @@ public class GenBankID extends SourceFile{
         this.synonym = synonym;
     }
 
+    public static String makeFile(String path, 
+            LinkedHashMap<String, DNASequence> dnaFile){
+        File file = new File(path + "\\sequence.gb");
+        
+        try {
+            GenbankWriterHelper.writeNucleotideSequence(file, 
+                    dnaFile.values());
+        } catch (Exception ex) {
+            Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return path + "\\sequence.gb";
+    }
+    
+    public static LinkedHashMap<String, DNASequence> 
+        downLoadSequenceForId(String genBankId) throws Exception {
+        LinkedHashMap<String, DNASequence> dnaFile = null;
+        String request = String
+                .format("db=nuccore&id=%s&rettype=gb&retmode=text", genBankId);
+        String idFormatted = genBankId;
+
+        if (idFormatted.contains(".")) {
+            idFormatted = idFormatted
+                    .substring(0, idFormatted.lastIndexOf("."));
+        }
+
+        URL ncbiGenbank = new URL(
+                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+                + request);
+
+        try {
+        dnaFile = GenbankReaderHelper
+                .readGenbankDNASequence(ncbiGenbank.openStream());
+        } catch(MalformedURLException ex){
+            System.out.println("ERROR: Malformed URL Exception");
+        }
+
+        return dnaFile;
+    }
+
+    /**
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        try {
+            downLoadSequenceForId("NM_001275794.1,NM_005690");
+        } catch (Exception ex) {
+            Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public String getSynonym() {
         return synonym;
     }
 
     public void setSynonym(String synonym) {
-        this.synonym = synonym.replace(';',',');
+        this.synonym = synonym.replace(';', ',');
     }
 
     public String getDescription() {
@@ -62,7 +128,7 @@ public class GenBankID extends SourceFile{
     }
 
     public void setDescription(String description) {
-        this.description = description.replace(';',',');
+        this.description = description.replace(';', ',');
     }
 
     public String getLocation() {
@@ -70,15 +136,17 @@ public class GenBankID extends SourceFile{
     }
 
     public void setLocation(int pos) {
-        if(this.cdsEnd != 0){
-            if(pos < cdsStart){
+        if (this.cdsEnd != 0) {
+            if (pos < cdsStart) {
                 location = "5'UTR";
-            } else if(pos > cdsEnd){
+            } else if (pos > cdsEnd) {
                 location = "3'UTR";
-            } else location = "CDS";
+            } else {
+                location = "CDS";
+            }
         }
     }
-    
+
     public int getCdsStart() {
         return cdsStart;
     }
@@ -86,28 +154,28 @@ public class GenBankID extends SourceFile{
     public int getCdsEnd() {
         return cdsEnd;
     }
-     
+
     public void setCDS(String cds) {
-        
-        if(cds == null){
+
+        if (cds == null) {
             return;
         }
-        
+
         String[] parts = cds.split("\\.\\.");
-        
-        if(parts.length > 0){
+
+        if (parts.length > 0) {
             this.cdsStart = new Integer(parts[0]);
             this.cdsEnd = new Integer(parts[1]);
         }
     }
-    
+
     public static String getHeader() {
         return GenBankID.HEADER;
     }
-    
+
     @Override
     public String toRowCSV() {
-        return  geneID.replace(';', ',') + ROW_DELIMITER
+        return geneID.replace(';', ',') + ROW_DELIMITER
                 + synonym + ROW_DELIMITER
                 + transcriptID.replace(';', ',') + ROW_DELIMITER
                 + description + ROW_DELIMITER

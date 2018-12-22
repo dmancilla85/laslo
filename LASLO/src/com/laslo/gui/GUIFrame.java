@@ -18,6 +18,7 @@
 package com.laslo.gui;
 
 import com.laslo.core.LoopCatcher;
+import com.tools.io.GenBankID;
 import com.tools.io.InputSequence;
 import static com.tools.io.InputSequence.BIOMART;
 import static com.tools.io.InputSequence.ENSEMBL;
@@ -33,12 +34,18 @@ import static java.lang.System.exit;
 import static java.lang.System.out;
 import static java.lang.System.setErr;
 import static java.lang.System.setOut;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
+import java.util.logging.Level;
 import static java.util.logging.Level.SEVERE;
+import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -48,6 +55,7 @@ import static javax.swing.JFileChooser.FILES_AND_DIRECTORIES;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.biojava.nbio.core.sequence.DNASequence;
 
 /**
  *
@@ -69,12 +77,9 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jRBen_EN.setSelected(true);
         this.jRBes_AR.setSelected(false);
         this.jLblError.setText("");
-        //this.jFTpercMismatch.setValue(25);
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
-        //this.jFTpercWooble.setValue(50);
-        //this.jFTpercMismatch.setVisible(false);
-        //this.jFTpercWooble.setVisible(false);
+        this.fromLocalPath = true;
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLabel2.setVisible(false);
@@ -82,6 +87,8 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jcbSearchInverse.setSelected(false);
         this.jcbExtended.setSelected(false);
         this.jcbMakeRandoms.setSelected(false);
+
+        this.jTab.setSelectedIndex(0);
 
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
         PrintStream ps = new PrintStream(taos);
@@ -107,6 +114,9 @@ public class GUIFrame extends javax.swing.JFrame {
         jftNumberOfRandoms = new javax.swing.JFormattedTextField();
         jLblNKlet = new javax.swing.JLabel();
         jftkLet = new javax.swing.JFormattedTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jTFPathOut = new javax.swing.JTextField();
+        jButtonOut = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jSpinMinLength = new javax.swing.JSpinner();
@@ -129,16 +139,14 @@ public class GUIFrame extends javax.swing.JFrame {
         jTab = new javax.swing.JTabbedPane();
         jPanFile = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         jTFPathIn = new javax.swing.JTextField();
-        jTFPathOut = new javax.swing.JTextField();
         jButtonIn = new javax.swing.JButton();
-        jButtonOut = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
         jPanOnline = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTAGenes = new javax.swing.JTextArea();
         jrbNcbi = new javax.swing.JRadioButton();
-        jrbUniprot = new javax.swing.JRadioButton();
+        jLabel8 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
@@ -175,6 +183,7 @@ public class GUIFrame extends javax.swing.JFrame {
         setIconImage(new ImageIcon(getClass().getResource("/resources/noun_655767_cc.png")).getImage());
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(533, 437));
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -219,6 +228,27 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel6.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jLabel6.setText(bundle.getString("DESTINATION")); // NOI18N
+
+        jTFPathOut.setEditable(false);
+        jTFPathOut.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jTFPathOut.setToolTipText(bundle.getString("DESTINATION_TOOLTIP")); // NOI18N
+        jTFPathOut.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jTFPathOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFPathOutActionPerformed(evt);
+            }
+        });
+
+        jButtonOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/noun_53223_cc.png"))); // NOI18N
+        jButtonOut.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButtonOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOutActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -226,22 +256,36 @@ public class GUIFrame extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jcbMakeRandoms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jcbExtended, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
-                .addGap(6, 6, 6)
-                .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
-                .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jcbMakeRandoms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jcbExtended, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
+                        .addGap(6, 6, 6)
+                        .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTFPathOut)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonOut))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(jTFPathOut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButtonOut, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jcbMakeRandoms)
                     .addComponent(jLblNRand)
@@ -319,11 +363,12 @@ public class GUIFrame extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTALoopPatterns);
 
         try {
-            jftAdditionalSeq.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("UUUUUUUUUU")));
+            jftAdditionalSeq.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("UUUUUUUUUUUUUUUUUUUUUU")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
         jftAdditionalSeq.setToolTipText(bundle.getString("ADDITION_SEQ_TOOLTIP"));
+        jftAdditionalSeq.setAutoscrolls(false);
         jftAdditionalSeq.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jftAdditionalSeq.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -345,7 +390,7 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -418,7 +463,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jTAConsole.setLineWrap(true);
         jTAConsole.setRows(5);
         jTAConsole.setToolTipText("");
-        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder("Output lines"));
+        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OUTPUT_TITLE"))); // NOI18N
         jTAConsole.setFocusable(false);
         jTAConsole.setVerifyInputWhenFocusTarget(false);
         jScrollPane2.setViewportView(jTAConsole);
@@ -439,8 +484,8 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jBStart, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLblError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jLblError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -450,18 +495,20 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jBStart)
                     .addComponent(jLblError))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTab.setBackground(javax.swing.UIManager.getDefaults().getColor("windowBorder"));
         jTab.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jTab.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabStateChanged(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jLabel4.setText(bundle.getString("PATH")); // NOI18N
-
-        jLabel6.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jLabel6.setText(bundle.getString("DESTINATION")); // NOI18N
 
         jTFPathIn.setEditable(false);
         jTFPathIn.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
@@ -473,16 +520,6 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jTFPathOut.setEditable(false);
-        jTFPathOut.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jTFPathOut.setToolTipText(bundle.getString("DESTINATION_TOOLTIP")); // NOI18N
-        jTFPathOut.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jTFPathOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTFPathOutActionPerformed(evt);
-            }
-        });
-
         jButtonIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/noun_53223_cc.png"))); // NOI18N
         jButtonIn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButtonIn.addActionListener(new java.awt.event.ActionListener() {
@@ -491,13 +528,9 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jButtonOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/noun_53223_cc.png"))); // NOI18N
-        jButtonOut.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButtonOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonOutActionPerformed(evt);
-            }
-        });
+        jLabel7.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
+        jLabel7.setText(bundle.getString("DESCRIPTION")); // NOI18N
+        jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         javax.swing.GroupLayout jPanFileLayout = new javax.swing.GroupLayout(jPanFile);
         jPanFile.setLayout(jPanFileLayout);
@@ -505,17 +538,15 @@ public class GUIFrame extends javax.swing.JFrame {
             jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanFileLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTFPathOut, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
-                    .addComponent(jTFPathIn))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonIn, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButtonOut, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanFileLayout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(22, 22, 22)
+                        .addComponent(jTFPathIn, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonIn)
+                        .addGap(4, 4, 4)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanFileLayout.setVerticalGroup(
@@ -527,28 +558,23 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addComponent(jLabel4)
                         .addComponent(jTFPathIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButtonIn, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel6)
-                        .addComponent(jTFPathOut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButtonOut, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         jTab.addTab("Archivo", jPanFile);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
-        jTextArea1.setRows(5);
-        jScrollPane3.setViewportView(jTextArea1);
+        jTAGenes.setColumns(20);
+        jTAGenes.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
+        jTAGenes.setRows(5);
+        jScrollPane3.setViewportView(jTAGenes);
 
         jrbNcbi.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         jrbNcbi.setSelected(true);
         jrbNcbi.setText("NCBI");
 
-        jrbUniprot.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jrbUniprot.setText("UniProt");
+        jLabel8.setText(bundle.getString("NCBI_DESC")); // NOI18N
 
         javax.swing.GroupLayout jPanOnlineLayout = new javax.swing.GroupLayout(jPanOnline);
         jPanOnline.setLayout(jPanOnlineLayout);
@@ -559,10 +585,10 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanOnlineLayout.createSequentialGroup()
                         .addComponent(jrbNcbi, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jrbUniprot, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel8)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanOnlineLayout.setVerticalGroup(
@@ -571,10 +597,10 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jrbNcbi)
-                    .addComponent(jrbUniprot))
+                    .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTab.addTab("En línea", jPanOnline);
@@ -630,28 +656,29 @@ public class GUIFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTab, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTab))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTab)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTab, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTFPathInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFPathInActionPerformed
@@ -818,9 +845,13 @@ public class GUIFrame extends javax.swing.JFrame {
     private void jMIAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAboutActionPerformed
         // TODO add your handling code here:
         AboutFrame af = new AboutFrame();
-        
+
         af.setVisible(true);
     }//GEN-LAST:event_jMIAboutActionPerformed
+
+    private void jTabStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTabStateChanged
 
     /**
      * @param args the command line arguments
@@ -831,8 +862,8 @@ public class GUIFrame extends javax.swing.JFrame {
             // Set cross-platform Java L&F (also called "Metal")
             UIManager.setLookAndFeel(
                     UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | IllegalAccessException | 
-                InstantiationException | UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | IllegalAccessException
+                | InstantiationException | UnsupportedLookAndFeelException ex) {
         }
         //</editor-fold>
 
@@ -859,6 +890,8 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLblError;
     private javax.swing.JLabel jLblNKlet;
@@ -885,11 +918,11 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JSpinner jSpinMismatch;
     private javax.swing.JSpinner jSpinWooble;
     private javax.swing.JTextArea jTAConsole;
+    private javax.swing.JTextArea jTAGenes;
     private javax.swing.JTextArea jTALoopPatterns;
     private javax.swing.JTextField jTFPathIn;
     private javax.swing.JTextField jTFPathOut;
     private javax.swing.JTabbedPane jTab;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JCheckBox jcbExtended;
     private javax.swing.JCheckBox jcbMakeRandoms;
     private javax.swing.JCheckBox jcbSearchInverse;
@@ -897,29 +930,14 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jftNumberOfRandoms;
     private javax.swing.JFormattedTextField jftkLet;
     private javax.swing.JRadioButton jrbNcbi;
-    private javax.swing.JRadioButton jrbUniprot;
     // End of variables declaration//GEN-END:variables
 
-    /**
-     *
-     */
     protected Locale locale;
     private final ResourceBundle bundle;
-
-    /**
-     *
-     */
     protected LoopCatcher loopCatcher;
-
-    /**
-     *
-     */
     protected File[] listOfFiles;
-
-    /**
-     *
-     */
     protected boolean isRunning;
+    protected boolean fromLocalPath;
 
     /**
      *
@@ -985,13 +1003,15 @@ public class GUIFrame extends javax.swing.JFrame {
      * @param pathIn
      * @param pathOut
      * @param loopList
+     * @param geneList
      * @param randoms
      * @param klet
      * @return
      */
     public boolean validateParameters(int min, int max, int wooble,
             int mismatch, String pathIn, String pathOut,
-            ArrayList<String> loopList, int randoms, int klet) {
+            ArrayList<String> loopList, ArrayList<String> geneList,
+            int randoms, int klet) {
         boolean isValid;
         isValid = true;
         String aux;
@@ -1003,13 +1023,35 @@ public class GUIFrame extends javax.swing.JFrame {
             isValid = false;
         }
 
-        // Validate paths
+        if (jTab.getSelectedIndex() == 1) {
+            if (!netIsAvailable()) {
+                isValid = false;
+                this.jLblError.setText(bundle.getString("NO_NET_CONNECTION"));
+                return isValid;
+            }
+
+            geneList.addAll(asList(this.jTAGenes.getText().split(",")));
+
+            for (int i = 0; i < geneList.size() && isValid; i++) {
+                aux = geneList.get(i);
+                aux = aux.trim();
+                if (aux.length() <= 0) {
+                    isValid = false;
+                    this.jLblError.setText(bundle.getString("ERROR_CHECK_GENES"));
+                    return isValid;
+                }
+            }
+
+        } else {
+            if (!new File(pathIn).exists()) {
+                this.jLblError.setText(bundle.getString("ERROR_SOURCE"));
+                isValid = false;
+            }
+        }
+
+        // Validate destiny
         if (!new File(pathOut).exists()) {
             this.jLblError.setText(bundle.getString("ERROR_DEST_FOLDER"));
-            isValid = false;
-        }
-        if (!new File(pathIn).exists()) {
-            this.jLblError.setText(bundle.getString("ERROR_SOURCE"));
             isValid = false;
         }
 
@@ -1046,17 +1088,41 @@ public class GUIFrame extends javax.swing.JFrame {
 
     /**
      *
+     * @return
+     */
+    private static boolean netIsAvailable() {
+        try {
+            final URL url = new URL("http://www.google.com");
+            final URLConnection conn = url.openConnection();
+            conn.connect();
+            conn.getInputStream().close();
+            return true;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     *
      */
     public void start() {
 
-        //String inputValue;
-        //inputValue = this.jCBOrigin.getItemAt(jCBOrigin.getSelectedIndex());
         int max, min, wooble, mismatch, randoms, klet;
         String pathOut = this.jTFPathOut.getText();
         String pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
-        ArrayList<String> loopList;
+        ArrayList<String> loopList, geneList;
         loopList = new ArrayList<>();
+        geneList = new ArrayList<>();
+        LinkedHashMap<String, DNASequence> dnaFile = null;
+
+        if (!this.jTAGenes.getText().isEmpty()) {
+            geneList.clear();
+            geneList.addAll(asList(this.jTAGenes.getText().split(",")));
+        }
+
         this.jLblError.setText("");
 
         if (this.isRunning) {
@@ -1076,8 +1142,21 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // Validar parámetros
         if (!validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
-                loopList, randoms, klet)) {
+                loopList, geneList, randoms, klet)) {
             return;
+        }
+
+        if (jTab.getSelectedIndex() == 1) {
+            try {
+                dnaFile = GenBankID.downLoadSequenceForId(jTAGenes.getText()
+                        .replaceAll(" ", ""));
+            } catch (Exception ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            pathIn = GenBankID.makeFile(pathOut, dnaFile);
+            this.listOfFiles = new File[1];
+            this.listOfFiles[0] = new File(pathIn);
+            
         }
 
         this.jTAConsole.setText("");
@@ -1092,9 +1171,11 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMinLength(min);
         loopCatcher.setMaxMismatch(mismatch);
         loopCatcher.setMaxWooble(wooble);
+
         loopCatcher.setPathOut(pathOut);
         loopCatcher.setPathIn(pathIn);
         loopCatcher.setFileList(this.listOfFiles);
+
         loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected());
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
