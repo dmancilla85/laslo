@@ -86,6 +86,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLabel5.setVisible(false);
         this.jcbSearchInverse.setSelected(false);
         this.jcbExtended.setSelected(false);
+        this.jcbExtended.setVisible(false); // temporario
         this.jcbMakeRandoms.setSelected(false);
 
         this.jTab.setSelectedIndex(0);

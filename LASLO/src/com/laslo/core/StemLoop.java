@@ -25,7 +25,6 @@ import com.tools.io.SourceFile;
 import com.tools.io.FlyBaseFastaID;
 import com.tools.io.EnsemblFastaID;
 import com.tools.io.GenBankID;
-import static java.lang.System.out;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,11 +33,11 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 
-class PosComparator implements Comparator<Integer>{
-    
+class PosComparator implements Comparator<Integer> {
+
     @Override
-    public int compare(Integer a, Integer b){
-        return a > b ? -1 :(a < b ? 1 : 0);
+    public int compare(Integer a, Integer b) {
+        return a > b ? -1 : (a < b ? 1 : 0);
     }
 }
 
@@ -126,9 +125,9 @@ public class StemLoop {
         numberFormatter.setMinimumFractionDigits(digits);
         return numberFormatter.format(number);
     }
-    
+
     private String getFormattedNumber(Double number) {
-        return getFormattedNumber(number,3);
+        return getFormattedNumber(number, 3);
     }
 
     /**
@@ -155,7 +154,7 @@ public class StemLoop {
             case GENERIC:
                 this.id_fasta = new GenericID();
                 break;
-                
+
             case GENBANK:
                 this.id_fasta = new GenBankID();
                 break;
@@ -327,13 +326,14 @@ public class StemLoop {
         return endsAt;
     }
 
-    public String isReverse(){
-        if(!this.reversed)
+    public String isReverse() {
+        if (!this.reversed) {
             return "+";
-        else
+        } else {
             return "-";
+        }
     }
-    
+
     /**
      *
      * @return
@@ -377,13 +377,13 @@ public class StemLoop {
      * @return
      */
     public String getLoop() {
-        
+
         String theLoop = this.loop;
-        
+
         if (reversed) {
             theLoop = reverseIt(theLoop);
         }
-        
+
         return theLoop;
     }
 
@@ -646,10 +646,10 @@ public class StemLoop {
         this.loop = loopPattern;
     }
 
-    public void setLocation(int pos){
-       ((GenBankID) id_fasta).setLocation(pos);
+    public void setLocation(int pos) {
+        ((GenBankID) id_fasta).setLocation(pos);
     }
-    
+
     /**
      *
      */
@@ -660,7 +660,7 @@ public class StemLoop {
         int CG = 0, AU = 0;
         StringBuilder aux = new StringBuilder(this.viennaStructure);
         int firstIzq = 1;
-        
+
         if (this.loop.isEmpty() || this.viennaStructure.isEmpty()) {
             return;
         }
@@ -671,7 +671,6 @@ public class StemLoop {
 
         bulge = StringUtils.countMatches(this.viennaStructure, "..(")
                 + StringUtils.countMatches(this.viennaStructure, ")..");*/
-
         try {
             firstIzq = this.viennaStructure.lastIndexOf('(');
             int firstDer = this.viennaStructure.indexOf(')');
@@ -715,7 +714,7 @@ public class StemLoop {
         //this.internalLoops = bulge;
 
     }
-    
+
     /*public static void main(String []args){
        String a =  "((.((...(((.........)))...)).))";
        String b =   "((((.(((((((.((....)).)))))))))))";
@@ -730,34 +729,32 @@ public class StemLoop {
        out.println("Internal: " + sl.internalLoops);
        out.println("Bulges: " + sl.bulge);
     }*/
-    
     /**
-     * 
+     *
      */
-    public void checkInternalLoops(){   
+    public void checkInternalLoops() {
         this.internalLoops = 0;
         this.bulge = 0;
         String auxStruct = this.viennaStructure;
         int len, aux, auxI;
         auxStruct = auxStruct.replaceAll("\\.", "a");
         auxStruct = auxStruct.replaceAll("([a-z])\\1+", "$1");
-        
+
         len = auxStruct.length();
         aux = auxStruct.indexOf(")");
         auxI = auxStruct.lastIndexOf("(");
-        
+
         //out.println(auxStruct);
         //out.println(auxStruct.length());
- 
-        for(int i = 0; (auxI - i) >= 0 && (aux + i) < len; i++ ){
-            
-            if( auxStruct.charAt(auxI - i) == 'a' && 
-                    auxStruct.charAt(aux + i) == 'a' ){
+        for (int i = 0; (auxI - i) >= 0 && (aux + i) < len; i++) {
+
+            if (auxStruct.charAt(auxI - i) == 'a'
+                    && auxStruct.charAt(aux + i) == 'a') {
                 this.internalLoops++;
-            } else if((auxStruct.charAt(auxI - i) == 'a' && 
-                    auxStruct.charAt(aux + i) != 'a') ||
-                    (auxStruct.charAt(auxI - i) != 'a' && 
-                    auxStruct.charAt(aux + i) == 'a')){
+            } else if ((auxStruct.charAt(auxI - i) == 'a'
+                    && auxStruct.charAt(aux + i) != 'a')
+                    || (auxStruct.charAt(auxI - i) != 'a'
+                    && auxStruct.charAt(aux + i) == 'a')) {
                 /*out.println("auxI-i: " + (auxI - i) + " : " 
                         + auxStruct.charAt(auxI-i) );
                 out.println("aux+i: " +(aux + i)+ ": " 
@@ -765,7 +762,7 @@ public class StemLoop {
                 this.bulge++;
             }
         }
-        
+
     }
 
     /**
@@ -779,23 +776,24 @@ public class StemLoop {
 
         if (reversed) {
             this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
-            
+
             matchFirst = rnaHairpinSequence.indexOf(reverseIt(loop));
             matchLast = rnaHairpinSequence.lastIndexOf(reverseIt(loop));
-            
-            if(matchFirst == matchLast)
+
+            if (matchFirst == matchLast) {
                 startPosLoop = matchFirst;
-            else
+            } else {
                 startPosLoop = matchLast;
-            
+            }
+
         }
-        
+
         if (this.rnaHairpinSequence != null) {
-            
+
             n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
             precedes = this.rnaHairpinSequence.charAt(startPosLoop - 1);
             precedes2 = this.rnaHairpinSequence.charAt(startPosLoop - 2);
-            
+
             if (this.loop.length() > 4) {
                 n5 = this.rnaHairpinSequence.charAt(startPosLoop + 4);
 
@@ -1028,16 +1026,16 @@ public class StemLoop {
                 break;
         }
     }
-    
+
     /**
-     * 
+     *
      * @param gene
      * @param synonym
      * @param transcript
      * @param description
-     * @param cds 
+     * @param cds
      */
-    public void setTags(String gene, String synonym, String transcript, 
+    public void setTags(String gene, String synonym, String transcript,
             String description,
             String cds) {
         id_fasta.setGeneID(gene);
@@ -1086,7 +1084,7 @@ public class StemLoop {
                 + getFormattedNumber(this.percent_CG) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.percent_GU) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.percent_AG) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.mfe,5) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.mfe, 5) + SourceFile.ROW_DELIMITER
                 + getFormattedNumber(this.relativePos) + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
