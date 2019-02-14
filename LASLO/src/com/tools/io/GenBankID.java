@@ -20,9 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
@@ -122,13 +120,14 @@ public class GenBankID extends SourceFile {
                 String proxyParm[] = proxyConn.split(",");
 
                 // defined a proxy connection
-                System.setProperty("http.proxyHost", proxyParm[0]);
-                System.setProperty("http.proxyPort", proxyParm[1]);
+                System.setProperty("http.proxyHost", proxyParm[0].trim());
+                System.setProperty("http.proxyPort", proxyParm[1].trim());
 
-                System.out.println("Proxy definida como:" + proxyConn);
-                // If proxy requires authentication,
-                //System.setProperty("http.proxyUser", "user");
-                //System.setProperty("http.proxyPassword", "password");
+                // If proxy requires authentication, 
+                if (proxyParm.length == 4) {
+                    System.setProperty("http.proxyUser", proxyParm[2].trim());
+                    System.setProperty("http.proxyPassword", proxyParm[3].trim());
+                }
             }
 
             ncbiGenbank = new URL(
@@ -138,13 +137,18 @@ public class GenBankID extends SourceFile {
             dnaFile = GenbankReaderHelper
                     .readGenbankDNASequence(ncbiGenbank.openStream());
         } catch (MalformedURLException ex) {
-            System.out.println("ERROR: Malformed URL Exception. Cause: " +
-                    ex.getCause().getLocalizedMessage());
-                    dnaFile = null;
+            System.out.println("ERROR: Malformed URL Exception. Cause: "
+                    + ex.getCause().getLocalizedMessage());
+            dnaFile = null;
         } catch (IOException ex) {
-            System.out.println("ERROR: IO Exception. Cause: " +
-                    ex.getLocalizedMessage());
-                    dnaFile = null;
+
+            if (ex.getLocalizedMessage().contains("400")) {
+                System.out.println("ERROR: " + genBankId + " code not found.");
+            } else {
+                System.out.println("ERROR: IO Exception. Cause: "
+                        + ex.getLocalizedMessage());
+            }
+            dnaFile = null;
         }
 
         return dnaFile;

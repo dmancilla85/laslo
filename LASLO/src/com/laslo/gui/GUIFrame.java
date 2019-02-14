@@ -192,6 +192,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -344,7 +345,8 @@ public class GUIFrame extends javax.swing.JFrame {
         jLabel3.setText(bundle.getString("ENTER_THE_LOOPS")); // NOI18N
 
         jcbSearchInverse.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        jcbSearchInverse.setLabel("Search for inversed patterns too ");
+        jcbSearchInverse.setText(bundle.getString("INVERSE_PATTERN")); // NOI18N
+        jcbSearchInverse.setActionCommand("");
         jcbSearchInverse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbSearchInverseActionPerformed(evt);
@@ -493,7 +495,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jBStart)
                     .addComponent(jLblError))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -561,7 +563,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap(25, Short.MAX_VALUE))
         );
 
-        jTab.addTab("Archivo", jPanFile);
+        jTab.addTab(bundle.getString("TAB_FILE"), jPanFile); // NOI18N
 
         jTAGenes.setColumns(20);
         jTAGenes.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
@@ -601,7 +603,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTab.addTab("En línea", jPanOnline);
+        jTab.addTab(bundle.getString("TAB_WEB"), jPanOnline); // NOI18N
 
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
         jMenuFile.setToolTipText("");
@@ -674,6 +676,9 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        jTab.getAccessibleContext().setAccessibleName("");
+        jTab.getAccessibleContext().setAccessibleDescription("");
 
         pack();
         setLocationRelativeTo(null);
@@ -1099,6 +1104,25 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     private static boolean netIsAvailable() {
         try {
+            String proxyConn = GenBankID.getProxyConfiguration();
+            
+            if (proxyConn.length() > 0) {
+                String proxyParm[] = proxyConn.split(",");
+
+                // defined a proxy connection
+                System.setProperty("http.proxyHost", proxyParm[0].trim());
+                System.setProperty("http.proxyPort", proxyParm[1].trim());
+
+                System.out.println("Setting proxy with: " + proxyConn);
+                
+                // If proxy requires authentication, 
+                if (proxyParm.length == 4) {
+                    System.setProperty("http.proxyUser", proxyParm[2].trim());
+                    System.setProperty("http.proxyPassword", proxyParm[3].trim());
+                }
+
+            }
+            
             final URL url = new URL("http://www.google.com");
             final URLConnection conn = url.openConnection();
             conn.connect();
@@ -1125,16 +1149,17 @@ public class GUIFrame extends javax.swing.JFrame {
         geneList = new ArrayList<>();
         LinkedHashMap<String, DNASequence> dnaFile = null;
 
+        if (this.isRunning) {
+            return;
+        } else
+            setIsRunning(true);
+        
         if (!this.jTAGenes.getText().isEmpty()) {
             geneList.clear();
             geneList.addAll(asList(this.jTAGenes.getText().split(",")));
         }
 
         this.jLblError.setText("");
-
-        if (this.isRunning) {
-            return;
-        }
 
         // Values
         min = new Integer(this.jSpinMinLength.getValue().toString());
@@ -1172,7 +1197,6 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         this.jTAConsole.setText("");
-        this.setIsRunning(true);
 
         // Start process
         out.flush();

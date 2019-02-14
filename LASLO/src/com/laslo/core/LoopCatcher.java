@@ -579,10 +579,7 @@ public class LoopCatcher {
                     pool.execute(thread);
                 } else {
                     i = 1;
-                    //out.println("Esperando hijos...");
                     latch.await();
-                    //out.println("Terminando pool");
-                    //out.println("Terminando pool");
                     pool.shutdown();
                     if (fasta.size() - count < nHilos) {
                         nHilos = fasta.size() - count;
@@ -595,9 +592,7 @@ public class LoopCatcher {
             }
 
             if (latch.getCount() > 0) {
-                // out.println("Esperando threads...");
                 latch.await();
-                //out.println("Terminando pool");
                 pool.shutdown();
             }
 
@@ -613,9 +608,9 @@ public class LoopCatcher {
             fasta.clear();
             fasta = null;
 
-            out.print(" Secuencias: " + secuencias);
+            out.print(" Sequences: " + secuencias);
             fin = Calendar.getInstance();
-            out.print(" Tiempo: " + (fin.getTimeInMillis()
+            out.print(" Time: " + (fin.getTimeInMillis()
                     - ini.getTimeInMillis()) / 1000 + " s.");
             out.println();
 
