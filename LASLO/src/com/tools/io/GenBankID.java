@@ -16,12 +16,15 @@
  */
 package com.tools.io;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
-import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
@@ -39,6 +42,8 @@ public class GenBankID extends SourceFile {
     protected int cdsEnd;
     protected String location;
     protected String synonym;
+    protected String proxyConf;
+    private static final String PROXY_FILE = "proxy";
 
     private final static String HEADER
             = "Gen" + ROW_DELIMITER
@@ -53,6 +58,7 @@ public class GenBankID extends SourceFile {
         this.description = "";
         this.cdsStart = 0;
         this.cdsEnd = 0;
+        this.proxyConf = "";
     }
 
     public GenBankID(String synonym, String description, int cdsStart, int cdsEnd) {
@@ -60,43 +66,85 @@ public class GenBankID extends SourceFile {
         this.cdsStart = cdsStart;
         this.cdsEnd = cdsEnd;
         this.synonym = synonym;
+        this.proxyConf = "";
     }
 
-    public static String makeFile(String path, 
-            LinkedHashMap<String, DNASequence> dnaFile){
+    public static String makeFile(String path,
+            LinkedHashMap<String, DNASequence> dnaFile) {
         File file = new File(path + "\\sequence.gb");
-        
+
         try {
-            GenbankWriterHelper.writeNucleotideSequence(file, 
+            GenbankWriterHelper.writeNucleotideSequence(file,
                     dnaFile.values());
         } catch (Exception ex) {
             Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return path + "\\sequence.gb";
     }
-    
-    public static LinkedHashMap<String, DNASequence> 
-        downLoadSequenceForId(String genBankId) throws Exception {
+
+    public static String getProxyConfiguration() {
+
+        String proxy = "";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(PROXY_FILE))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                proxy = sCurrentLine;
+            }
+
+        } catch (IOException e) {
+            //System.out.println(e.getLocalizedMessage());
+        }
+
+        return proxy;
+    }
+
+    public static LinkedHashMap<String, DNASequence>
+            downLoadSequenceForId(String genBankId) throws Exception {
         LinkedHashMap<String, DNASequence> dnaFile = null;
         String request = String
                 .format("db=nuccore&id=%s&rettype=gb&retmode=text", genBankId);
         String idFormatted = genBankId;
+        URL ncbiGenbank = null;
 
         if (idFormatted.contains(".")) {
             idFormatted = idFormatted
                     .substring(0, idFormatted.lastIndexOf("."));
         }
 
-        URL ncbiGenbank = new URL(
-                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
-                + request);
-
         try {
-        dnaFile = GenbankReaderHelper
-                .readGenbankDNASequence(ncbiGenbank.openStream());
-        } catch(MalformedURLException ex){
-            System.out.println("ERROR: Malformed URL Exception");
+            String proxyConn = getProxyConfiguration();
+
+            if (proxyConn.length() > 0) {
+                String proxyParm[] = proxyConn.split(",");
+
+                // defined a proxy connection
+                System.setProperty("http.proxyHost", proxyParm[0]);
+                System.setProperty("http.proxyPort", proxyParm[1]);
+
+                System.out.println("Proxy definida como:" + proxyConn);
+                // If proxy requires authentication,
+                //System.setProperty("http.proxyUser", "user");
+                //System.setProperty("http.proxyPassword", "password");
+            }
+
+            ncbiGenbank = new URL(
+                    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+                    + request);
+
+            dnaFile = GenbankReaderHelper
+                    .readGenbankDNASequence(ncbiGenbank.openStream());
+        } catch (MalformedURLException ex) {
+            System.out.println("ERROR: Malformed URL Exception. Cause: " +
+                    ex.getCause().getLocalizedMessage());
+                    dnaFile = null;
+        } catch (IOException ex) {
+            System.out.println("ERROR: IO Exception. Cause: " +
+                    ex.getLocalizedMessage());
+                    dnaFile = null;
         }
 
         return dnaFile;

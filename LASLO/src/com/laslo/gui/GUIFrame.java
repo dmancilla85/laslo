@@ -43,9 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
-import java.util.logging.Level;
 import static java.util.logging.Level.SEVERE;
-import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -71,7 +69,7 @@ public class GUIFrame extends javax.swing.JFrame {
     public GUIFrame() throws IOException {
         loopCatcher = new LoopCatcher();
         isRunning = false;
-        this.locale = new Locale("en", "US");
+        this.locale = new Locale("es", "AR");
         this.bundle = getBundle("resources/Bundle", locale);
         initComponents();
         this.jRBen_EN.setSelected(true);
@@ -194,7 +192,6 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -946,24 +943,24 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     public void setInputSequence(String value) {
         InputSequence origin;
-        String fs = "";
-        String cols = "0";
+        //String fs = "";
+        //String cols = "0";
 
         switch (value) {
             case "Ensembl":
                 origin = ENSEMBL;
-                fs = ";";
-                cols = "10";
+                //fs = ";";
+                //cols = "10";
                 break;
             case "FlyBase":
                 origin = FLYBASE;
-                fs = ",";
-                cols = "8";
+                //fs = ",";
+                //cols = "8";
                 break;
             case "BioMart":
                 origin = BIOMART;
-                fs = "|";
-                cols = "6";
+                //fs = "|";
+                //cols = "6";
                 break;
             default:
                 origin = GENERIC;
@@ -1021,6 +1018,7 @@ public class GUIFrame extends javax.swing.JFrame {
         if (min > max || wooble > max || mismatch > max
                 || min < 3 || wooble < 0 || mismatch < 0) {
             this.jLblError.setText(bundle.getString("ERROR_PARAM"));
+            MessageBox.show(bundle.getString("ERROR_PARAM"), "Error");
             isValid = false;
         }
 
@@ -1028,6 +1026,7 @@ public class GUIFrame extends javax.swing.JFrame {
             if (!netIsAvailable()) {
                 isValid = false;
                 this.jLblError.setText(bundle.getString("NO_NET_CONNECTION"));
+                MessageBox.show(bundle.getString("NO_NET_CONNECTION"),"Error");
                 return isValid;
             }
 
@@ -1039,6 +1038,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 if (aux.length() <= 0) {
                     isValid = false;
                     this.jLblError.setText(bundle.getString("ERROR_CHECK_GENES"));
+                    MessageBox.show(bundle.getString("ERROR_CHECK_GENES"),"Error");
                     return isValid;
                 }
             }
@@ -1046,6 +1046,7 @@ public class GUIFrame extends javax.swing.JFrame {
         } else {
             if (!new File(pathIn).exists()) {
                 this.jLblError.setText(bundle.getString("ERROR_SOURCE"));
+                MessageBox.show(bundle.getString("ERROR_SOURCE"),"Error");
                 isValid = false;
             }
         }
@@ -1053,11 +1054,13 @@ public class GUIFrame extends javax.swing.JFrame {
         // Validate destiny
         if (!new File(pathOut).exists()) {
             this.jLblError.setText(bundle.getString("ERROR_DEST_FOLDER"));
+            MessageBox.show(bundle.getString("ERROR_DEST_FOLDER"),"Error");
             isValid = false;
         }
 
         if (loopList.size() <= 0 || loopList.get(0).trim().length() == 0) {
             this.jLblError.setText(bundle.getString("ERROR_LOOPS"));
+            MessageBox.show(bundle.getString("ERROR_LOOPS"),"Error");
             isValid = false;
         }
 
@@ -1067,12 +1070,14 @@ public class GUIFrame extends javax.swing.JFrame {
             if (aux.length() <= 0) {
                 isValid = false;
                 this.jLblError.setText(bundle.getString("ERROR_CHECK_LOOPS"));
+                MessageBox.show(bundle.getString("ERROR_CHECK_LOOPS"),"Error");
             }
         }
 
         if (this.jcbMakeRandoms.isSelected()) {
             if (randoms <= 0) {
                 this.jLblError.setText(bundle.getString("ERROR_INVALID_NBR_RANDOMS"));
+                MessageBox.show(bundle.getString("ERROR_INVALID_NBR_RANDOMS"),"Error");
                 isValid = false;
             }
         }
@@ -1080,6 +1085,7 @@ public class GUIFrame extends javax.swing.JFrame {
         if (this.jcbMakeRandoms.isSelected()) {
             if (klet <= 0 || klet > 10) {
                 this.jLblError.setText(bundle.getString("ERROR_INVALID_NBR_RANDOMS"));
+                MessageBox.show(bundle.getString("ERROR_INVALID_NBR_RANDOMS"),"Error");
                 isValid = false;
             }
         }
@@ -1151,8 +1157,13 @@ public class GUIFrame extends javax.swing.JFrame {
             try {
                 dnaFile = GenBankID.downLoadSequenceForId(jTAGenes.getText()
                         .replaceAll(" ", ""));
+                
+                if(dnaFile == null)
+                    throw new Exception("No se pudo conectar a NCBI.");
             } catch (Exception ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+                out.println("ERROR: " + ex.getLocalizedMessage());
+                setIsRunning(false);
+                return;
             }
             pathIn = GenBankID.makeFile(pathOut, dnaFile);
             this.listOfFiles = new File[1];
