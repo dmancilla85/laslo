@@ -798,13 +798,13 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        if (this.isRunning) {
+        /*if (this.isRunning) {
             MessageBox.show(bundle.getString("CANT_EXIT_WHILE_RUNNING")
                     + bundle.getString("PROCESS_IS_RUNNING"), bundle.getString("PROCESS_RUNNING_MSG_TITLE"));
 
-        } else {
+        } else { */
             exit(0);
-        }
+        //}
     }//GEN-LAST:event_formWindowClosing
 
     private void jcbExtendedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbExtendedActionPerformed
@@ -1176,6 +1176,7 @@ public class GUIFrame extends javax.swing.JFrame {
         // Validar parámetros
         if (!validateParameters(min, max, wooble, mismatch, pathIn, pathOut,
                 loopList, geneList, randoms, klet)) {
+            setIsRunning(false);
             return;
         }
 
@@ -1208,11 +1209,9 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setMinLength(min);
         loopCatcher.setMaxMismatch(mismatch);
         loopCatcher.setMaxWooble(wooble);
-
         loopCatcher.setPathOut(pathOut);
         loopCatcher.setPathIn(pathIn);
         loopCatcher.setFileList(this.listOfFiles);
-
         loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected());
         loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
         loopCatcher.setNumberOfRandoms(randoms);
