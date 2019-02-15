@@ -1111,7 +1111,8 @@ public class GUIFrame extends javax.swing.JFrame {
 
                 // defined a proxy connection
                 System.setProperty("http.proxyHost", proxyParm[0].trim());
-                System.setProperty("http.proxyPort", proxyParm[1].trim());
+                System.setProperty("http.proxyPort", proxyParm[0] + ", "
+                    + proxyParm[1]);
 
                 System.out.println("Setting proxy with: " + proxyConn);
                 
