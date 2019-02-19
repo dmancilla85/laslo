@@ -1141,6 +1141,11 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     public void start() {
 
+        if (this.isRunning) {
+            return;
+        } else
+            setIsRunning(true);
+        
         int max, min, wooble, mismatch, randoms, klet;
         String pathOut = this.jTFPathOut.getText();
         String pathIn = this.jTFPathIn.getText();
@@ -1149,11 +1154,6 @@ public class GUIFrame extends javax.swing.JFrame {
         loopList = new ArrayList<>();
         geneList = new ArrayList<>();
         LinkedHashMap<String, DNASequence> dnaFile = null;
-
-        if (this.isRunning) {
-            return;
-        } else
-            setIsRunning(true);
         
         if (!this.jTAGenes.getText().isEmpty()) {
             geneList.clear();

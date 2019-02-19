@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +35,8 @@ public class RNAfold {
     //private final static String RNAFOLD_ARGS = " -d2 --noLP --noPS";
     private String structure;
     private double mfe;
+    private Double temperature;
+    private boolean avoidLonelyPairs;
 
     /**
      *
@@ -45,6 +44,31 @@ public class RNAfold {
     public RNAfold() {
         this.mfe = 0.0;
         this.structure = "";
+        this.temperature = 37.00;
+        this.avoidLonelyPairs = true;
+    }
+
+    public RNAfold(double temp, boolean avoidLonelyPairs) {
+        this.mfe = 0.0;
+        this.structure = "";
+        this.temperature = temp;
+        this.avoidLonelyPairs = avoidLonelyPairs;
+    }
+
+    public Double getTemperature() {
+        return temperature;
+    }
+
+    private void setTemperature(Double temperature) {
+        this.temperature = temperature;
+    }
+
+    public boolean isAvoidLonelyPairs() {
+        return avoidLonelyPairs;
+    }
+
+    public void setAvoidLonelyPairs(boolean avoidLonelyPairs) {
+        this.avoidLonelyPairs = avoidLonelyPairs;
     }
 
     /**
@@ -53,16 +77,24 @@ public class RNAfold {
      */
     public RNAfold(String sequence) {
         String command = COMMAND_RNAFOLD; // + RNAFOLD_ARGS;
-        //String aux = "";
-        //String output = "";
-        //int i = 1;
+
         InputStreamReader isr;
         BufferedReader br;
         String line;
+        String lpCmd = "--noLP";
+        String lpTemp = "--temp=";
+
+        this.setTemperature(25.00);
+
+        lpTemp += this.temperature;
+
+        if (!this.avoidLonelyPairs) {
+            lpCmd = "";
+        }
 
         try {
             Process child
-                    = new ProcessBuilder(command, "-d2", "--noLP", "--noPS")
+                    = new ProcessBuilder(command, "-d2", lpCmd, "--noPS", lpTemp)
                             .start();
 
             OutputStream out = child.getOutputStream();
@@ -94,8 +126,7 @@ public class RNAfold {
             isr.close();
             out.close();
         } catch (IOException | NumberFormatException ex) {
-            Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println(Arrays.toString(ex.getStackTrace()));
+            System.out.println("RNAFold error: " + ex.getLocalizedMessage());
         }
     }
 

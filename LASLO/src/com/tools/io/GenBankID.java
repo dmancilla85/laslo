@@ -85,6 +85,9 @@ public class GenBankID extends SourceFile {
 
         String proxy = "";
 
+        if(!(new File(PROXY_FILE).exists()))
+            return "";
+        
         try (BufferedReader br = new BufferedReader(new FileReader(PROXY_FILE))) {
 
             String sCurrentLine;
