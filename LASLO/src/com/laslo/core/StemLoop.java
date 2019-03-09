@@ -281,7 +281,7 @@ public class StemLoop {
 
         return header
                 + "LoopPattern" + SourceFile.ROW_DELIMITER
-                + "LoopID" + SourceFile.ROW_DELIMITER
+                //+ "LoopID" + SourceFile.ROW_DELIMITER
                 + "TerminalPair" + SourceFile.ROW_DELIMITER
                 + "Sense" + SourceFile.ROW_DELIMITER
                 + "N-2" + SourceFile.ROW_DELIMITER
@@ -311,7 +311,7 @@ public class StemLoop {
                 + "AU_PercentPairs" + SourceFile.ROW_DELIMITER
                 + "CG_PercentPairs" + SourceFile.ROW_DELIMITER
                 + "GU_PercentPairs" + SourceFile.ROW_DELIMITER
-                + "PurinePercentStem" + SourceFile.ROW_DELIMITER
+                + "PurinePercentPairs" + SourceFile.ROW_DELIMITER
                 + "RnaFoldMFE" + SourceFile.ROW_DELIMITER
                 + "RelativePosition" + SourceFile.ROW_DELIMITER
                 + "AdditionalSeqMatches" + SourceFile.ROW_DELIMITER
@@ -1053,7 +1053,7 @@ public class StemLoop {
 
         return this.id_fasta.toRowCSV()
                 + this.getLoopPattern() + SourceFile.ROW_DELIMITER
-                + this.getLoopID() + SourceFile.ROW_DELIMITER
+                //+ this.getLoopID() + SourceFile.ROW_DELIMITER
                 + this.getTerminalPair() + SourceFile.ROW_DELIMITER
                 + this.isReverse() + SourceFile.ROW_DELIMITER
                 + this.predecessor2Loop + SourceFile.ROW_DELIMITER //n-2
