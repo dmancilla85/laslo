@@ -162,8 +162,10 @@ public class UShuffle {
 
                     exitVal = pr.waitFor();
 
-                    /*System.out.println(destiny + ": Sequence " + j++
-                        + " - ["+ exitVal + "]");*/
+                    /*if(exitVal != 0) {
+                    System.out.println(destiny + ": Sequence " + j++
+                        + " - ["+ exitVal + "]");
+                    }*/
                 }
 
                 bw.close();
