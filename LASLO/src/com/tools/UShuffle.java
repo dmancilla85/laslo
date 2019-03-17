@@ -38,7 +38,7 @@ import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASe
  */
 public class UShuffle {
 
-    private static final String COMMAND_SHUFFLE = "./ext/ushuffle.exe -s ";
+    private static final String COMMAND_SHUFFLE = "./ext/ushuffle.exe";
     private static final String RANDOM_PATH = "\\shuffled";
 
     /**
@@ -74,13 +74,13 @@ public class UShuffle {
 
     /**
      *
-     * @param path      Path of the file to shuffle
-     * @param filename  Name of the file to shuffle
-     * @param fasta     Hashmap of DNASequence's from BioJava
-     * @param nRandoms  Number of random sequences to generate
-     * @param k         Value of k-let permutations
+     * @param path Path of the file to shuffle
+     * @param filename Name of the file to shuffle
+     * @param fasta Hashmap of DNASequence's from BioJava
+     * @param nRandoms Number of random sequences to generate
+     * @param k Value of k-let permutations
      * @param isGenBank It tells if it's a GenBank file
-     * @return          Last process exit value (an integer)
+     * @return Last process exit value (an integer)
      */
     public static int makeShuffleSequences(String path, String filename,
             LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k,
@@ -137,9 +137,17 @@ public class UShuffle {
                     }
 
                     sequence = element.getSequenceAsString();
-                    String cmd = COMMAND_SHUFFLE + sequence
-                            + " -n 1 -k " + k;
-                    Process pr = rt.exec(cmd);
+                    //String cmd = COMMAND_SHUFFLE + sequence
+                    //        + " -n 1 -k " + k;
+
+                    if (sequence.length() > 30000) {
+                        //System.out.println(element.getAccession() + " -> very large: " + sequence.length());
+                        sequence = sequence.substring(0, 30000);
+                    }
+
+                    Process pr = //rt.exec(cmd);
+                        new ProcessBuilder(COMMAND_SHUFFLE, "-s", sequence,
+                                "-k", Integer.toString(k)).start();
 
                     try (InputStream in = pr.getInputStream()) {
                         int c;
@@ -162,10 +170,6 @@ public class UShuffle {
 
                     exitVal = pr.waitFor();
 
-                    /*if(exitVal != 0) {
-                    System.out.println(destiny + ": Sequence " + j++
-                        + " - ["+ exitVal + "]");
-                    }*/
                 }
 
                 bw.close();
@@ -176,7 +180,7 @@ public class UShuffle {
                 System.out.println("Error: " + ex.getMessage());
             }
         }
-        
+
         return exitVal;
     }
 }
