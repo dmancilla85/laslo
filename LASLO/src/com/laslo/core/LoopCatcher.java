@@ -583,10 +583,12 @@ public class LoopCatcher {
                     pool.shutdown();
                     if (fasta.size() - count < nHilos) {
                         nHilos = fasta.size() - count;
+                        
                     }
-
+                    if(nHilos >0){
                     pool = Executors.newFixedThreadPool(nHilos);
                     latch = new CountDownLatch(nHilos);
+                    }
 
                 }
             }
