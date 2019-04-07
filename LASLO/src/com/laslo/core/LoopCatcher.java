@@ -627,7 +627,7 @@ public class LoopCatcher {
         writer = null;
         fileName = null;
         fileOut = null;
-        System.gc();
+        //System.gc();
     }
 
     /**
