@@ -121,8 +121,11 @@ public class LoopCatcherThread implements Runnable {
 
                 try {
                     SEM.acquire();
-                    sequenceExtendedResearch(dnaElement, fold.getStructure(),
-                            currentPattern, writer, false, maxLength, minLength,
+                    sequenceExtendedResearch(
+                            dnaElement, 
+                            fold.getStructure(),
+                            currentPattern, writer, 
+                            false, maxLength, minLength,
                             inputType, additionalSequence);
                 } catch (InterruptedException ex) {
                     out.println("ERROR: " + ex.getMessage());
@@ -133,10 +136,12 @@ public class LoopCatcherThread implements Runnable {
                 if (searchReverse) {
                     try {
                         SEM.acquire();
-                        sequenceExtendedResearch(dnaElement,
-                                fold.getStructure(), currentPattern, writer,
-                                true, maxLength, minLength, inputType,
-                                additionalSequence);
+                        sequenceExtendedResearch(
+                                dnaElement,
+                                fold.getStructure(), 
+                                currentPattern, writer,
+                                true, maxLength, minLength, 
+                                inputType, additionalSequence);
                     } catch (InterruptedException ex) {
                         out.println("ERROR: " + ex.getMessage());
                     } finally {

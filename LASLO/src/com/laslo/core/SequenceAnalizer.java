@@ -157,7 +157,7 @@ public class SequenceAnalizer {
                         if (fold.getMfe() == 0.0) {
                             isValidHairpin = false;
                         } else {
-                            hairpinModel = isValidHairpin(minLength, maxLength,
+                            hairpinModel = isValidHairpin(minLength,
                                     hairpinModel, loopLength, loopPos, rnaSeq);
                             isValidHairpin = hairpinModel.length() > 0;
                         }
@@ -265,7 +265,7 @@ public class SequenceAnalizer {
     }
 
     @SuppressWarnings("empty-statement")
-    public static String isValidHairpin(int minLength, int maxLength,
+    public static String isValidHairpin(int minLength,
             String hairpin, int loopLength, int loopPos,
             String seq) {
         boolean ret, begin = true;
@@ -387,15 +387,17 @@ public class SequenceAnalizer {
      * @param additionalSequence
      * @return
      */
-    public static int sequenceExtendedResearch(DNASequence fastaSeq, String hairpinSeq,
-            String stemLoopPattern, CSVWriter writer, boolean invert,
-            int maxLength, int minLength, InputSequence inputType,
+    public static int sequenceExtendedResearch(
+            DNASequence fastaSeq, 
+            String hairpinSeq,
+            String stemLoopPattern, 
+            CSVWriter writer, boolean invert,
+            int maxLength, int minLength, 
+            InputSequence inputType,
             String additionalSequence) {
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
-        slr = null;
-        int size;
-        size = 0;
+        int size = -1;
         int length = maxLength, posAux, k = 1;
         int loopPos = 0, loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
@@ -413,7 +415,7 @@ public class SequenceAnalizer {
         Pattern p = Pattern.compile(regExp);
         Matcher loopFinder = p.matcher(rnaSequence);
 
-        String rnaLoop = "", rnaSeq = "", hairpinModel = ""; //NOI18N
+        String rnaLoop, rnaSeq, hairpinModel = ""; //NOI18N
 
         // As exists loop matches
         while (loopFinder.find()) {
@@ -457,9 +459,8 @@ public class SequenceAnalizer {
                             rnaSequence.charAt(loopPos + rnaLoop.length()));
 
                     if (isValidHairpin) {
-                        hairpinModel = SequenceAnalizer.isValidHairpin(
-                                maxLength, minLength, hairpinModel, loopLength,
-                                loopPos, rnaSeq);
+                        hairpinModel = isValidHairpin(minLength,
+                                    hairpinModel, loopLength, loopPos, rnaSeq);
                         isValidHairpin = hairpinModel.length() > 0;
                     }
 
@@ -539,7 +540,6 @@ public class SequenceAnalizer {
             }
         }
 
-        slr = null;
         Iterator<StemLoop> itr = slrList.iterator();
 
         while (itr.hasNext()) {
@@ -556,8 +556,7 @@ public class SequenceAnalizer {
 
         size = slrList.size();
         slrList.clear();
-        slrList = null;
-
+        
         return size;
     }
 
