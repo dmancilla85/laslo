@@ -17,7 +17,7 @@
  */
 package com.laslo.gui;
 
-import com.laslo.core.LoopCatcher;
+import com.laslo.core.LoopMatcher;
 import com.tools.io.GenBankID;
 import com.tools.io.InputSequence;
 import static com.tools.io.InputSequence.BIOMART;
@@ -67,7 +67,7 @@ public class GUIFrame extends javax.swing.JFrame {
      * @throws java.io.IOException
      */
     public GUIFrame() throws IOException {
-        loopCatcher = new LoopCatcher();
+        loopCatcher = new LoopMatcher();
         isRunning = false;
         this.locale = new Locale("es", "AR");
         this.bundle = getBundle("resources/Bundle", locale);
@@ -937,7 +937,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
     protected Locale locale;
     private final ResourceBundle bundle;
-    protected LoopCatcher loopCatcher;
+    protected LoopMatcher loopCatcher;
     protected File[] listOfFiles;
     protected boolean isRunning;
     protected boolean fromLocalPath;

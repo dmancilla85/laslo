@@ -17,8 +17,8 @@
  */
 package com.laslo.core;
 
-import static com.laslo.core.LoopCatcherThread.MUTEX;
-import static com.laslo.core.LoopCatcherThread.SEM;
+import static com.laslo.core.LoopMatcherThread.MUTEX;
+import static com.laslo.core.LoopMatcherThread.SEM;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.io.InputSequence;
@@ -39,6 +39,8 @@ import org.biojava.nbio.core.sequence.features.TextFeature;
  *
  */
 public class SequenceAnalizer {
+
+    private static boolean omitRNAFold = false;
 
     /**
      *
@@ -107,18 +109,18 @@ public class SequenceAnalizer {
                                 .getValue();
                         id = fastaSeq.getAccession().getID();
                         cds = ((TextFeature) fastaSeq.getFeaturesByType("CDS")
-                        .toArray()[0]).getSource();
+                                .toArray()[0]).getSource();
                     }
                 } else {
                     String auxH[] = fastaSeq.getOriginalHeader().split("@");
-                    
+
                     gene = auxH[0];
                     synonym = auxH[1];
                     note = auxH[2];
                     id = auxH[3];
                     cds = auxH[4];
                 }
-                
+
                 slr.setTags(gene, synonym, id, note, cds);
             }
 
@@ -154,13 +156,14 @@ public class SequenceAnalizer {
                                     + hairpinModel);
                         }
 
-                        if (fold.getMfe() == 0.0) {
+                        if (fold.getMfe() >= 0.0 && !omitRNAFold) {
                             isValidHairpin = false;
                         } else {
                             hairpinModel = isValidHairpin(minLength,
                                     hairpinModel, loopLength, loopPos, rnaSeq);
                             isValidHairpin = hairpinModel.length() > 0;
                         }
+
                     }
 
                 } else {
@@ -388,11 +391,11 @@ public class SequenceAnalizer {
      * @return
      */
     public static int sequenceExtendedResearch(
-            DNASequence fastaSeq, 
+            DNASequence fastaSeq,
             String hairpinSeq,
-            String stemLoopPattern, 
+            String stemLoopPattern,
             CSVWriter writer, boolean invert,
-            int maxLength, int minLength, 
+            int maxLength, int minLength,
             InputSequence inputType,
             String additionalSequence) {
         List<StemLoop> slrList = new ArrayList<>();
@@ -460,7 +463,7 @@ public class SequenceAnalizer {
 
                     if (isValidHairpin) {
                         hairpinModel = isValidHairpin(minLength,
-                                    hairpinModel, loopLength, loopPos, rnaSeq);
+                                hairpinModel, loopLength, loopPos, rnaSeq);
                         isValidHairpin = hairpinModel.length() > 0;
                     }
 
@@ -556,7 +559,7 @@ public class SequenceAnalizer {
 
         size = slrList.size();
         slrList.clear();
-        
+
         return size;
     }
 

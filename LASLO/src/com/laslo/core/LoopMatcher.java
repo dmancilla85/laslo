@@ -51,7 +51,7 @@ import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankD
  * @author David
  *
  */
-public class LoopCatcher {
+public class LoopMatcher {
 
     protected String pathOut;
     protected String pathIn;
@@ -86,7 +86,7 @@ public class LoopCatcher {
      * @param kLetRandoms
      * @param searchReverse
      */
-    public LoopCatcher(String pathOut, String pathIn,
+    public LoopMatcher(String pathOut, String pathIn,
             ArrayList<String> loopPatterns, String additionalSequence,
             InputSequence inputType,
             int minLength, int maxLength,
@@ -113,7 +113,7 @@ public class LoopCatcher {
     /**
      *
      */
-    public LoopCatcher() {
+    public LoopMatcher() {
         this("", "", new ArrayList<>(), BiologyPatterns.PUM1,
                 InputSequence.ENSEMBL, //NOI18N
                 4, 16, 2, 0, new Locale("es", "AR"), 2, false);
@@ -570,7 +570,7 @@ public class LoopCatcher {
                 Iterator<String> patternItr = loopPatterns.iterator();
                 count++;
                 secuencias++;
-                LoopCatcherThread thread = new LoopCatcherThread(extendedMode,
+                LoopMatcherThread thread = new LoopMatcherThread(extendedMode,
                         additionalSequence, maxLength, minLength, element,
                         inputType, patternItr, writer, searchReverse);
 

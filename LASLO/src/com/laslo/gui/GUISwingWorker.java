@@ -17,7 +17,7 @@
  */
 package com.laslo.gui;
 
-import com.laslo.core.LoopCatcher;
+import com.laslo.core.LoopMatcher;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -31,7 +31,7 @@ class GUISwingWorker extends
 
     private final JTextArea textArea;
     private final JButton button;
-    private final LoopCatcher loop;
+    private final LoopMatcher loop;
     private boolean ok;
 
     /**
@@ -41,7 +41,7 @@ class GUISwingWorker extends
      * @param loop 
      */
     public GUISwingWorker(JTextArea textArea, JButton button,
-            LoopCatcher loop) {
+            LoopMatcher loop) {
         this.textArea = textArea;
         this.loop = loop;
         this.button = button;

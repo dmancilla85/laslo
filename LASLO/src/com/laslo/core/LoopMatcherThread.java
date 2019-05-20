@@ -32,7 +32,7 @@ import org.biojava.nbio.core.sequence.DNASequence;
  *
  * @author David A. Mancilla
  */
-public class LoopCatcherThread implements Runnable {
+public class LoopMatcherThread implements Runnable {
 
     protected boolean extendedMode;
     protected boolean searchReverse;
@@ -60,7 +60,7 @@ public class LoopCatcherThread implements Runnable {
      * @param writer
      * @param searchReverse
      */
-    public LoopCatcherThread(boolean extendedMode, String additionalSequence,
+    public LoopMatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse) {
