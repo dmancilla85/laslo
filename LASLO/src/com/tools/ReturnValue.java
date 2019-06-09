@@ -23,17 +23,10 @@ package com.tools;
  */
 public enum ReturnValue {
 
-    /**
-     *
-     */
     SUCCESS(0),
-
-    /**
-     *
-     */
     FAILURE(-1);
 
-    private int returnCode;
+    private final int returnCode;
 
     /**
      * 

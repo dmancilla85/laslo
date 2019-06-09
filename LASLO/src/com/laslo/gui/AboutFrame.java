@@ -51,7 +51,7 @@ public class AboutFrame extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/rnastemloop.jpg"))); // NOI18N
         jLabel1.setText("jLabel1");
 
-        jLabel2.setText("<<Enter text here>>");
+        jLabel2.setText("LASLO v1.0");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);

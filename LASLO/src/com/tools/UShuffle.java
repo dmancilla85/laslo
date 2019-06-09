@@ -22,14 +22,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import static java.lang.System.err;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
+import org.biojava.nbio.core.sequence.features.FeatureInterface;
 import org.biojava.nbio.core.sequence.features.Qualifier;
-import org.biojava.nbio.core.sequence.features.TextFeature;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 
 /**
@@ -73,6 +74,7 @@ public class UShuffle {
     }
 
     /**
+     * Generate shuffled sequences with the k-let value indicated.
      *
      * @param path Path of the file to shuffle
      * @param filename Name of the file to shuffle
@@ -82,18 +84,25 @@ public class UShuffle {
      * @param isGenBank It tells if it's a GenBank file
      * @return Last process exit value (an integer)
      */
+    @SuppressWarnings("NestedAssignment")
     public static int makeShuffleSequences(String path, String filename,
             LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k,
             boolean isGenBank) {
-        Runtime rt;
+
         char sep = '@';
         int exitVal = 0;
         String aux = "", gene, synonym, note;
-        rt = Runtime.getRuntime();
-        String fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
-        String destiny = "", sequence = "", header = "", id = "", cds = "";
+        String fileNameWithOutExt;
+        fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
+        String destiny;
+        String sequence;
+        String header = "", id, cds;
         boolean mkdirs, delete;
         mkdirs = new File(path + RANDOM_PATH).mkdirs();
+
+        if (!mkdirs) {
+            err.println("Error: Failed to create new 'shuffled' path.");
+        }
 
         for (int i = 1; i <= nRandoms; i++) {
             try {
@@ -104,80 +113,80 @@ public class UShuffle {
 
                 if (file.exists()) {
                     delete = (new File(destiny)).delete();
+
+                    if (!delete) {
+                        err.println("Error: Failed to delete old shuffled file.");
+                    }
                 }
 
                 file.createNewFile();
 
                 FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                int j = 1;
-                for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
-                    DNASequence element = entry.getValue();
+                try (BufferedWriter bw = new BufferedWriter(fw)) {
+                    
+                    for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
+                        DNASequence element = entry.getValue();
 
-                    if (!isGenBank) {
-                        header = element.getOriginalHeader();
-                    } else {
-                        Map qual = ((TextFeature) element.getFeaturesByType("gene")
-                                .toArray()[0]).getQualifiers();
+                        if (!isGenBank) {
+                            header = element.getOriginalHeader();
+                        } else {
+                            Map qual = ((FeatureInterface) element.getFeaturesByType("gene")
+                                    .toArray()[0]).getQualifiers();
 
-                        if (!qual.isEmpty()) {
-                            gene = ((Qualifier) ((ArrayList) (qual.get("gene"))).get(0))
-                                    .getValue();
-                            synonym = ((Qualifier) ((ArrayList) (qual.get("gene_synonym"))).get(0))
-                                    .getValue();
-                            note = ((Qualifier) ((ArrayList) (qual.get("note"))).get(0))
-                                    .getValue();
-                            id = element.getAccession().getID();
-                            cds = ((TextFeature) element.getFeaturesByType("CDS")
-                                    .toArray()[0]).getSource();
+                            if (!qual.isEmpty()) {
+                                gene = ((Qualifier) ((List) (qual.get("gene"))).get(0))
+                                        .getValue();
+                                synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
+                                        .getValue();
+                                note = ((Qualifier) ((List) (qual.get("note"))).get(0))
+                                        .getValue();
+                                id = element.getAccession().getID();
+                                cds = ((FeatureInterface) element.getFeaturesByType("CDS")
+                                        .toArray()[0]).getSource();
 
-                            header = gene + sep + synonym + sep
-                                    + note + sep + id + sep + cds;
-                        }
-                    }
-
-                    sequence = element.getSequenceAsString();
-                    //String cmd = COMMAND_SHUFFLE + sequence
-                    //        + " -n 1 -k " + k;
-
-                    if (sequence.length() > 30000) {
-                        //System.out.println(element.getAccession() + " -> very large: " + sequence.length());
-                        sequence = sequence.substring(0, 30000);
-                    }
-
-                    Process pr = //rt.exec(cmd);
-                        new ProcessBuilder(COMMAND_SHUFFLE, "-s", sequence,
-                                "-k", Integer.toString(k)).start();
-
-                    try (InputStream in = pr.getInputStream()) {
-                        int c;
-
-                        while ((c = in.read()) != -1) {
-
-                            if (c != '\n') {
-                                aux += (char) c;
-                            } else {
-                                bw.write(">" + header);
-                                bw.newLine();
-                                bw.write(aux);
-                                bw.newLine();
-                                bw.newLine();
-                                aux = "";
+                                header = gene + sep + synonym + sep
+                                        + note + sep + id + sep + cds;
                             }
-
                         }
+
+                        sequence = element.getSequenceAsString();
+                        //String cmd = COMMAND_SHUFFLE + sequence
+                        //        + " -n 1 -k " + k;
+
+                        if (sequence.length() > 30000) {
+                            sequence = sequence.substring(0, 30000);
+                        }
+
+                        Process pr
+                                = new ProcessBuilder(COMMAND_SHUFFLE, "-s", sequence,
+                                        "-k", Integer.toString(k)).start();
+
+                        try (InputStream in = pr.getInputStream()) {
+                            int c;
+
+                            while ((c = in.read()) != -1) {
+
+                                if (c != '\n') {
+                                    aux += (char) c;
+                                } else {
+                                    bw.write(">" + header);
+                                    bw.newLine();
+                                    bw.write(aux);
+                                    bw.newLine();
+                                    bw.newLine();
+                                    aux = "";
+                                }
+
+                            }
+                        }
+
+                        exitVal = pr.waitFor();
+
                     }
-
-                    exitVal = pr.waitFor();
-
                 }
 
-                bw.close();
-                bw = null;
-                fw = null;
-
             } catch (IOException | InterruptedException ex) {
-                System.out.println("Error: " + ex.getMessage());
+                err.println("Error: " + ex.getMessage());
             }
         }
 

@@ -33,36 +33,24 @@ import java.util.logging.Logger;
  */
 public class FASTACorrector {
 
-    /**
-     *
-     */
     protected final static String HEADER_START = ">";
-
-    /**
-     *
-     */
     protected final static String BLANK = " ";
-
-    /**
-     *
-     */
     protected final static String NEW_LINE = System.getProperty("line.separator");
-
-    /**
-     *
-     */
     protected final static String HEADER_DESC = "Sequence ID";
 
     /**
-     * 
+     * Format bad FASTA files.
      * @param fileName
      * @return 
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static boolean formatFile(String fileName) {
         try {
             Path filePath = Paths.get(fileName);
             int count = 1;
-            List<String> fileContent = new ArrayList<>(Files.readAllLines(filePath, StandardCharsets.UTF_8));
+            List<String> fileContent;
+            fileContent = new ArrayList<>(
+                    Files.readAllLines(filePath, StandardCharsets.UTF_8));
             String line;
 
             for (int i = 0; i < fileContent.size(); i++) {

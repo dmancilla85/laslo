@@ -1,0 +1,88 @@
+LOCUS       NM_001032098            2080 bp    DNA              linear 09-jun-2019
+DEFINITION  Drosophila melanogaster alcohol dehydrogenase, transcript variant F
+            (Adh), mRNA.
+ACCESSION   NM_001032098
+VERSION     NM_001032098
+KEYWORDS    .
+SOURCE      
+FEATURES             Location/Qualifiers
+     gene            1..2080
+                     /exception=dicistronic gene
+                     /note=Alcohol dehydrogenase
+                     /dbxref=
+                     /dbxref=
+                     /gene=Adh
+                     /gene_synonym=adh; ADH; Adh3; BG:DS01486.8; CG32954;
+                     CG3481; dADH; DM-ADH; DmADH; Dmel\CG3481; Dreg-1; Reg-1;
+                     T16
+                     /locus_tag=Dmel_CG3481
+                     /map=35B3-35B3
+     source          1..2080
+                     /dbxref=
+                     /organism=Drosophila melanogaster
+                     /chromosome=2L
+                     /mol_type=mRNA
+                     /genotype=y[1]; Gr22b[1] Gr22d[1] cn[1] CG33964[R4.2] bw[1]
+                     sp[1]; LysC[1] MstProx[1] GstD5[1] Rh6[1]
+     CDS             129..899
+                     /note=CG3481 gene product from transcript CG3481-RF;
+                     CG3481-PF; Adh-PF; alcoholdehydrogenase; drosophila
+                     rhythmically expressed gene 1; alcohol dehydrogenase;
+                     alcohol dehyrdrogenase
+                     /codon_start=1
+                     /dbxref=
+                     /dbxref=
+                     /dbxref=
+                     /product=alcohol dehydrogenase, isoform F
+                     /EC_number=1.-.-.-
+                     /EC_number=1.1.1.1
+                     /EC_number=1.2.1.10
+                     /protein_id=NP_001027269.1
+                     /gene=Adh
+                     /translation=MSFTLTNKNVIFVAGLGGIGLDTSKELLKRDLKNLVILDRIENPAA
+                     IAELKAINPKVTVTFYPYDVTVPIAETTKLLKTIFAQLKTVDVLINGAGILDDHQIERT
+                     IAVNYTGLVNTTTAILDFWDKRKGGPGGIICNIGSVTGFNAIYQVPVYSGTKAAVVNFT
+                     SSLAKLAPITGVTAYTVNPGITRTTLVHTFNSWLDVEPQVAEKLLAHPTQPSLACAENF
+                     VKAIELNQNGAIWKLDLGTLEAIQWTKHWDSGI
+                     /gene_synonym=adh; ADH; Adh3; BG:DS01486.8; CG32954;
+                     CG3481; dADH; DM-ADH; DmADH; Dmel\CG3481; Dreg-1; Reg-1;
+                     T16
+                     /locus_tag=Dmel_CG3481
+
+ORIGIN
+        1 catgcattat tgtctcagtg cagttgtcag ttgcagttca gcagacgggc taacgagtac
+       61 ttgcatctct tcaaatttac ttaattgatc aaatcgaaag agcctgctaa agcaaaaaag
+      121 aagtcaccat gtcgtttact ttgaccaaca agaacgtgat tttcgttgcc ggtctgggag
+      181 gcattggtct ggacaccagc aaggagctgc tcaagcgcga tctgaagaac ctggtgatcc
+      241 tcgaccgcat tgagaacccg gctgccattg ccgagctgaa ggcaatcaat ccaaaggtga
+      301 ccgtcacctt ctacccctat gatgtgaccg tgcccattgc cgagaccacc aagctgctga
+      361 agaccatctt cgcccagctg aagaccgtcg atgtcctgat caacggagct ggtatcctgg
+      421 acgatcacca gatcgagcgc accattgccg tcaactacac tggcctggtc aacaccacga
+      481 cggccattct ggacttctgg gacaagcgca agggcggtcc cggtggtatc atctgcaaca
+      541 ttggatccgt cactggattc aatgccatct accaggtgcc cgtctactcc ggcaccaagg
+      601 ccgccgtggt caacttcacc agctccctgg cgaaactggc ccccattacc ggcgtgacgg
+      661 cttacactgt gaaccccggc atcacccgca ccaccctggt gcacacgttc aactcctggt
+      721 tggatgttga gcctcaggtt gccgagaagc tcctggctca tcccacccag ccctcgttgg
+      781 cctgcgccga gaacttcgtc aaggctatcg agctgaacca gaacggagcc atctggaaac
+      841 tggacttggg caccctggag gccatccagt ggaccaagca ctgggactcc ggcatctaag
+      901 aagtgatact cccaaaaaaa aaaaaaaaca taacattagt tcatagggtt ctgcgaacca
+      961 gaagatattc acgcaaggca ataaggctga ttcgatgcac actcacattc ttctcctaat
+     1021 acgataataa aactttccat gaaaaatatg gaaaaatata tgaaaattga gaaatccaaa
+     1081 aaactgataa acgctctact taattaaaat agataaatgg gagcggcagg aatggcggag
+     1141 catggccaag ttcctccgcc aatcagtcgt aaaacagaag tcgtggaaag cggatagaaa
+     1201 gaatgttcga tttgacgggc aagcatgtct gctatgtggc ggattgcgga ggaattgcac
+     1261 tggagaccag caaggttctc atgaccaaga atatagcgaa actggccatt ttacagagta
+     1321 cggaaaatcc ccaggccatc gctcagttgc agtcgataaa gccgagtacc caaatatttt
+     1381 tctggaccta cgacgtgacc atggcaaggg aagatatgaa gaagtacttc gatgaggtga
+     1441 tggtccaaat ggactacatc gatgtcctga tcaatggtgc tacgctgtgc gatgaaaata
+     1501 acattgatgc caccatcaat acaaatctaa cgggaatgat gaacactgtg gccacagtgt
+     1561 taccctatat ggacagaaaa atgggaggaa ctggtgggct aattgtgaac gtcacttcgg
+     1621 tcattggatt ggacccttcg ccggttttct gcgcatatag tgcatccaaa ttcggtgtaa
+     1681 ttggatttac cagaagtcta gcggaccctc tttactattc ccaaaacggg gtagctgtga
+     1741 tggcggtttg ttgtggtcct acaagggtct ttgtggaccg ggaactgaaa gcgtttttgg
+     1801 aatacggaca atcctttgcc gatcgcctgc ggcgagcgcc ctgccaatcg acatcggttt
+     1861 gtggtcagaa tattgtcaat gccatcgaga gatcggagaa tggtcagata tggattgcgg
+     1921 ataagggtgg actcgagttg gtcaaattgc attggtactg gcacatggcc gaccagttcg
+     1981 tgcactatat gcagagcaat gatgaagagg atcaagattg aattcgaatc aaataaaata
+     2041 atgctttacg caaaaagtag gcaattcatt ttcctatgat
+//

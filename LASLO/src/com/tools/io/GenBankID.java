@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import static java.lang.System.out;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -35,23 +36,29 @@ import org.biojava.nbio.core.sequence.io.GenbankWriterHelper;
  */
 public class GenBankID extends SourceFile {
 
-    protected String description;
-    protected int cdsStart;
-    protected int cdsEnd;
-    protected String location;
-    protected String synonym;
-    protected String proxyConf;
-    private static final String PROXY_FILE = "proxy";
+    private String description;
+    private int cdsStart;
+    private int cdsEnd;
+    private String location;
+    private String synonym;
+    private String proxyConf;
+    private static String PROXY_FILE = "proxy";
+    private final static String 
+            E_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"; 
+    
+    
+    private static String HEADER
+            = "Gen" + getROW_DELIMITER()
+            + "GeneSynonym" + getROW_DELIMITER()
+            + "Note" + getROW_DELIMITER()
+            + "AccessionID" + getROW_DELIMITER()
+            + "CDS_Start" + getROW_DELIMITER()
+            + "CDS_End" + getROW_DELIMITER()
+            + "Location" + getROW_DELIMITER();
 
-    private final static String HEADER
-            = "Gen" + ROW_DELIMITER
-            + "GeneSynonym" + ROW_DELIMITER
-            + "Note" + ROW_DELIMITER
-            + "AccessionID" + ROW_DELIMITER
-            + "CDS_Start" + ROW_DELIMITER
-            + "CDS_End" + ROW_DELIMITER
-            + "Location" + ROW_DELIMITER;
-
+    /**
+     * Blank constructor.
+     */
     public GenBankID() {
         this.description = "";
         this.cdsStart = 0;
@@ -59,7 +66,15 @@ public class GenBankID extends SourceFile {
         this.proxyConf = "";
     }
 
-    public GenBankID(String synonym, String description, int cdsStart, int cdsEnd) {
+    /**
+     * 
+     * @param synonym
+     * @param description
+     * @param cdsStart
+     * @param cdsEnd 
+     */
+    public GenBankID(String synonym, String description, int cdsStart, 
+            int cdsEnd) {
         this.description = description;
         this.cdsStart = cdsStart;
         this.cdsEnd = cdsEnd;
@@ -67,6 +82,12 @@ public class GenBankID extends SourceFile {
         this.proxyConf = "";
     }
 
+    /**
+     * Save GenBank downloaded file.
+     * @param path
+     * @param dnaFile
+     * @return Path of the new file
+     */
     public static String makeFile(String path,
             LinkedHashMap<String, DNASequence> dnaFile) {
         File file = new File(path + "\\sequence.gb");
@@ -81,14 +102,23 @@ public class GenBankID extends SourceFile {
         return path + "\\sequence.gb";
     }
 
+    /**
+     * Added an additional option to configurate the proxy settings:
+     * Must exist an file "proxy" containing the following parameters:
+     * * proxy.site, port.number
+     * @return 
+     */
+    @SuppressWarnings("NestedAssignment")
     public static String getProxyConfiguration() {
 
         String proxy = "";
 
-        if(!(new File(PROXY_FILE).exists()))
+        if (!(new File(PROXY_FILE).exists())) {
             return "";
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(PROXY_FILE))) {
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new FileReader(getPROXY_FILE()))) {
 
             String sCurrentLine;
 
@@ -97,24 +127,32 @@ public class GenBankID extends SourceFile {
             }
 
         } catch (IOException e) {
-            //System.out.println(e.getLocalizedMessage());
+            out.println("ERROR: " + e.getLocalizedMessage());
         }
 
         return proxy;
     }
 
+    /**
+     * Download a NCBI sequence by ID
+     * @param genBankId
+     * @return
+     * @throws Exception 
+     */
     public static LinkedHashMap<String, DNASequence>
             downLoadSequenceForId(String genBankId) throws Exception {
-        LinkedHashMap<String, DNASequence> dnaFile = null;
-        String request = String
-                .format("db=nuccore&id=%s&rettype=gb&retmode=text", genBankId);
-        String idFormatted = genBankId;
-        URL ncbiGenbank = null;
+                
+        LinkedHashMap<String, DNASequence> dnaFile;
+        String request;
+        //String idFormatted = genBankId;
+        URL ncbiGenbank;
+        request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text", 
+                genBankId);
 
-        if (idFormatted.contains(".")) {
+        /*if (idFormatted.contains(".")) {
             idFormatted = idFormatted
                     .substring(0, idFormatted.lastIndexOf("."));
-        }
+        }*/
 
         try {
             String proxyConn = getProxyConfiguration();
@@ -133,12 +171,12 @@ public class GenBankID extends SourceFile {
                 }
             }
 
-            ncbiGenbank = new URL(
-                    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
-                    + request);
+            // Request to NCBI e-fetch
+            ncbiGenbank = new URL(E_FETCH + request);
 
             dnaFile = GenbankReaderHelper
                     .readGenbankDNASequence(ncbiGenbank.openStream());
+            
         } catch (MalformedURLException ex) {
             System.out.println("ERROR: Malformed URL Exception. Cause: "
                     + ex.getCause().getLocalizedMessage());
@@ -170,46 +208,82 @@ public class GenBankID extends SourceFile {
         }
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getSynonym() {
         return synonym;
     }
 
+    /**
+     * 
+     * @param synonym 
+     */
     public void setSynonym(String synonym) {
         this.synonym = synonym.replace(';', ',');
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * 
+     * @param description 
+     */
     public void setDescription(String description) {
         this.description = description.replace(';', ',');
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getLocation() {
         return location;
     }
 
+    /**
+     * 
+     * @param pos 
+     */
     public void setLocation(int pos) {
-        if (this.cdsEnd != 0) {
-            if (pos < cdsStart) {
-                location = "5'UTR";
-            } else if (pos > cdsEnd) {
-                location = "3'UTR";
+        if (this.getCdsEnd() != 0) {
+            if (pos < getCdsStart()) {
+                setLocation("5'UTR");
+            } else if (pos > getCdsEnd()) {
+                setLocation("3'UTR");
             } else {
-                location = "CDS";
+                setLocation("CDS");
             }
         }
     }
 
+    /**
+     * 
+     * @return 
+     */
     public int getCdsStart() {
         return cdsStart;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public int getCdsEnd() {
         return cdsEnd;
     }
 
+    /**
+     * 
+     * @param cds 
+     */
     public void setCDS(String cds) {
 
         if (cds == null) {
@@ -219,23 +293,94 @@ public class GenBankID extends SourceFile {
         String[] parts = cds.split("\\.\\.");
 
         if (parts.length > 0) {
-            this.cdsStart = new Integer(parts[0]);
-            this.cdsEnd = new Integer(parts[1]);
+            this.setCdsStart((int) new Integer(parts[0]));
+            this.setCdsEnd((int) new Integer(parts[1]));
         }
     }
 
+    /**
+     * 
+     * @return 
+     */
     public static String getHeader() {
-        return GenBankID.HEADER;
+        return GenBankID.getHEADER();
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public String toRowCSV() {
-        return geneID.replace(';', ',') + ROW_DELIMITER
-                + synonym + ROW_DELIMITER
-                + transcriptID.replace(';', ',') + ROW_DELIMITER
-                + description + ROW_DELIMITER
-                + cdsStart + ROW_DELIMITER
-                + cdsEnd + ROW_DELIMITER
-                + location + ROW_DELIMITER;
+        return getGeneID().replace(';', ',') + getROW_DELIMITER()
+                + getSynonym() + getROW_DELIMITER()
+                + getTranscriptID().replace(';', ',') + getROW_DELIMITER()
+                + getDescription() + getROW_DELIMITER()
+                + getCdsStart() + getROW_DELIMITER()
+                + getCdsEnd() + getROW_DELIMITER()
+                + getLocation() + getROW_DELIMITER();
+    }
+
+    /**
+     * @return the proxyConf
+     */
+    public String getProxyConf() {
+        return proxyConf;
+    }
+
+    /**
+     * @param cdsEnd the cdsEnd to set
+     */
+    public void setCdsEnd(int cdsEnd) {
+        this.cdsEnd = cdsEnd;
+    }
+
+    /**
+     * @param cdsStart the cdsStart to set
+     */
+    public void setCdsStart(int cdsStart) {
+        this.cdsStart = cdsStart;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * @param proxyConf the proxyConf to set
+     */
+    public void setProxyConf(String proxyConf) {
+        this.proxyConf = proxyConf;
+    }
+
+    /**
+     * @return the HEADER
+     */
+    public static String getHEADER() {
+        return HEADER;
+    }
+
+    /**
+     * @return the PROXY_FILE
+     */
+    public static String getPROXY_FILE() {
+        return PROXY_FILE;
+    }
+
+    /**
+     * @param aHEADER the HEADER to set
+     */
+    public static void setHEADER(String aHEADER) {
+        HEADER = aHEADER;
+    }
+
+    /**
+     * @param aPROXY_FILE the PROXY_FILE to set
+     */
+    public static void setPROXY_FILE(String aPROXY_FILE) {
+        PROXY_FILE = aPROXY_FILE;
     }
 }

@@ -23,13 +23,43 @@ package com.tools.io;
  */
 public class BioMartFastaID extends SourceFile {
 
-    protected static int nCols = 6;
-    protected static char fs = '|';
-    protected String columns[];
+    private static int nCols = 6;
+    private static char fs = '|';
+    private String columns[];
 
-    
+    /**
+     * 
+     */
     public BioMartFastaID(){
         columns = new String[nCols];
+    }
+    
+    /**
+     * @return the fs
+     */
+    public static char getFs() {
+        return fs;
+    }
+
+    /**
+     * @return the nCols
+     */
+    public static int getnCols() {
+        return nCols;
+    }
+
+    /**
+     * @param aFs the fs to set
+     */
+    public static void setFs(char aFs) {
+        fs = aFs;
+    }
+
+    /**
+     * @param anCols the nCols to set
+     */
+    public static void setnCols(int anCols) {
+        nCols = anCols;
     }
     
     /**
@@ -37,15 +67,7 @@ public class BioMartFastaID extends SourceFile {
      * @return
      */
     public int getNumColumns() {
-        return columns.length;
-    }
-
-    /**
-     *
-     * @param cols
-     */
-    public void setColumns(String cols[]) {
-        columns = cols;
+        return getColumns().length;
     }
 
     /**
@@ -55,8 +77,8 @@ public class BioMartFastaID extends SourceFile {
     public static String getHeader() {
         String header = "";
 
-        for (int i = 0; i < nCols; i++) {
-            header += "Column" + (i + 1) + ROW_DELIMITER;
+        for (int i = 0; i < getnCols(); i++) {
+            header += "Column" + (i + 1) + getROW_DELIMITER();
         }
 
         return header;
@@ -68,10 +90,10 @@ public class BioMartFastaID extends SourceFile {
      */
     public void setBioMartTags(String idSequence) {
 
-        String auxSeq = "";
+        String auxSeq;
 
         if (idSequence.contains("|")) {
-            auxSeq = idSequence.replace(fs, '@');
+            auxSeq = idSequence.replace(getFs(), '@');
         } else {
             auxSeq = idSequence.replace('=', '@');
         }
@@ -80,7 +102,7 @@ public class BioMartFastaID extends SourceFile {
         String[] cols = auxSeq.split("@");
 
         for (int i = 0; i < cols.length && i < 6; i++) {
-            columns[i] = cols[i];
+            getColumns()[i] = cols[i];
         }
     }
 
@@ -93,10 +115,25 @@ public class BioMartFastaID extends SourceFile {
         String row = "";
         int i;
 
-        for (i = 0; i < columns.length; i++) {
-            row += columns[i] + ROW_DELIMITER;
+        for (i = 0; i < getColumns().length; i++) {
+            row += getColumns()[i] + getROW_DELIMITER();
         }
 
         return row;
+    }
+
+    /**
+     * @return the columns
+     */
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
+    public String[] getColumns() {
+        return columns;
+    }
+
+    /**
+     * @param columns the columns to set
+     */
+    public void setColumns(String[] columns) {
+        this.columns = columns;
     }
 }

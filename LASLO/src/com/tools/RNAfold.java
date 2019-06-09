@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import static java.lang.System.err;
+import static java.lang.System.out;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,11 @@ public class RNAfold {
         this.avoidLonelyPairs = true;
     }
 
+    /**
+     *
+     * @param temp
+     * @param avoidLonelyPairs
+     */
     public RNAfold(double temp, boolean avoidLonelyPairs) {
         this.mfe = 0.0;
         this.structure = "";
@@ -55,27 +62,12 @@ public class RNAfold {
         this.avoidLonelyPairs = avoidLonelyPairs;
     }
 
-    public Double getTemperature() {
-        return temperature;
-    }
-
-    private void setTemperature(Double temperature) {
-        this.temperature = temperature;
-    }
-
-    public boolean isAvoidLonelyPairs() {
-        return avoidLonelyPairs;
-    }
-
-    public void setAvoidLonelyPairs(boolean avoidLonelyPairs) {
-        this.avoidLonelyPairs = avoidLonelyPairs;
-    }
-
     /**
      *
      * @param sequence
+     * @param temperature
      */
-    public RNAfold(String sequence) {
+    public RNAfold(String sequence, double temperature) {
         String command = COMMAND_RNAFOLD; // + RNAFOLD_ARGS;
 
         InputStreamReader isr;
@@ -84,7 +76,7 @@ public class RNAfold {
         String lpCmd = "--noLP";
         String lpTemp = "--temp=";
 
-        this.setTemperature(25.00);
+        this.setTemperature(temperature);
 
         lpTemp += this.temperature;
 
@@ -95,7 +87,7 @@ public class RNAfold {
         try {
             Process child
                     = new ProcessBuilder(command, "-d2", lpCmd, "--noPS", lpTemp)
-                            .start();
+                    .start();
 
             OutputStream out = child.getOutputStream();
             out.write(sequence.getBytes());
@@ -105,7 +97,7 @@ public class RNAfold {
             out.close();
 
             try (InputStream in = child.getInputStream()) {
-                //int c;
+
                 isr = new InputStreamReader(in);
                 br = new BufferedReader(isr);
                 br.readLine();
@@ -126,8 +118,48 @@ public class RNAfold {
             isr.close();
             out.close();
         } catch (IOException | NumberFormatException ex) {
-            System.out.println("RNAFold error: " + ex.getLocalizedMessage());
+            err.println("RNAFold error: " + ex.getLocalizedMessage());
         }
+    }
+
+    /**
+     *
+     * @param sequence
+     */
+    public RNAfold(String sequence) {
+        this(sequence, 25.00);
+    }
+
+    /**
+     *
+     * @return the temperature
+     */
+    public Double getTemperature() {
+        return temperature;
+    }
+
+    /**
+     *
+     * @param temperature
+     */
+    private void setTemperature(Double temperature) {
+        this.temperature = temperature;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isAvoidLonelyPairs() {
+        return avoidLonelyPairs;
+    }
+
+    /**
+     *
+     * @param avoidLonelyPairs
+     */
+    public void setAvoidLonelyPairs(boolean avoidLonelyPairs) {
+        this.avoidLonelyPairs = avoidLonelyPairs;
     }
 
     /**
@@ -179,7 +211,7 @@ public class RNAfold {
         String sequence = "UAGAGAUCUCUAUGUAUUUCCC";
         RNAfold test;
         test = new RNAfold(sequence);
-        System.out.println(test);
+        out.println(test);
     }
 
 }

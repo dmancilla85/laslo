@@ -30,6 +30,7 @@ public class MessageBox {
      * @param titleBar 
      */
     public static void show(String infoMessage, String titleBar) {
-        JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + 
+                titleBar, JOptionPane.INFORMATION_MESSAGE);
     }
 }

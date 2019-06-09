@@ -23,63 +23,30 @@ package com.tools.io;
  */
 public class SourceFile {
 
-    final static String FIELD_DELIMITER = "|"; //$NON-NLS-1$
-
-    /**
-     *
-     */
-    public final static String ROW_DELIMITER = ";"; //$NON-NLS-1$
-
-    /**
-     *
-     */
+    private static String FIELD_DELIMITER = "|"; //$NON-NLS-1$
+    private static String ROW_DELIMITER = ";"; //$NON-NLS-1$
+    private static String LOG_EXT = ".log";
+    private static String CSV_EXT = ".csv";
+    private static String FASTA_EXT = ".fasta";
+    private static String FASTA_EXT_2 = ".fa";
+    private static String GENBANK_EXT = ".gb";
     protected String transcriptID;
-
-    /**
-     *
-     */
     protected String geneID;
-
-    /**
-     *
-     */
     protected String geneSymbol;
-
-    /**
-     *
-     */
     protected String fieldDelimiter;
-
-    /**
-     *
-     */
     protected String rowDelimiter;
 
     /**
      *
      */
-    public static final String LOG_EXT = ".log";
-
-    /**
-     *
-     */
-    public static final String CSV_EXT = ".csv";
-
-    /**
-     *
-     */
-    public static final String FASTA_EXT = ".fasta";
-
-    /**
-     *
-     */
-    public static final String FASTA_EXT_2 = ".fa";
-
-    /**
-     *
-     */
-    public static final String GENBANK_EXT = ".gb";
-
+    public SourceFile() {
+        this.fieldDelimiter = FIELD_DELIMITER;
+        this.rowDelimiter = ROW_DELIMITER;
+        this.transcriptID = null;
+        this.geneID = null;
+        this.geneSymbol = null;        
+    }
+    
     /**
      *
      * @param header
@@ -123,6 +90,27 @@ public class SourceFile {
     }
 
     /**
+     * @param aGENBANK_EXT the GENBANK_EXT to set
+     */
+    public static void setGENBANK_EXT(String aGENBANK_EXT) {
+        GENBANK_EXT = aGENBANK_EXT;
+    }
+
+    /**
+     * @param aLOG_EXT the LOG_EXT to set
+     */
+    public static void setLOG_EXT(String aLOG_EXT) {
+        LOG_EXT = aLOG_EXT;
+    }
+
+    /**
+     * @param aROW_DELIMITER the ROW_DELIMITER to set
+     */
+    public static void setROW_DELIMITER(String aROW_DELIMITER) {
+        ROW_DELIMITER = aROW_DELIMITER;
+    }
+
+    /**
      *
      * @return
      */
@@ -162,6 +150,83 @@ public class SourceFile {
         return geneSymbol;
     }
 
+    /**
+     * @return the CSV_EXT
+     */
+    public static String getCSV_EXT() {
+        return CSV_EXT;
+    }
+
+    /**
+     * @return the FASTA_EXT
+     */
+    public static String getFASTA_EXT() {
+        return FASTA_EXT;
+    }
+
+    /**
+     * @return the FASTA_EXT_2
+     */
+    public static String getFASTA_EXT_2() {
+        return FASTA_EXT_2;
+    }
+
+    /**
+     * @return the FIELD_DELIMITER
+     */
+    public static String getFIELD_DELIMITER() {
+        return FIELD_DELIMITER;
+    }
+
+    /**
+     * @return the GENBANK_EXT
+     */
+    public static String getGENBANK_EXT() {
+        return GENBANK_EXT;
+    }
+
+    /**
+     * @return the LOG_EXT
+     */
+    public static String getLOG_EXT() {
+        return LOG_EXT;
+    }
+
+    /**
+     * @return the ROW_DELIMITER
+     */
+    public static String getROW_DELIMITER() {
+        return ROW_DELIMITER;
+    }
+
+    /**
+     * @param aCSV_EXT the CSV_EXT to set
+     */
+    public static void setCSV_EXT(String aCSV_EXT) {
+        CSV_EXT = aCSV_EXT;
+    }
+
+    /**
+     * @param aFASTA_EXT the FASTA_EXT to set
+     */
+    public static void setFASTA_EXT(String aFASTA_EXT) {
+        FASTA_EXT = aFASTA_EXT;
+    }
+
+    /**
+     * @param aFASTA_EXT_2 the FASTA_EXT_2 to set
+     */
+    public static void setFASTA_EXT_2(String aFASTA_EXT_2) {
+        FASTA_EXT_2 = aFASTA_EXT_2;
+    }
+
+    /**
+     * @param aFIELD_DELIMITER the FIELD_DELIMITER to set
+     */
+    public static void setFIELD_DELIMITER(String aFIELD_DELIMITER) {
+        FIELD_DELIMITER = aFIELD_DELIMITER;
+    }
+    
     /**
      *
      * @param geneSymbol
@@ -204,14 +269,6 @@ public class SourceFile {
 
     /**
      *
-     */
-    public SourceFile() {
-        this.fieldDelimiter = FIELD_DELIMITER;
-        this.rowDelimiter = ROW_DELIMITER;
-    }
-
-    /**
-     *
      * @return
      */
     public static String getHeader() {
@@ -224,8 +281,8 @@ public class SourceFile {
      */
     @Override
     public String toString() {
-        return "geneID = " + geneID + " - "
-                + "transcriptID = " + transcriptID;
+        return "geneID = " + getGeneID() + " - "
+                + "transcriptID = " + getTranscriptID();
     }
 
     /**
@@ -233,7 +290,7 @@ public class SourceFile {
      * @return
      */
     public String toRowCSV() {
-        return geneID + ROW_DELIMITER
-                + transcriptID + ROW_DELIMITER;
+        return getGeneID() + getROW_DELIMITER()
+                + getTranscriptID() + getROW_DELIMITER();
     }
 }

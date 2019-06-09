@@ -23,62 +23,27 @@ package com.tools.io;
  */
 public class EnsemblFastaID extends SourceFile {
 
-    /**
-     *
-     */
-    public final String GENE = "gene:"; //$NON-NLS-1$
+    private String GENE = "gene:";
+    private static String GENE_BIOTYPE = "gene_biotype:";
+    private static String TRANSCRIPT_BIOTYPE = "transcript_biotype:";
+    private static String GENE_SYMBOL = "gene_symbol:";
+    private static String DESCRIPTION = "description:";
+
+    private static String HEADER = "GeneID" + getROW_DELIMITER()
+            + "GeneSymbol" + getROW_DELIMITER()
+            + "GeneBioType" + getROW_DELIMITER()
+            + "TranscriptID" + getROW_DELIMITER()
+            + "TranscriptBiotype" + getROW_DELIMITER()
+            + "#Splice" + getROW_DELIMITER()
+            + "Description" + getROW_DELIMITER();
+
+    private String geneBiotype;
+    private String transcriptBiotype;
+    private String description;
+    private String spliceNumber;
 
     /**
      *
-     */
-    public final static String GENE_BIOTYPE = "gene_biotype:"; //$NON-NLS-1$
-
-    /**
-     *
-     */
-    public final static String TRANSCRIPT_BIOTYPE = "transcript_biotype:"; //$NON-NLS-1$
-
-    /**
-     *
-     */
-    public final static String GENE_SYMBOL = "gene_symbol:"; //$NON-NLS-1$
-
-    /**
-     *
-     */
-    public final static String DESCRIPTION = "description:"; //$NON-NLS-1$
-
-    final static String HEADER = "GeneID" + ROW_DELIMITER //$NON-NLS-1$
-            + "GeneSymbol" + ROW_DELIMITER //$NON-NLS-1$
-            + "GeneBioType" + ROW_DELIMITER //$NON-NLS-1$
-            + "TranscriptID" + ROW_DELIMITER //$NON-NLS-1$
-            + "TranscriptBiotype" + ROW_DELIMITER //$NON-NLS-1$
-            + "#Splice" + ROW_DELIMITER //$NON-NLS-1$
-            + "Description" + ROW_DELIMITER //$NON-NLS-1$
-            ;
-
-    /**
-     *
-     */
-    protected String geneBiotype;
-
-    /**
-     *
-     */
-    protected String transcriptBiotype;
-
-    /**
-     *
-     */
-    protected String description;
-
-    /**
-     *
-     */
-    protected String spliceNumber;
-
-    /**
-     * 
      */
     public EnsemblFastaID() {
         this.transcriptID = ""; //$NON-NLS-1$
@@ -92,91 +57,35 @@ public class EnsemblFastaID extends SourceFile {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
-    public String getGeneBiotype() {
-        return geneBiotype;
+    @Override
+    public String toRowCSV() {
+        return getGeneID() + getROW_DELIMITER()
+                + getGeneSymbol() + getROW_DELIMITER()
+                + getGeneBiotype() + getROW_DELIMITER()
+                + getTranscriptID() + getROW_DELIMITER()
+                + getTranscriptBiotype() + getROW_DELIMITER()
+                + getSpliceNumber() + getROW_DELIMITER()
+                + getDescription() + getROW_DELIMITER();
     }
 
     /**
-     * 
-     * @param geneBiotype 
-     */
-    public void setGeneBiotype(String geneBiotype) {
-        this.geneBiotype = geneBiotype;
-    }
-
-    /**
-     * 
-     * @return 
-     */
-    public String getTranscriptBiotype() {
-        return transcriptBiotype;
-    }
-
-    /**
-     * 
-     * @param transcriptBiotype 
-     */
-    public void setTranscriptBiotype(String transcriptBiotype) {
-        this.transcriptBiotype = transcriptBiotype;
-    }
-
-    /**
-     * 
-     * @return 
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * 
-     * @param description 
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * 
-     * @return 
-     */
-    public String getSpliceNumber() {
-        return spliceNumber;
-    }
-
-    /**
-     * 
-     * @param spliceNumber 
-     */
-    public void setSpliceNumber(String spliceNumber) {
-        this.spliceNumber = spliceNumber;
-    }
-
-    /**
-     * 
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
-        return "EnsemblFastaID [transcriptID=" + transcriptID + ", geneID=" + geneID + ", geneBiotype=" + geneBiotype //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                + ", trancriptBiotype=" + transcriptBiotype + ", geneSymbol=" + geneSymbol + ", description=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                + description + ", spliceNumber=" + spliceNumber + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "EnsemblFastaID [transcriptID=" + getTranscriptID() + ", geneID=" + getGeneID() + ", geneBiotype=" + getGeneBiotype() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+                + ", trancriptBiotype=" + getTranscriptBiotype() + ", geneSymbol=" + getGeneSymbol() + ", description=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + getDescription() + ", spliceNumber=" + getSpliceNumber() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
-     * 
-     * @return 
-     */
-    public static String getHeader() {
-        return EnsemblFastaID.HEADER;
-    }
-
-    /**
-     * 
-     * @param idSequence 
+     *
+     * @param idSequence
      */
     public void setEnsemblTags(String idSequence) {
 
@@ -209,79 +118,79 @@ public class EnsemblFastaID extends SourceFile {
         }
 
         // get GeneID
-        index = idSequence.indexOf(GENE, 0);
+        index = idSequence.indexOf(getGENE(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(' ');
 
             if (index2 > 0) {
-                aux = idsequence.substring(GENE.length(), index2);
+                aux = idsequence.substring(getGENE().length(), index2);
             } else {
-                aux = idsequence.substring(GENE.length());
+                aux = idsequence.substring(getGENE().length());
             }
 
             setGeneID(aux.trim());
         }
 
         // get Gene Biotype
-        index = idsequence.indexOf(GENE_BIOTYPE, 0);
+        index = idsequence.indexOf(getGENE_BIOTYPE(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(' ');
 
             if (index2 > 0) {
-                aux = idsequence.substring(GENE_BIOTYPE.length(), index2);
+                aux = idsequence.substring(getGENE_BIOTYPE().length(), index2);
             } else {
-                aux = idsequence.substring(GENE_BIOTYPE.length());
+                aux = idsequence.substring(getGENE_BIOTYPE().length());
             }
 
             setGeneBiotype(aux.trim());
         }
         // get Trancript Biotype
-        index = idsequence.indexOf(EnsemblFastaID.TRANSCRIPT_BIOTYPE, 0);
+        index = idsequence.indexOf(EnsemblFastaID.getTRANSCRIPT_BIOTYPE(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(' ');
 
             if (index2 > 0) {
-                aux = idsequence.substring(EnsemblFastaID.TRANSCRIPT_BIOTYPE.length(), index2);
+                aux = idsequence.substring(EnsemblFastaID.getTRANSCRIPT_BIOTYPE().length(), index2);
             } else {
-                aux = idsequence.substring(EnsemblFastaID.TRANSCRIPT_BIOTYPE.length());
+                aux = idsequence.substring(EnsemblFastaID.getTRANSCRIPT_BIOTYPE().length());
             }
 
             setTranscriptBiotype(aux.trim());
         }
 
         // get Gene Symbol
-        index = idsequence.indexOf(EnsemblFastaID.GENE_SYMBOL, 0);
+        index = idsequence.indexOf(EnsemblFastaID.getGENE_SYMBOL(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(' ');
 
             if (index2 > 0) {
-                aux = idsequence.substring(EnsemblFastaID.GENE_SYMBOL.length(), index2);
+                aux = idsequence.substring(EnsemblFastaID.getGENE_SYMBOL().length(), index2);
             } else {
-                aux = idsequence.substring(EnsemblFastaID.GENE_SYMBOL.length());
+                aux = idsequence.substring(EnsemblFastaID.getGENE_SYMBOL().length());
             }
 
             setGeneSymbol(aux.trim());
         }
 
         // Description
-        index = idsequence.indexOf(EnsemblFastaID.DESCRIPTION, 0);
+        index = idsequence.indexOf(EnsemblFastaID.getDESCRIPTION(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.lastIndexOf(':');
 
             if (index2 > 0) {
-                aux = idsequence.substring(EnsemblFastaID.DESCRIPTION.length(), idsequence.lastIndexOf(' '));
+                aux = idsequence.substring(EnsemblFastaID.getDESCRIPTION().length(), idsequence.lastIndexOf(' '));
             } else {
-                aux = idsequence.substring(EnsemblFastaID.DESCRIPTION.length());
+                aux = idsequence.substring(EnsemblFastaID.getDESCRIPTION().length());
             }
 
             setDescription(aux.trim());
@@ -290,17 +199,158 @@ public class EnsemblFastaID extends SourceFile {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
-    @Override
-    public String toRowCSV() {
-        return geneID + ROW_DELIMITER
-                + geneSymbol + ROW_DELIMITER
-                + geneBiotype + ROW_DELIMITER
-                + transcriptID + ROW_DELIMITER
-                + transcriptBiotype + ROW_DELIMITER
-                + spliceNumber + ROW_DELIMITER
-                + description + ROW_DELIMITER;
+    public static String getHeader() {
+        return EnsemblFastaID.getHEADER();
+    }
+
+    /**
+     * @return the GENE
+     */
+    public String getGENE() {
+        return GENE;
+    }
+
+    /**
+     * @param GENE the GENE to set
+     */
+    public void setGENE(String GENE) {
+        this.GENE = GENE;
+    }
+
+    /**
+     * @return the DESCRIPTION
+     */
+    public static String getDESCRIPTION() {
+        return DESCRIPTION;
+    }
+
+    /**
+     * @return the GENE_BIOTYPE
+     */
+    public static String getGENE_BIOTYPE() {
+        return GENE_BIOTYPE;
+    }
+
+    /**
+     * @return the GENE_SYMBOL
+     */
+    public static String getGENE_SYMBOL() {
+        return GENE_SYMBOL;
+    }
+
+    /**
+     * @return the HEADER
+     */
+    public static String getHEADER() {
+        return HEADER;
+    }
+
+    /**
+     * @return the TRANSCRIPT_BIOTYPE
+     */
+    public static String getTRANSCRIPT_BIOTYPE() {
+        return TRANSCRIPT_BIOTYPE;
+    }
+
+    /**
+     * @param aDESCRIPTION the DESCRIPTION to set
+     */
+    public static void setDESCRIPTION(String aDESCRIPTION) {
+        DESCRIPTION = aDESCRIPTION;
+    }
+
+    /**
+     * @param aGENE_BIOTYPE the GENE_BIOTYPE to set
+     */
+    public static void setGENE_BIOTYPE(String aGENE_BIOTYPE) {
+        GENE_BIOTYPE = aGENE_BIOTYPE;
+    }
+
+    /**
+     * @param aGENE_SYMBOL the GENE_SYMBOL to set
+     */
+    public static void setGENE_SYMBOL(String aGENE_SYMBOL) {
+        GENE_SYMBOL = aGENE_SYMBOL;
+    }
+
+    /**
+     * @param aHEADER the HEADER to set
+     */
+    public static void setHEADER(String aHEADER) {
+        HEADER = aHEADER;
+    }
+
+    /**
+     * @param aTRANSCRIPT_BIOTYPE the TRANSCRIPT_BIOTYPE to set
+     */
+    public static void setTRANSCRIPT_BIOTYPE(String aTRANSCRIPT_BIOTYPE) {
+        TRANSCRIPT_BIOTYPE = aTRANSCRIPT_BIOTYPE;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getGeneBiotype() {
+        return geneBiotype;
+    }
+
+    /**
+     *
+     * @param geneBiotype
+     */
+    public void setGeneBiotype(String geneBiotype) {
+        this.geneBiotype = geneBiotype;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getTranscriptBiotype() {
+        return transcriptBiotype;
+    }
+
+    /**
+     *
+     * @param transcriptBiotype
+     */
+    public void setTranscriptBiotype(String transcriptBiotype) {
+        this.transcriptBiotype = transcriptBiotype;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     *
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getSpliceNumber() {
+        return spliceNumber;
+    }
+
+    /**
+     *
+     * @param spliceNumber
+     */
+    public void setSpliceNumber(String spliceNumber) {
+        this.spliceNumber = spliceNumber;
     }
 }

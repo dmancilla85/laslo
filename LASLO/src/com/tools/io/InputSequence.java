@@ -25,32 +25,32 @@ package com.tools.io;
 public enum InputSequence {
 
     /**
-     *
+     * Ensembl FASTA format file.
      */
     ENSEMBL,
 
     /**
-     *
+     * FlyBase FASTA format file.
      */
     FLYBASE,
 
     /**
-     *
+     * Ensembl BiOMART FASTA format file.
      */
     BIOMART,
 
     /**
-     *
+     * NCBI GenBank format file
      */
     GENBANK,
 
     /**
-     *
+     * Generic FASTA sequence (no parseable tags)
      */
     GENERIC,
     
     /**
-     * 
+     * Generic FASTA used in Random Generation
      */
     GENBANK_RND
 }

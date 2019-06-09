@@ -106,6 +106,7 @@ public class OSValidator {
      *
      * @return
      */
+    @SuppressWarnings({"null", "NestedAssignment"})
     public static int getNumberOfCPUCores() {
         //OSValidator osValidator; 
         //osValidator = new OSValidator();
@@ -139,13 +140,16 @@ public class OSValidator {
         try {
             while ((line = reader.readLine()) != null) {
                 if (OSValidator.isMac()) {
-                    numberOfCores = line.length() > 0 ? Integer.parseInt(line) : 0;
+                    numberOfCores = line.length() > 0 ? 
+                            Integer.parseInt(line) : 0;
                 } else if (OSValidator.isUnix()) {
                     if (line.contains("Core(s) per socket:")) {
-                        numberOfCores = Integer.parseInt(line.split("\\s+")[line.split("\\s+").length - 1]);
+                        numberOfCores = Integer.parseInt(line.split("\\s+")
+                                [line.split("\\s+").length - 1]);
                     }
                     if (line.contains("Socket(s):")) {
-                        sockets = Integer.parseInt(line.split("\\s+")[line.split("\\s+").length - 1]);
+                        sockets = Integer.parseInt(line.split("\\s+")
+                                [line.split("\\s+").length - 1]);
                     }
                 } else if (OSValidator.isWindows()) {
                     if (line.contains("NumberOfCores")) {

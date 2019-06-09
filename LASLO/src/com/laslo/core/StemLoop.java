@@ -287,41 +287,41 @@ public class StemLoop {
         }
 
         return header
-                + "LoopPattern" + SourceFile.ROW_DELIMITER
-                + "TerminalPair" + SourceFile.ROW_DELIMITER
-                + "Sense" + SourceFile.ROW_DELIMITER
-                + "N-2" + SourceFile.ROW_DELIMITER
-                + "N-1" + SourceFile.ROW_DELIMITER
-                + "N2" + SourceFile.ROW_DELIMITER
-                + "N5" + SourceFile.ROW_DELIMITER
-                + "N6" + SourceFile.ROW_DELIMITER
-                + "N7" + SourceFile.ROW_DELIMITER
-                + "N8" + SourceFile.ROW_DELIMITER
-                + "Loop" + SourceFile.ROW_DELIMITER
-                + "StemLoopSequence" + SourceFile.ROW_DELIMITER
-                + "Additional5Seq" + SourceFile.ROW_DELIMITER
-                + "Additional3Seq" + SourceFile.ROW_DELIMITER
-                + "PredictedStructure" + SourceFile.ROW_DELIMITER
-                + "ViennaBracketStr" + SourceFile.ROW_DELIMITER
-                + "Pairments" + SourceFile.ROW_DELIMITER
-                + "WooblePairs" + SourceFile.ROW_DELIMITER
-                + "Bulges" + SourceFile.ROW_DELIMITER
-                + "InternalLoops" + SourceFile.ROW_DELIMITER
-                + "SequenceLength" + SourceFile.ROW_DELIMITER
-                + "StartsAt" + SourceFile.ROW_DELIMITER
-                + "EndsAt" + SourceFile.ROW_DELIMITER
-                + "A_PercentSequence" + SourceFile.ROW_DELIMITER
-                + "C_PercentSequence" + SourceFile.ROW_DELIMITER
-                + "G_PercentSequence" + SourceFile.ROW_DELIMITER
-                + "U_PercentSequence" + SourceFile.ROW_DELIMITER
-                + "AU_PercentPairs" + SourceFile.ROW_DELIMITER
-                + "CG_PercentPairs" + SourceFile.ROW_DELIMITER
-                + "GU_PercentPairs" + SourceFile.ROW_DELIMITER
-                + "PurinePercentPairs" + SourceFile.ROW_DELIMITER
-                + "RnaFoldMFE" + SourceFile.ROW_DELIMITER
-                + "RelativePosition" + SourceFile.ROW_DELIMITER
-                + "AdditionalSeqMatches" + SourceFile.ROW_DELIMITER
-                + "AdditionalSeqPositions" + SourceFile.ROW_DELIMITER;
+                + "LoopPattern" + SourceFile.getROW_DELIMITER()
+                + "TerminalPair" + SourceFile.getROW_DELIMITER()
+                + "Sense" + SourceFile.getROW_DELIMITER()
+                + "N-2" + SourceFile.getROW_DELIMITER()
+                + "N-1" + SourceFile.getROW_DELIMITER()
+                + "N2" + SourceFile.getROW_DELIMITER()
+                + "N5" + SourceFile.getROW_DELIMITER()
+                + "N6" + SourceFile.getROW_DELIMITER()
+                + "N7" + SourceFile.getROW_DELIMITER()
+                + "N8" + SourceFile.getROW_DELIMITER()
+                + "Loop" + SourceFile.getROW_DELIMITER()
+                + "StemLoopSequence" + SourceFile.getROW_DELIMITER()
+                + "Additional5Seq" + SourceFile.getROW_DELIMITER()
+                + "Additional3Seq" + SourceFile.getROW_DELIMITER()
+                + "PredictedStructure" + SourceFile.getROW_DELIMITER()
+                + "ViennaBracketStr" + SourceFile.getROW_DELIMITER()
+                + "Pairments" + SourceFile.getROW_DELIMITER()
+                + "WooblePairs" + SourceFile.getROW_DELIMITER()
+                + "Bulges" + SourceFile.getROW_DELIMITER()
+                + "InternalLoops" + SourceFile.getROW_DELIMITER()
+                + "SequenceLength" + SourceFile.getROW_DELIMITER()
+                + "StartsAt" + SourceFile.getROW_DELIMITER()
+                + "EndsAt" + SourceFile.getROW_DELIMITER()
+                + "A_PercentSequence" + SourceFile.getROW_DELIMITER()
+                + "C_PercentSequence" + SourceFile.getROW_DELIMITER()
+                + "G_PercentSequence" + SourceFile.getROW_DELIMITER()
+                + "U_PercentSequence" + SourceFile.getROW_DELIMITER()
+                + "AU_PercentPairs" + SourceFile.getROW_DELIMITER()
+                + "CG_PercentPairs" + SourceFile.getROW_DELIMITER()
+                + "GU_PercentPairs" + SourceFile.getROW_DELIMITER()
+                + "PurinePercentPairs" + SourceFile.getROW_DELIMITER()
+                + "RnaFoldMFE" + SourceFile.getROW_DELIMITER()
+                + "RelativePosition" + SourceFile.getROW_DELIMITER()
+                + "AdditionalSeqMatches" + SourceFile.getROW_DELIMITER()
+                + "AdditionalSeqPositions" + SourceFile.getROW_DELIMITER();
     }
 
     /**
@@ -1044,41 +1044,42 @@ public class StemLoop {
     public String toRowCSV() {
 
         return this.getId_fasta().toRowCSV()
-                + this.getLoopPattern() + SourceFile.ROW_DELIMITER
-                + this.getTerminalPair() + SourceFile.ROW_DELIMITER
-                + this.isReverse() + SourceFile.ROW_DELIMITER
-                + this.getPredecessor2Loop() + SourceFile.ROW_DELIMITER //n-2
-                + this.getPredecessorLoop() + SourceFile.ROW_DELIMITER
-                + this.getN2Loop() + SourceFile.ROW_DELIMITER
-                + this.getN5Loop() + SourceFile.ROW_DELIMITER
-                + this.getN6Loop() + SourceFile.ROW_DELIMITER
-                + this.getN7Loop() + SourceFile.ROW_DELIMITER
-                + this.getN8Loop() + SourceFile.ROW_DELIMITER
-                + this.getLoop() + SourceFile.ROW_DELIMITER
-                + this.getRnaHairpinSequence() + SourceFile.ROW_DELIMITER
-                + this.getAdditional5Seq() + SourceFile.ROW_DELIMITER
-                + this.getAdditional3Seq() + SourceFile.ROW_DELIMITER
-                + this.getHairpinStructure() + SourceFile.ROW_DELIMITER
-                + this.getStructure() + SourceFile.ROW_DELIMITER
-                + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
-                + this.getGUPairs() + SourceFile.ROW_DELIMITER
-                + this.getMismatches() + SourceFile.ROW_DELIMITER
-                + this.getInternalLoops() + SourceFile.ROW_DELIMITER
-                + this.getSequenceLength() + SourceFile.ROW_DELIMITER
-                + this.getStartsAt() + SourceFile.ROW_DELIMITER
-                + this.getEndsAt() + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercA_sequence()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercC_sequence()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercG_sequence()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercU_sequence()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercent_AU()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercent_CG()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercent_GU()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getPercent_AG()) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getMfe(), 5) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.getRelativePos()) + SourceFile.ROW_DELIMITER
-                + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
-                + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
+                + this.getLoopPattern() + SourceFile.getROW_DELIMITER()
+                + this.getTerminalPair() + SourceFile.getROW_DELIMITER()
+                + this.isReverse() + SourceFile.getROW_DELIMITER()
+                + this.getPredecessor2Loop() + SourceFile.getROW_DELIMITER() //n-2
+        
+                + this.getPredecessorLoop() + SourceFile.getROW_DELIMITER()
+                + this.getN2Loop() + SourceFile.getROW_DELIMITER()
+                + this.getN5Loop() + SourceFile.getROW_DELIMITER()
+                + this.getN6Loop() + SourceFile.getROW_DELIMITER()
+                + this.getN7Loop() + SourceFile.getROW_DELIMITER()
+                + this.getN8Loop() + SourceFile.getROW_DELIMITER()
+                + this.getLoop() + SourceFile.getROW_DELIMITER()
+                + this.getRnaHairpinSequence() + SourceFile.getROW_DELIMITER()
+                + this.getAdditional5Seq() + SourceFile.getROW_DELIMITER()
+                + this.getAdditional3Seq() + SourceFile.getROW_DELIMITER()
+                + this.getHairpinStructure() + SourceFile.getROW_DELIMITER()
+                + this.getStructure() + SourceFile.getROW_DELIMITER()
+                + this.getPairments() + SourceFile.getROW_DELIMITER() /* para que me de apareamientos */ 
+                + this.getGUPairs() + SourceFile.getROW_DELIMITER()
+                + this.getMismatches() + SourceFile.getROW_DELIMITER()
+                + this.getInternalLoops() + SourceFile.getROW_DELIMITER()
+                + this.getSequenceLength() + SourceFile.getROW_DELIMITER()
+                + this.getStartsAt() + SourceFile.getROW_DELIMITER()
+                + this.getEndsAt() + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercA_sequence()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercC_sequence()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercG_sequence()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercU_sequence()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercent_AU()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercent_CG()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercent_GU()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getPercent_AG()) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getMfe(), 5) + SourceFile.getROW_DELIMITER()
+                + getFormattedNumber(this.getRelativePos()) + SourceFile.getROW_DELIMITER()
+                + this.getAdditionalSequenceCount() + SourceFile.getROW_DELIMITER()
+                + this.getAdditionalSequenceLocations() + SourceFile.getROW_DELIMITER();
     }
 
     /**

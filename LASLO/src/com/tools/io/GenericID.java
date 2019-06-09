@@ -24,7 +24,7 @@ package com.tools.io;
  */
 public class GenericID extends SourceFile {
 
-    final static String HEADER = "SequenceID" + ROW_DELIMITER;
+    final static String HEADER = "SequenceID" + getROW_DELIMITER();
 
     /**
      *
@@ -33,9 +33,13 @@ public class GenericID extends SourceFile {
         this.geneID = "";
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public String toString() {
-        return "GenericID [sequenceID=" + geneID + "]";
+        return "GenericID [sequenceID=" + getGeneID() + "]";
     }
 
     /**
@@ -52,11 +56,15 @@ public class GenericID extends SourceFile {
      */
     public void setGenericTags(String id) {
         // TODO Auto-generated method stub
-        geneID = id.replace(';', '-');
+        setGeneID(id.replace(';', '-'));
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public String toRowCSV() {
-        return geneID + ROW_DELIMITER;
+        return getGeneID() + getROW_DELIMITER();
     }
 }

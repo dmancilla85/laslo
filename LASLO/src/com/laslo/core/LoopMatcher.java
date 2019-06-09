@@ -424,15 +424,15 @@ public class LoopMatcher {
             out.print("Making random sequences... ");
             for (File currentFile : getFileList()) {
                 if (currentFile.isFile()
-                        && (currentFile.toString().endsWith(FASTA_EXT)
-                        || currentFile.toString().endsWith(FASTA_EXT_2)
-                        || currentFile.toString().endsWith(GENBANK_EXT))) {
+                        && (currentFile.toString().endsWith(getFASTA_EXT())
+                        || currentFile.toString().endsWith(getFASTA_EXT_2())
+                        || currentFile.toString().endsWith(getGENBANK_EXT()))) {
 
                     //fileName = currentFile.getName();
                     LinkedHashMap<String, DNASequence> dnaFile = null;
 
                     try {
-                        if (currentFile.toString().endsWith(GENBANK_EXT)) {
+                        if (currentFile.toString().endsWith(getGENBANK_EXT())) {
                             dnaFile = readGenbankDNASequence(currentFile, false);
                             isGenBank = true;
                         } else {
@@ -460,9 +460,9 @@ public class LoopMatcher {
         // I. File level (hacer un hilo)
         for (File currentFile : getFileList()) {
             if (currentFile.isFile() && 
-                    (currentFile.toString().endsWith(GENBANK_EXT) || 
-                    currentFile.toString().endsWith(FASTA_EXT) ||
-                    currentFile.toString().endsWith(FASTA_EXT_2))) {
+                    (currentFile.toString().endsWith(getGENBANK_EXT()) || 
+                    currentFile.toString().endsWith(getFASTA_EXT()) ||
+                    currentFile.toString().endsWith(getFASTA_EXT_2()))) {
 
                 this.setActualFile(currentFile);
                 callProcessThreads();
@@ -507,7 +507,7 @@ public class LoopMatcher {
                     .getString("FILE_PRINT"), new Object[]{fileName})); 
             out.flush();
             fileName = fileName.replaceFirst("[.][^.]+$", ""); 
-            fileOut = this.getPathOut() + "\\" + fileName + CSV_EXT;
+            fileOut = this.getPathOut() + "\\" + fileName + getCSV_EXT();
 
             if (new File(fileOut).exists()) {
                 try {
@@ -525,7 +525,7 @@ public class LoopMatcher {
             // Generation of the iterator of {id,sequence}
             LinkedHashMap<String, DNASequence> fasta;
 
-            if (getActualFile().getName().endsWith(GENBANK_EXT)) {
+            if (getActualFile().getName().endsWith(getGENBANK_EXT())) {
                 fasta = readGenbankDNASequence(getActualFile());
                 genbank = true;
             } else {
