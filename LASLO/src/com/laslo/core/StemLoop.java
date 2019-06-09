@@ -33,6 +33,10 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * 
+ * @author David A. Mancilla
+ */
 class PosComparator implements Comparator<Integer> {
 
     @Override
@@ -42,45 +46,46 @@ class PosComparator implements Comparator<Integer> {
 }
 
 /**
- * 13/12/2016
- *
+ * Main class for stem-loops
  * @author David A. Mancilla
+ * @version 1.0
+ * @since 2016-12-13
  */
 public class StemLoop {
 
-    protected SourceFile id_fasta;
-    protected InputSequence mode;
-    protected String rnaHairpinSequence;
-    protected String loop;
-    protected String hairpinStructure;
-    protected String additional5Seq;
-    protected String additional3Seq;
-    protected String loopPattern;
-    protected String viennaStructure;
-    protected int sequenceLength;
-    protected int startsAt;
-    protected int endsAt;
-    protected int bulge;
-    protected int internalLoops;
-    protected char predecessor2Loop;
-    protected char predecessorLoop;
-    protected char n2Loop;
-    protected char n5Loop;
-    protected char n6Loop;
-    protected char n7Loop;
-    protected char n8Loop;
-    protected double percent_AG;
-    protected double percent_GU;
-    protected double percent_CG;
-    protected double percent_AU;
-    protected double percA_sequence;
-    protected double percG_sequence;
-    protected double percC_sequence;
-    protected double percU_sequence;
-    protected double relativePos;
-    protected boolean reversed;
-    protected double mfe;
-    protected List<Integer> additionalSeqLocations;
+    private SourceFile id_fasta;
+    private InputSequence mode;
+    private String rnaHairpinSequence;
+    private String loop;
+    private String hairpinStructure;
+    private String additional5Seq;
+    private String additional3Seq;
+    private String loopPattern;
+    private String viennaStructure;
+    private int sequenceLength;
+    private int startsAt;
+    private int endsAt;
+    private int bulge;
+    private int internalLoops;
+    private char predecessor2Loop;
+    private char predecessorLoop;
+    private char n2Loop;
+    private char n5Loop;
+    private char n6Loop;
+    private char n7Loop;
+    private char n8Loop;
+    private double percent_AG;
+    private double percent_GU;
+    private double percent_CG;
+    private double percent_AU;
+    private double percA_sequence;
+    private double percG_sequence;
+    private double percC_sequence;
+    private double percU_sequence;
+    private double relativePos;
+    private boolean reversed;
+    private double mfe;
+    private List<Integer> additionalSeqLocations;
 
     /**
      *
@@ -182,9 +187,11 @@ public class StemLoop {
         this.relativePos = 0.0;
         this.predecessorLoop = 0;
         this.predecessor2Loop = 0;
-        this.n2Loop = this.n5Loop = this.n6Loop
-                = this.n7Loop = this.n8Loop = 0;
-
+        this.n2Loop = 0;
+        this.n5Loop = 0;
+        this.n6Loop = 0;
+        this.n7Loop = 0;
+        this.n8Loop = 0;
         this.mfe = (float) 0.0;
         this.viennaStructure = "";
         this.additional5Seq = "";
@@ -197,7 +204,7 @@ public class StemLoop {
      * @return
      */
     public int getMismatches() {
-        return bulge;
+        return getBulge();
     }
 
     /**
@@ -205,7 +212,7 @@ public class StemLoop {
      * @param invert
      */
     public void setReverse(boolean invert) {
-        this.reversed = invert;
+        this.setReversed(invert);
     }
 
     /**
@@ -213,7 +220,7 @@ public class StemLoop {
      * @return
      */
     public boolean getReversed() {
-        return reversed;
+        return isReversed();
     }
 
     /**
@@ -221,7 +228,7 @@ public class StemLoop {
      * @param mismatches
      */
     public void setMismatches(int mismatches) {
-        this.bulge = mismatches;
+        this.setBulge(mismatches);
     }
 
     /**
@@ -281,7 +288,6 @@ public class StemLoop {
 
         return header
                 + "LoopPattern" + SourceFile.ROW_DELIMITER
-                //+ "LoopID" + SourceFile.ROW_DELIMITER
                 + "TerminalPair" + SourceFile.ROW_DELIMITER
                 + "Sense" + SourceFile.ROW_DELIMITER
                 + "N-2" + SourceFile.ROW_DELIMITER
@@ -327,7 +333,7 @@ public class StemLoop {
     }
 
     public String isReverse() {
-        if (!this.reversed) {
+        if (!this.isReversed()) {
             return "+";
         } else {
             return "-";
@@ -339,7 +345,7 @@ public class StemLoop {
      * @return
      */
     public String getGeneID() {
-        return this.id_fasta.getGeneID();
+        return this.getId_fasta().getGeneID();
     }
 
     /**
@@ -347,8 +353,8 @@ public class StemLoop {
      * @return
      */
     public String getGeneSymbol() {
-        if (this.id_fasta.getGeneSymbol() != null) {
-            return this.id_fasta.getGeneSymbol();
+        if (this.getId_fasta().getGeneSymbol() != null) {
+            return this.getId_fasta().getGeneSymbol();
         } else {
             return "";
         }
@@ -359,7 +365,7 @@ public class StemLoop {
      * @return
      */
     public String getGUPairs() {
-        long pairs = Math.round(this.percent_GU * this.getPairments());
+        long pairs = Math.round(this.getPercent_GU() * this.getPairments());
 
         return pairs + "";
     }
@@ -380,7 +386,7 @@ public class StemLoop {
 
         String theLoop = this.loop;
 
-        if (reversed) {
+        if (isReversed()) {
             theLoop = reverseIt(theLoop);
         }
 
@@ -394,15 +400,15 @@ public class StemLoop {
     public String getLoopID() {
         String theLoop, terminal;
 
-        theLoop = this.loop;
+        theLoop = this.getLoop();
         terminal = this.getTerminalPair();
 
-        if (reversed) {
+        if (isReversed()) {
             theLoop = reverseIt(theLoop);
             terminal = reverseIt(terminal);
         }
 
-        return this.predecessorLoop + theLoop
+        return this.getPredecessorLoop() + theLoop
                 + "(" + terminal + ")|" + this.getPairments();
     }
 
@@ -543,8 +549,8 @@ public class StemLoop {
 
         Integer count = 0;
 
-        if (this.additionalSeqLocations != null) {
-            count = this.additionalSeqLocations.size();
+        if (this.getAdditionalSeqLocations() != null) {
+            count = this.getAdditionalSeqLocations().size();
         }
 
         return count.toString();
@@ -558,11 +564,11 @@ public class StemLoop {
 
         String locations = ""; //$NON-NLS-1$
 
-        if (this.additionalSeqLocations == null) {
+        if (this.getAdditionalSeqLocations() == null) {
             return "";
         }
 
-        Iterator<Integer> itr = this.additionalSeqLocations.iterator();
+        Iterator<Integer> itr = this.getAdditionalSeqLocations().iterator();
 
         while (itr.hasNext()) {
 
@@ -607,7 +613,7 @@ public class StemLoop {
      * @return
      */
     public int getPairments() {
-        int count = StringUtils.countMatches(viennaStructure, "(");
+        int count = StringUtils.countMatches(getViennaStructure(), "(");
         return count;
     }
 
@@ -616,8 +622,8 @@ public class StemLoop {
      * @return
      */
     public String getTerminalPair() {
-        Character a = rnaHairpinSequence.charAt(viennaStructure.lastIndexOf("("));
-        Character b = rnaHairpinSequence.charAt(viennaStructure.indexOf(")"));
+        Character a = getRnaHairpinSequence().charAt(getViennaStructure().lastIndexOf("("));
+        Character b = getRnaHairpinSequence().charAt(getViennaStructure().indexOf(")"));
 
         return a.toString() + b.toString();
     }
@@ -627,7 +633,7 @@ public class StemLoop {
      * @return
      */
     public String getTranscriptID() {
-        return this.id_fasta.getTranscriptID();
+        return this.getId_fasta().getTranscriptID();
     }
 
     /**
@@ -647,21 +653,21 @@ public class StemLoop {
     }
 
     public void setLocation(int pos) {
-        ((GenBankID) id_fasta).setLocation(pos);
+        ((GenBankID) getId_fasta()).setLocation(pos);
     }
 
     /**
-     *
+     * 
      */
     public void checkPairments() {
 
-        String seq = this.rnaHairpinSequence;
+        String seq = this.getRnaHairpinSequence();
         int woobleCount = 0;
         int CG = 0, AU = 0;
-        StringBuilder aux = new StringBuilder(this.viennaStructure);
-        int firstIzq = 1;
+        StringBuilder aux = new StringBuilder(this.getViennaStructure());
+        int firstIzq;
 
-        if (this.loop.isEmpty() || this.viennaStructure.isEmpty()) {
+        if (this.getLoop().isEmpty() || this.getViennaStructure().isEmpty()) {
             return;
         }
 
@@ -672,28 +678,32 @@ public class StemLoop {
         bulge = StringUtils.countMatches(this.viennaStructure, "..(")
                 + StringUtils.countMatches(this.viennaStructure, ")..");*/
         try {
-            firstIzq = this.viennaStructure.lastIndexOf('(');
-            int firstDer = this.viennaStructure.indexOf(')');
+            firstIzq = this.getViennaStructure().lastIndexOf('(');
+            int firstDer = this.getViennaStructure().indexOf(')');
 
-            for (int i = firstIzq; i >= 0 && firstDer < viennaStructure.length(); i--) {
-                if (viennaStructure.charAt(i) == '(') {
-                    while (viennaStructure.charAt(firstDer) != ')') {
+            for (int i = firstIzq; i >= 0 && firstDer < 
+                    getViennaStructure().length(); i--) {
+                if (getViennaStructure().charAt(i) == '(') {
+                    while (getViennaStructure().charAt(firstDer) != ')') {
                         firstDer++;
                     }
 
-                    if (viennaStructure.charAt(firstDer) == ')') {
-                        if (SequenceAnalizer.isComplementaryRNAWooble(seq.charAt(i), seq.charAt(firstDer))) {
+                    if (getViennaStructure().charAt(firstDer) == ')') {
+                        if (SequenceAnalizer.isComplementaryRNAWooble(
+                                seq.charAt(i), seq.charAt(firstDer))) {
                             aux.setCharAt(i, '{');
                             aux.setCharAt(firstDer, '}');
                             woobleCount++;
                         } else {
                             if ((seq.charAt(i) == 'U' && seq.charAt(firstDer) == 'A')
-                                    || (seq.charAt(i) == 'A' && seq.charAt(firstDer) == 'U')) {
+                                    || (seq.charAt(i) == 'A' 
+                                    && seq.charAt(firstDer) == 'U')) {
                                 AU++;
                             }
 
                             if ((seq.charAt(i) == 'C' && seq.charAt(firstDer) == 'G')
-                                    || (seq.charAt(i) == 'G' && seq.charAt(firstDer) == 'C')) {
+                                    || (seq.charAt(i) == 'G' 
+                                    && seq.charAt(firstDer) == 'C')) {
                                 CG++;
                             }
                         }
@@ -706,36 +716,19 @@ public class StemLoop {
         } catch (Exception e) {
             System.out.println("checkPairments-ERROR: " + e.getMessage());
         }
-        this.hairpinStructure = aux.toString();
-        this.percent_AU = (double) AU / (double) (AU + CG + woobleCount);
-        this.percent_CG = (double) CG / (double) (AU + CG + woobleCount);
-        this.percent_GU = (double) woobleCount / (double) (AU + CG + woobleCount);
-        //this.setMismatches(mismatch);
-        //this.internalLoops = bulge;
-
+        this.setHairpinStructure(aux.toString());
+        this.setPercent_AU(AU / (double) (AU + CG + woobleCount));
+        this.setPercent_CG(CG / (double) (AU + CG + woobleCount));
+        this.setPercent_GU(woobleCount / (double) (AU + CG + woobleCount));
     }
 
-    /*public static void main(String []args){
-       String a =  "((.((...(((.........)))...)).))";
-       String b =   "((((.(((((((.((....)).)))))))))))";
-       String c =   "((((((((...((((....))))...))))))))";
-       String d =   "(((((((..(((((.....))))))))))))";
-       String e =   "(((((((.....)))).)))";
-
-       StemLoop sl = new StemLoop(InputSequence.BIOMART);
-       sl.viennaStructure = e;
-       sl.checkInternalLoops();
-       
-       out.println("Internal: " + sl.internalLoops);
-       out.println("Bulges: " + sl.bulge);
-    }*/
     /**
-     *
+     * 
      */
     public void checkInternalLoops() {
-        this.internalLoops = 0;
-        this.bulge = 0;
-        String auxStruct = this.viennaStructure;
+        this.setInternalLoops(0);
+        this.setBulge(0);
+        String auxStruct = this.getViennaStructure();
         int len, aux, auxI;
         auxStruct = auxStruct.replaceAll("\\.", "a");
         auxStruct = auxStruct.replaceAll("([a-z])\\1+", "$1");
@@ -743,26 +736,19 @@ public class StemLoop {
         len = auxStruct.length();
         aux = auxStruct.indexOf(")");
         auxI = auxStruct.lastIndexOf("(");
-
-        //out.println(auxStruct);
-        //out.println(auxStruct.length());
+        
         for (int i = 0; (auxI - i) >= 0 && (aux + i) < len; i++) {
 
             if (auxStruct.charAt(auxI - i) == 'a'
                     && auxStruct.charAt(aux + i) == 'a') {
-                this.internalLoops++;
+                this.setInternalLoops(this.getInternalLoops() + 1);
             } else if ((auxStruct.charAt(auxI - i) == 'a'
                     && auxStruct.charAt(aux + i) != 'a')
                     || (auxStruct.charAt(auxI - i) != 'a'
                     && auxStruct.charAt(aux + i) == 'a')) {
-                /*out.println("auxI-i: " + (auxI - i) + " : " 
-                        + auxStruct.charAt(auxI-i) );
-                out.println("aux+i: " +(aux + i)+ ": " 
-                        + auxStruct.charAt(aux + i) );*/
-                this.bulge++;
+                this.setBulge(this.getBulge() + 1);
             }
         }
-
     }
 
     /**
@@ -770,41 +756,49 @@ public class StemLoop {
      * @param startPosLoop
      */
     public void setNLoop(int startPosLoop) {
-        char n2 = ' ', n5 = ' ', n6 = ' ', n7 = ' ', n8 = ' ';
-        char precedes = ' ', precedes2 = ' ';
-        int matchFirst, matchLast;
+        char n2 = ' ', 
+                n5 = ' ', 
+                n6 = ' ', 
+                n7 = ' ',
+                n8 = ' ';
+        char precedes = ' ', 
+                precedes2 = ' ';
+        int matchFirst, 
+                matchLast,
+                startPos;
+        
+        startPos = startPosLoop;
 
-        if (reversed) {
-            this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
+        if (isReversed()) {
+            this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
 
-            matchFirst = rnaHairpinSequence.indexOf(reverseIt(loop));
-            matchLast = rnaHairpinSequence.lastIndexOf(reverseIt(loop));
+            matchFirst = getRnaHairpinSequence().indexOf(reverseIt(getLoop()));
+            matchLast = getRnaHairpinSequence().lastIndexOf(reverseIt(getLoop()));
 
             if (matchFirst == matchLast) {
-                startPosLoop = matchFirst;
+                startPos = matchFirst;
             } else {
-                startPosLoop = matchLast;
+                startPos = matchLast;
             }
-
         }
 
-        if (this.rnaHairpinSequence != null) {
+        if (this.getRnaHairpinSequence() != null) {
 
-            n2 = this.rnaHairpinSequence.charAt(startPosLoop + 1);
-            precedes = this.rnaHairpinSequence.charAt(startPosLoop - 1);
-            precedes2 = this.rnaHairpinSequence.charAt(startPosLoop - 2);
+            n2 = this.getRnaHairpinSequence().charAt(startPos + 1);
+            precedes = this.getRnaHairpinSequence().charAt(startPos - 1);
+            precedes2 = this.getRnaHairpinSequence().charAt(startPos - 2);
 
-            if (this.loop.length() > 4) {
-                n5 = this.rnaHairpinSequence.charAt(startPosLoop + 4);
+            if (this.getLoop().length() > 4) {
+                n5 = this.getRnaHairpinSequence().charAt(startPos + 4);
 
-                if (this.loop.length() > 5) {
-                    n6 = this.rnaHairpinSequence.charAt(startPosLoop + 5);
+                if (this.getLoop().length() > 5) {
+                    n6 = this.getRnaHairpinSequence().charAt(startPos + 5);
 
-                    if (this.loop.length() > 6) {
-                        n7 = this.rnaHairpinSequence.charAt(startPosLoop + 6);
+                    if (this.getLoop().length() > 6) {
+                        n7 = this.getRnaHairpinSequence().charAt(startPos + 6);
 
-                        if (this.loop.length() > 7) {
-                            n8 = this.rnaHairpinSequence.charAt(startPosLoop + 7);
+                        if (this.getLoop().length() > 7) {
+                            n8 = this.getRnaHairpinSequence().charAt(startPos + 7);
                         }
 
                     }
@@ -812,16 +806,16 @@ public class StemLoop {
             }
         }
 
-        this.n2Loop = n2;
-        this.n5Loop = n5;
-        this.n6Loop = n6;
-        this.n7Loop = n7;
-        this.n8Loop = n8;
-        this.predecessorLoop = precedes;
-        this.predecessor2Loop = precedes2;
+        this.setN2Loop(n2);
+        this.setN5Loop(n5);
+        this.setN6Loop(n6);
+        this.setN7Loop(n7);
+        this.setN8Loop(n8);
+        this.setPredecessorLoop(precedes);
+        this.setPredecessor2Loop(precedes2);
 
-        if (reversed) {
-            this.rnaHairpinSequence = reverseIt(this.rnaHairpinSequence);
+        if (isReversed()) {
+            this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
         }
     }
 
@@ -848,18 +842,17 @@ public class StemLoop {
 
         float myPercent_AG = 0;
         int count;
-        count = 0;
         String aux;
-        aux = rnaHairpinSequence;
+        aux = getRnaHairpinSequence();
 
         if (aux != null) {
-            count = aux.length() - aux.replace("A", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
-            count += aux.length() - aux.replace("G", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
+            count = aux.length() - aux.replace("A", "").length(); 
+            count += aux.length() - aux.replace("G", "").length();
 
-            myPercent_AG = new Float(count) / new Float(aux.length());
+            myPercent_AG = count / (float) aux.length();
         }
 
-        this.percent_AG = myPercent_AG;
+        this.setPercent_AG(myPercent_AG);
     }
 
     /**
@@ -875,7 +868,7 @@ public class StemLoop {
      * @param mfe
      */
     public void setMfe(Double mfe) {
-        this.mfe = mfe;
+        this.setMfe((double) mfe);
     }
 
     /**
@@ -883,7 +876,7 @@ public class StemLoop {
      * @return
      */
     public String getStructure() {
-        return viennaStructure;
+        return getViennaStructure();
     }
 
     /**
@@ -891,18 +884,18 @@ public class StemLoop {
      * @param structure
      */
     public void setStructure(String structure) {
-        this.viennaStructure = structure;
+        this.setViennaStructure(structure);
     }
 
     /**
      *
      */
     public void setPercent_AU() {
-        float percentAU = 0;
+        float percentAU;
         int count = 0;
-        int size = 0;
-        String aux = rnaHairpinSequence;
-        size = (aux.length() - loop.length()) / 2;
+        int size;
+        String aux = getRnaHairpinSequence();
+        size = (aux.length() - getLoop().length()) / 2;
 
         for (int i = 0; i < size; i++) {
 
@@ -912,9 +905,9 @@ public class StemLoop {
             }
         }
 
-        percentAU = new Float(count) / new Float(size);
+        percentAU = count / (float) size;
 
-        this.percent_AU = percentAU;
+        this.setPercent_AU(percentAU);
     }
 
     /**
@@ -922,12 +915,10 @@ public class StemLoop {
      */
     public void setPercent_CG() {
         float percentCG;
-        percentCG = 0;
         int count = 0;
         int size;
-        size = 0;
-        String aux = rnaHairpinSequence;
-        size = (aux.length() - loop.length()) / 2;
+        String aux = getRnaHairpinSequence();
+        size = (aux.length() - getLoop().length()) / 2;
 
         for (int i = 0; i < size; i++) {
 
@@ -937,9 +928,9 @@ public class StemLoop {
             }
         }
 
-        percentCG = new Float(count) / new Float(size);
+        percentCG = count / (float) size;
 
-        this.percent_CG = percentCG;
+        this.setPercent_CG(percentCG);
     }
 
     /**
@@ -949,13 +940,13 @@ public class StemLoop {
     public void setPercent_GU(int wooble) {
         float percentGU;
         int size;
-        String aux = rnaHairpinSequence;
-        size = (aux.length() - this.loop.length()) / 2;
+        String aux = getRnaHairpinSequence();
+        size = (aux.length() - this.getLoop().length()) / 2;
 
         aux = aux.substring(0, size);
 
-        percentGU = new Float(wooble) / new Float(aux.length());
-        this.percent_GU = percentGU;
+        percentGU = (float) wooble / aux.length();
+        this.setPercent_GU(percentGU);
     }
 
     /**
@@ -974,12 +965,13 @@ public class StemLoop {
         this.percU_sequence = percU_sequence;
     }
 
+    
     /**
-     *
-     * @param pumilioLocations
+     * 
+     * @param locations 
      */
-    public void setAdditionalSeqLocations(List<Integer> pumilioLocations) {
-        this.additionalSeqLocations = pumilioLocations;
+    public void setAdditionalSeqLocations(List<Integer> locations) {
+        this.additionalSeqLocations = locations;
     }
 
     /**
@@ -1011,18 +1003,18 @@ public class StemLoop {
      * @param id
      */
     public void setTags(String id) {
-        switch (this.mode) {
+        switch (this.getMode()) {
             case ENSEMBL:
-                ((EnsemblFastaID) id_fasta).setEnsemblTags(id);
+                ((EnsemblFastaID) getId_fasta()).setEnsemblTags(id);
                 break;
             case FLYBASE:
-                ((FlyBaseFastaID) id_fasta).setFlyBaseTags(id);
+                ((FlyBaseFastaID) getId_fasta()).setFlyBaseTags(id);
                 break;
             case BIOMART:
-                ((BioMartFastaID) id_fasta).setBioMartTags(id);
+                ((BioMartFastaID) getId_fasta()).setBioMartTags(id);
                 break;
             case GENERIC:
-                ((GenericID) id_fasta).setGenericTags(id);
+                ((GenericID) getId_fasta()).setGenericTags(id);
                 break;
         }
     }
@@ -1038,11 +1030,11 @@ public class StemLoop {
     public void setTags(String gene, String synonym, String transcript,
             String description,
             String cds) {
-        id_fasta.setGeneID(gene);
-        id_fasta.setTranscriptID(transcript);
-        ((GenBankID) id_fasta).setDescription(description);
-        ((GenBankID) id_fasta).setCDS(cds);
-        ((GenBankID) id_fasta).setSynonym(synonym);
+        getId_fasta().setGeneID(gene);
+        getId_fasta().setTranscriptID(transcript);
+        ((GenBankID) getId_fasta()).setDescription(description);
+        ((GenBankID) getId_fasta()).setCDS(cds);
+        ((GenBankID) getId_fasta()).setSynonym(synonym);
     }
 
     /**
@@ -1051,43 +1043,252 @@ public class StemLoop {
      */
     public String toRowCSV() {
 
-        return this.id_fasta.toRowCSV()
+        return this.getId_fasta().toRowCSV()
                 + this.getLoopPattern() + SourceFile.ROW_DELIMITER
-                //+ this.getLoopID() + SourceFile.ROW_DELIMITER
                 + this.getTerminalPair() + SourceFile.ROW_DELIMITER
                 + this.isReverse() + SourceFile.ROW_DELIMITER
-                + this.predecessor2Loop + SourceFile.ROW_DELIMITER //n-2
-                + this.predecessorLoop + SourceFile.ROW_DELIMITER
-                + this.n2Loop + SourceFile.ROW_DELIMITER
-                + this.n5Loop + SourceFile.ROW_DELIMITER
-                + this.n6Loop + SourceFile.ROW_DELIMITER
-                + this.n7Loop + SourceFile.ROW_DELIMITER
-                + this.n8Loop + SourceFile.ROW_DELIMITER
+                + this.getPredecessor2Loop() + SourceFile.ROW_DELIMITER //n-2
+                + this.getPredecessorLoop() + SourceFile.ROW_DELIMITER
+                + this.getN2Loop() + SourceFile.ROW_DELIMITER
+                + this.getN5Loop() + SourceFile.ROW_DELIMITER
+                + this.getN6Loop() + SourceFile.ROW_DELIMITER
+                + this.getN7Loop() + SourceFile.ROW_DELIMITER
+                + this.getN8Loop() + SourceFile.ROW_DELIMITER
                 + this.getLoop() + SourceFile.ROW_DELIMITER
-                + this.rnaHairpinSequence + SourceFile.ROW_DELIMITER
-                + this.additional5Seq + SourceFile.ROW_DELIMITER
-                + this.additional3Seq + SourceFile.ROW_DELIMITER
+                + this.getRnaHairpinSequence() + SourceFile.ROW_DELIMITER
+                + this.getAdditional5Seq() + SourceFile.ROW_DELIMITER
+                + this.getAdditional3Seq() + SourceFile.ROW_DELIMITER
                 + this.getHairpinStructure() + SourceFile.ROW_DELIMITER
                 + this.getStructure() + SourceFile.ROW_DELIMITER
                 + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
                 + this.getGUPairs() + SourceFile.ROW_DELIMITER
                 + this.getMismatches() + SourceFile.ROW_DELIMITER
-                + this.internalLoops + SourceFile.ROW_DELIMITER
-                + this.sequenceLength + SourceFile.ROW_DELIMITER
-                + this.startsAt + SourceFile.ROW_DELIMITER
-                + this.endsAt + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percA_sequence) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percC_sequence) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percG_sequence) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percU_sequence) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percent_AU) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percent_CG) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percent_GU) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.percent_AG) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.mfe, 5) + SourceFile.ROW_DELIMITER
-                + getFormattedNumber(this.relativePos) + SourceFile.ROW_DELIMITER
+                + this.getInternalLoops() + SourceFile.ROW_DELIMITER
+                + this.getSequenceLength() + SourceFile.ROW_DELIMITER
+                + this.getStartsAt() + SourceFile.ROW_DELIMITER
+                + this.getEndsAt() + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercA_sequence()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercC_sequence()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercG_sequence()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercU_sequence()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercent_AU()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercent_CG()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercent_GU()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getPercent_AG()) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getMfe(), 5) + SourceFile.ROW_DELIMITER
+                + getFormattedNumber(this.getRelativePos()) + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceCount() + SourceFile.ROW_DELIMITER
                 + this.getAdditionalSequenceLocations() + SourceFile.ROW_DELIMITER;
+    }
+
+    /**
+     * @return the additionalSeqLocations
+     */
+    public List<Integer> getAdditionalSeqLocations() {
+        return additionalSeqLocations;
+    }
+
+    /**
+     * @return the bulge
+     */
+    public int getBulge() {
+        return bulge;
+    }
+
+    /**
+     * @return the id_fasta
+     */
+    public SourceFile getId_fasta() {
+        return id_fasta;
+    }
+
+    /**
+     * @return the internalLoops
+     */
+    public int getInternalLoops() {
+        return internalLoops;
+    }
+
+    /**
+     * @return the predecessor2Loop
+     */
+    public char getPredecessor2Loop() {
+        return predecessor2Loop;
+    }
+
+    /**
+     * @return the viennaStructure
+     */
+    public String getViennaStructure() {
+        return viennaStructure;
+    }
+
+    /**
+     * @return the reversed
+     */
+    public boolean isReversed() {
+        return reversed;
+    }
+
+    /**
+     * @param bulge the bulge to set
+     */
+    public void setBulge(int bulge) {
+        this.bulge = bulge;
+    }
+
+    /**
+     * @param hairpinStructure the hairpinStructure to set
+     */
+    public void setHairpinStructure(String hairpinStructure) {
+        this.hairpinStructure = hairpinStructure;
+    }
+
+    /**
+     * @param id_fasta the id_fasta to set
+     */
+    public void setId_fasta(SourceFile id_fasta) {
+        this.id_fasta = id_fasta;
+    }
+
+    /**
+     * @param internalLoops the internalLoops to set
+     */
+    public void setInternalLoops(int internalLoops) {
+        this.internalLoops = internalLoops;
+    }
+
+    /**
+     * @param mfe the mfe to set
+     */
+    public void setMfe(double mfe) {
+        this.mfe = mfe;
+    }
+
+    /**
+     * @param mode the mode to set
+     */
+    public void setMode(InputSequence mode) {
+        this.mode = mode;
+    }
+
+    /**
+     * @param n2Loop the n2Loop to set
+     */
+    public void setN2Loop(char n2Loop) {
+        this.n2Loop = n2Loop;
+    }
+
+    /**
+     * @param n5Loop the n5Loop to set
+     */
+    public void setN5Loop(char n5Loop) {
+        this.n5Loop = n5Loop;
+    }
+
+    /**
+     * @param n6Loop the n6Loop to set
+     */
+    public void setN6Loop(char n6Loop) {
+        this.n6Loop = n6Loop;
+    }
+
+    /**
+     * @param n7Loop the n7Loop to set
+     */
+    public void setN7Loop(char n7Loop) {
+        this.n7Loop = n7Loop;
+    }
+
+    /**
+     * @param n8Loop the n8Loop to set
+     */
+    public void setN8Loop(char n8Loop) {
+        this.n8Loop = n8Loop;
+    }
+
+    /**
+     * @param percA_sequence the percA_sequence to set
+     */
+    public void setPercA_sequence(double percA_sequence) {
+        this.percA_sequence = percA_sequence;
+    }
+
+    /**
+     * @param percC_sequence the percC_sequence to set
+     */
+    public void setPercC_sequence(double percC_sequence) {
+        this.percC_sequence = percC_sequence;
+    }
+
+    /**
+     * @param percG_sequence the percG_sequence to set
+     */
+    public void setPercG_sequence(double percG_sequence) {
+        this.percG_sequence = percG_sequence;
+    }
+
+    /**
+     * @param percU_sequence the percU_sequence to set
+     */
+    public void setPercU_sequence(double percU_sequence) {
+        this.percU_sequence = percU_sequence;
+    }
+
+    /**
+     * @param percent_AG the percent_AG to set
+     */
+    public void setPercent_AG(double percent_AG) {
+        this.percent_AG = percent_AG;
+    }
+
+    /**
+     * @param percent_AU the percent_AU to set
+     */
+    public void setPercent_AU(double percent_AU) {
+        this.percent_AU = percent_AU;
+    }
+
+    /**
+     * @param percent_CG the percent_CG to set
+     */
+    public void setPercent_CG(double percent_CG) {
+        this.percent_CG = percent_CG;
+    }
+
+    /**
+     * @param percent_GU the percent_GU to set
+     */
+    public void setPercent_GU(double percent_GU) {
+        this.percent_GU = percent_GU;
+    }
+
+    /**
+     * @param predecessor2Loop the predecessor2Loop to set
+     */
+    public void setPredecessor2Loop(char predecessor2Loop) {
+        this.predecessor2Loop = predecessor2Loop;
+    }
+
+    /**
+     * @param predecessorLoop the predecessorLoop to set
+     */
+    public void setPredecessorLoop(char predecessorLoop) {
+        this.predecessorLoop = predecessorLoop;
+    }
+
+    /**
+     * @param reversed the reversed to set
+     */
+    public void setReversed(boolean reversed) {
+        this.reversed = reversed;
+    }
+
+    /**
+     * @param viennaStructure the viennaStructure to set
+     */
+    public void setViennaStructure(String viennaStructure) {
+        this.viennaStructure = viennaStructure;
     }
 
 }

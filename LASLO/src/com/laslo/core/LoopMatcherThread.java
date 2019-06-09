@@ -34,22 +34,22 @@ import org.biojava.nbio.core.sequence.DNASequence;
  */
 public class LoopMatcherThread implements Runnable {
 
-    protected boolean extendedMode;
-    protected boolean searchReverse;
-    protected String additionalSequence;
-    protected int maxLength;
-    protected int minLength;
-    protected InputSequence inputType;
-    protected Iterator<String> patternItr;
-    protected CSVWriter writer;
-    protected DNASequence dnaElement;
-    protected final static Semaphore MUTEX = new Semaphore(1);
-    protected static Semaphore SEM;
+    private boolean extendedMode;
+    private boolean searchReverse;
+    private String additionalSequence;
+    private int maxLength;
+    private int minLength;
+    private InputSequence inputType;
+    private Iterator<String> patternItr;
+    private CSVWriter writer;
+    private DNASequence dnaElement;
+    private static Semaphore MUTEX = new Semaphore(1);
+    private static Semaphore SEM;
     private static boolean started = false;
     private CountDownLatch latch;
-
+    
     /**
-     *
+     * 
      * @param extendedMode
      * @param additionalSequence
      * @param maxLength
@@ -58,14 +58,14 @@ public class LoopMatcherThread implements Runnable {
      * @param inputType
      * @param patternItr
      * @param writer
-     * @param searchReverse
+     * @param searchReverse 
      */
     public LoopMatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse) {
 
-        int count = 0;
+        int count;
         this.extendedMode = extendedMode;
         this.additionalSequence = additionalSequence;
         this.maxLength = maxLength;
@@ -81,21 +81,13 @@ public class LoopMatcherThread implements Runnable {
             count = OSValidator.getNumberOfCPUCores();
 
             if (count > 1) {
-                count = count - 1;
+                count -= 1;
             }
 
             out.println("[Using " + count + " CPU cores.]");
             SEM = new Semaphore(count);
             started = true;
         }
-    }
-
-    /**
-     *
-     * @param latch
-     */
-    public void setLatch(CountDownLatch latch) {
-        this.latch = latch;
     }
 
     /**
@@ -107,65 +99,245 @@ public class LoopMatcherThread implements Runnable {
         RNAfold fold = new RNAfold();
 
         // sólo para modo dos
-        if (extendedMode) {
-            fold = new RNAfold(dnaElement.getRNASequence()
+        if (isExtendedMode()) {
+            fold = new RNAfold(getDnaElement().getRNASequence()
                     .getSequenceAsString());
         }
         // III. Loop level
-        while (patternItr.hasNext()) {
+        while (getPatternItr().hasNext()) {
 
-            String currentPattern = patternItr.next().trim().toUpperCase();
+            String currentPattern = getPatternItr().next().trim().toUpperCase();
 
             // 1. Stem research
-            if (extendedMode) {
-
+            if (isExtendedMode()) {
+                
                 try {
-                    SEM.acquire();
-                    sequenceExtendedResearch(
-                            dnaElement, 
+                    getSEM().acquire();
+                    sequenceExtendedResearch(getDnaElement(), 
                             fold.getStructure(),
-                            currentPattern, writer, 
-                            false, maxLength, minLength,
-                            inputType, additionalSequence);
+                            currentPattern, getWriter(), false, getMaxLength(), 
+                            getMinLength(), getInputType(), 
+                            getAdditionalSequence());
                 } catch (InterruptedException ex) {
                     out.println("ERROR: " + ex.getMessage());
                 } finally {
-                    SEM.release();
-                } 
-
-                if (searchReverse) {
+                    getSEM().release();
+                }
+                
+                if (isSearchReverse()) {
                     try {
-                        SEM.acquire();
-                        sequenceExtendedResearch(
-                                dnaElement,
+                        getSEM().acquire();
+                        sequenceExtendedResearch(getDnaElement(),
                                 fold.getStructure(), 
-                                currentPattern, writer,
-                                true, maxLength, minLength, 
-                                inputType, additionalSequence);
+                                currentPattern, getWriter(), true, getMaxLength(), 
+                                getMinLength(), getInputType(), 
+                                getAdditionalSequence());
                     } catch (InterruptedException ex) {
                         out.println("ERROR: " + ex.getMessage());
                     } finally {
-                        SEM.release();
+                        getSEM().release();
                     }
                 }
             } else {
-
-                SequenceAnalizer.sequenceResearch(dnaElement, currentPattern, 
-                        writer, false, maxLength, minLength, inputType, 
-                        additionalSequence);
-
-                if (searchReverse) {
-                    SequenceAnalizer.sequenceResearch(dnaElement, currentPattern, 
-                        writer, true, maxLength, minLength, inputType, 
-                        additionalSequence);
+                
+                SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern, 
+                        getWriter(), false, getMaxLength(), getMinLength(), 
+                        getInputType(), getAdditionalSequence());
+                
+                if (isSearchReverse()) {
+                    SequenceAnalizer.sequenceResearch(getDnaElement(), 
+                            currentPattern, getWriter(), true, getMaxLength(), 
+                            getMinLength(), getInputType(), 
+                            getAdditionalSequence());
                 }
-
+                
             }
         }
 
-        latch.countDown();
-
+        getLatch().countDown();
     }
 
+    /**
+     * @return the additionalSequence
+     */
+    public String getAdditionalSequence() {
+        return additionalSequence;
+    }
+
+    /**
+     * @return the dnaElement
+     */
+    public DNASequence getDnaElement() {
+        return dnaElement;
+    }
+
+    /**
+     * @return the inputType
+     */
+    public InputSequence getInputType() {
+        return inputType;
+    }
+
+    /**
+     * @return the latch
+     */
+    public CountDownLatch getLatch() {
+        return latch;
+    }
+
+    /**
+     * @return the maxLength
+     */
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    /**
+     * @return the minLength
+     */
+    public int getMinLength() {
+        return minLength;
+    }
+
+    /**
+     * @return the patternItr
+     */
+    public Iterator<String> getPatternItr() {
+        return patternItr;
+    }
+
+    /**
+     * @return the writer
+     */
+    public CSVWriter getWriter() {
+        return writer;
+    }
+
+    /**
+     * @return the extendedMode
+     */
+    public boolean isExtendedMode() {
+        return extendedMode;
+    }
+
+    /**
+     * @return the searchReverse
+     */
+    public boolean isSearchReverse() {
+        return searchReverse;
+    }
+
+    /**
+     * @param additionalSequence the additionalSequence to set
+     */
+    public void setAdditionalSequence(String additionalSequence) {
+        this.additionalSequence = additionalSequence;
+    }
+
+    /**
+     * @param dnaElement the dnaElement to set
+     */
+    public void setDnaElement(DNASequence dnaElement) {
+        this.dnaElement = dnaElement;
+    }
+
+    /**
+     * @param extendedMode the extendedMode to set
+     */
+    public void setExtendedMode(boolean extendedMode) {
+        this.extendedMode = extendedMode;
+    }
+
+    /**
+     * @param inputType the inputType to set
+     */
+    public void setInputType(InputSequence inputType) {
+        this.inputType = inputType;
+    }
+
+    /**
+     * @param maxLength the maxLength to set
+     */
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    }
+
+    /**
+     * @param minLength the minLength to set
+     */
+    public void setMinLength(int minLength) {
+        this.minLength = minLength;
+    }
+
+    /**
+     * @param patternItr the patternItr to set
+     */
+    public void setPatternItr(Iterator<String> patternItr) {
+        this.patternItr = patternItr;
+    }
+
+    /**
+     * @param searchReverse the searchReverse to set
+     */
+    public void setSearchReverse(boolean searchReverse) {
+        this.searchReverse = searchReverse;
+    }
+
+    /**
+     * @param writer the writer to set
+     */
+    public void setWriter(CSVWriter writer) {
+        this.writer = writer;
+    }
     
+    /**
+     * 
+     * @return 
+     */
+    public static Semaphore getMUTEX() {
+        return MUTEX;
+    }
+
+    /**
+     * @return the SEM
+     */
+    public static Semaphore getSEM() {
+        return SEM;
+    }
+
+    /**
+     * @return the started
+     */
+    public static boolean isStarted() {
+        return started;
+    }
+
+    /**
+     * @param aMUTEX the MUTEX to set
+     */
+    public static void setMUTEX(Semaphore aMUTEX) {
+        MUTEX = aMUTEX;
+    }
+
+    /**
+     * @param aSEM the SEM to set
+     */
+    public static void setSEM(Semaphore aSEM) {
+        SEM = aSEM;
+    }
+
+    /**
+     * @param aStarted the started to set
+     */
+    public static void setStarted(boolean aStarted) {
+        started = aStarted;
+    }
+    
+    /**
+     *
+     * @param latch
+     */
+    public void setLatch(CountDownLatch latch) {
+        this.latch = latch;
+    }
 }
