@@ -363,14 +363,18 @@ public class GUIFrame extends javax.swing.JFrame {
         jTALoopPatterns.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane1.setViewportView(jTALoopPatterns);
 
+        jftAdditionalSeq.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         try {
-            jftAdditionalSeq.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("UUUUUUUUUUUUUUUUUUUUUU")));
+            jftAdditionalSeq.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("UUUUUUUUUUUUUU")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        jftAdditionalSeq.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         jftAdditionalSeq.setToolTipText(bundle.getString("ADDITION_SEQ_TOOLTIP"));
         jftAdditionalSeq.setAutoscrolls(false);
+        jftAdditionalSeq.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
         jftAdditionalSeq.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jftAdditionalSeq.setVerifyInputWhenFocusTarget(false);
         jftAdditionalSeq.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jftAdditionalSeqActionPerformed(evt);
@@ -414,8 +418,8 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanOptionsLayout.createSequentialGroup()
                         .addComponent(jlSingleSequence, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jftAdditionalSeq)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
         );
         jPanOptionsLayout.setVerticalGroup(
@@ -441,9 +445,9 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jlSingleSequence)
-                    .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -470,7 +474,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTAConsole);
         jTAConsole.getAccessibleContext().setAccessibleName(bundle.getString("MONITOR")); // NOI18N
 
-        jLblError.setFont(new java.awt.Font("Calibri", 1, 12)); // NOI18N
+        jLblError.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         jLblError.setForeground(new java.awt.Color(255, 0, 0));
         jLblError.setText(bundle.getString("ERROR")); // NOI18N
 
@@ -496,7 +500,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jBStart)
                     .addComponent(jLblError))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
         );
 
         jTabInput.setBackground(javax.swing.UIManager.getDefaults().getColor("windowBorder"));
@@ -574,6 +578,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jrbNcbi.setSelected(true);
         jrbNcbi.setText("NCBI");
 
+        jLabel8.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
         jLabel8.setText(bundle.getString("NCBI_DESC")); // NOI18N
 
         javax.swing.GroupLayout jPanOnlineLayout = new javax.swing.GroupLayout(jPanOnline);
@@ -584,11 +589,11 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanOnlineLayout.createSequentialGroup()
-                        .addComponent(jrbNcbi, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jrbNcbi)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel8)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanOnlineLayout.setVerticalGroup(
@@ -673,7 +678,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanOptions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanConsole, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanConsole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -823,13 +828,12 @@ public class GUIFrame extends javax.swing.JFrame {
     private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
         // TODO add your handling code here:
         this.jRBen_EN.setSelected(false);
-        this.locale = new Locale("es", "AR");
+        this.locale = new Locale("es", "ES");
     }//GEN-LAST:event_jRBes_ARActionPerformed
 
     private void jRBen_ENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
         // TODO add your handling code here:
         jRBes_AR.setSelected(false);
-
         this.locale = new Locale("en", "US");
     }//GEN-LAST:event_jRBen_USActionPerformed
 
@@ -982,6 +986,7 @@ public class GUIFrame extends javax.swing.JFrame {
             this.jBStart.setText(bundle.getString("WAIT"));
         } else {
             this.jBStart.setText(bundle.getString("START"));
+            this.jTAConsole.setText("");
         }
     }
 
@@ -1175,7 +1180,7 @@ public class GUIFrame extends javax.swing.JFrame {
                         .replaceAll(" ", ""));
 
                 if (dnaFile == null) {
-                    throw new Exception("Can't connect to NCBI.");
+                    throw new Exception(bundle.getString("CANT_CONNECT_NCBI"));
                 }
             } catch (Exception ex) {
                 err.println("ERROR: " + ex.getLocalizedMessage());
@@ -1193,6 +1198,9 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // Start process
         out.flush();
+        out.println(bundle.getBaseBundleName() + " - " + bundle.getLocale().toString());
+        
+        
         loopCatcher.setBundle(bundle);
         loopCatcher.setLoopPatterns(loopList);
         loopCatcher.setAdditionalSequence(this.jftAdditionalSeq.getText().trim());
@@ -1208,7 +1216,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setNumberOfRandoms(randoms);
         loopCatcher.setkLetRandoms(klet);
         loopCatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
-
+        
         GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
                 this.jBStart, this.loopCatcher);
         worker.execute();

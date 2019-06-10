@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +39,24 @@ import org.biojava.nbio.core.sequence.features.Qualifier;
  */
 public class SequenceAnalizer {
 
+    private static ResourceBundle bundle;
+    
+    /**
+     * 
+     * @param newBundle 
+     */
+    public static void setBundle(ResourceBundle newBundle){
+        bundle = newBundle;
+    }
+    
+    /**
+     * 
+     * @return current bundle
+     */
+    public static ResourceBundle getBundle(){
+        return bundle;
+    }
+    
     /**
      * Validates if the predicted Vienna structure has the pattern desired.
      * @param minLength
@@ -144,7 +163,9 @@ public class SequenceAnalizer {
                 hairpin_ = hairpin_.substring(0, k + 1);
                 
             } catch (IndexOutOfBoundsException e) {
-                err.println("Error: " + e.getMessage());
+                err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {e.getMessage()}));
             }
         }
 
@@ -293,9 +314,9 @@ public class SequenceAnalizer {
                             fold = new RNAfold(rnaSeq);
                             
                         } catch (InterruptedException ex) {
-                            err.println("Error. " + 
-                                    SequenceAnalizer.class.getClass() 
-                                    + ": "  + ex.getMessage());
+                            err.printf(getBundle().getString("ERROR_CLASE"),
+                                    SequenceAnalizer.class.getClass(),
+                                    ex.getMessage());
                         } finally {
                             LoopMatcherThread.getSEM().release();
                         }
@@ -303,9 +324,8 @@ public class SequenceAnalizer {
                         hairpinModel = fold.getStructure();
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            err.println(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_NOT_MATCHING") 
-                                    + rnaSeq + " - "
-                                    + hairpinModel);
+                            err.printf(getBundle().getString("ERRORNOTMATCHING"),
+                                    rnaSeq, hairpinModel);
                         }
                         // check minimum free energy, must be < 0
                         if (fold.getMfe() >= 0.0 ) {
@@ -322,7 +342,9 @@ public class SequenceAnalizer {
                 }
                 
             } catch (Exception e) {
-                err.println("ERROR: " + e.getMessage());
+                err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {e.getMessage()}));
             }
 
             // extract output variables from the sequence
@@ -405,7 +427,9 @@ public class SequenceAnalizer {
                 LoopMatcherThread.getMUTEX().acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                err.println("ERROR: " + ex.getMessage());
+                err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -542,9 +566,8 @@ public class SequenceAnalizer {
                                         loopPos + loopLength + length);
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            err.println("Error. Not matching: " 
-                                    + rnaSeq + " - "
-                                    + hairpinModel);
+                            err.printf(getBundle().getString("ERRORNOTMATCHING"),
+                                    rnaSeq, hairpinModel);
                         }
                         
                         // check minimum free energy, must be < 0 ..not here..
@@ -560,7 +583,9 @@ public class SequenceAnalizer {
                 }
                 
             } catch (Exception e) {
-                err.println("ERROR: " + e.getMessage());
+                err.println(java.text.MessageFormat.format(
+                            getBundle().getString("ERROR_EX"), 
+                        new Object[] {e.getMessage()}));
             }
 
             // extract output variables from the sequence
@@ -643,7 +668,8 @@ public class SequenceAnalizer {
                 LoopMatcherThread.getMUTEX().acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                err.println("ERROR: " + ex.getMessage());
+                err.println(java.text.MessageFormat.format(
+                            getBundle().getString("ERROR_EX"), new Object[] {ex.getMessage()}));
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }

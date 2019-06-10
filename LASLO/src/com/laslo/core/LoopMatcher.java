@@ -104,7 +104,8 @@ public class LoopMatcher {
         this.numberOfRandoms = 0;
         this.additionalSequence = additionalSequence;
         this.kLetRandoms = kLetRandoms;
-        this.bundle = ResourceBundle. getBundle("resources/Bundle", locale);
+        this.bundle = ResourceBundle.getBundle("resources/Bundle", locale);
+        SequenceAnalizer.setBundle(bundle);
         this.searchReverse = searchReverse;
     }
 
@@ -114,7 +115,8 @@ public class LoopMatcher {
     public LoopMatcher() {
         this("", "", new ArrayList<>(), BiologicPatterns.PUM1,
                 InputSequence.ENSEMBL, //NOI18N
-                4, 16, 2, 0, new Locale("es", "AR"), 2, false);
+                4, 16, 2, 0, new Locale("es", "ES"), 2, false);
+        SequenceAnalizer.setBundle(bundle);
     }
 
     /**
@@ -389,7 +391,9 @@ public class LoopMatcher {
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            err.println("ERROR: " + e.getMessage());
+            err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {e.getMessage()}));
         }
     }
 
@@ -425,7 +429,7 @@ public class LoopMatcher {
         }
 
         if (this.isMakeRandoms()) {
-            out.print(java.util.ResourceBundle.getBundle("resources/Bundle").getString("MAKING_RANDOM_SEQUENCES"));
+            out.print(getBundle().getString("MAKING_RANDOM_SEQUENCES"));
             for (File currentFile : getFileList()) {
                 if (currentFile.isFile()
                         && (currentFile.toString().endsWith(getFASTA_EXT())
@@ -444,16 +448,19 @@ public class LoopMatcher {
                         }
 
                     } catch (IOException ex) {
-                        err.println("ERROR: " + ex.getMessage());
+                        err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
                     } catch (Exception ex) {
-                        err.println("ERROR: " + ex.getMessage());
+                        err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
                     }
                     UShuffle.makeShuffleSequences(getPathOut(), currentFile.getName(),
                             dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
                 }
             }
-            out.print(java.util.ResourceBundle
-                    .getBundle("resources/Bundle").getString("DONE"));
+            out.print(getBundle().getString("DONE"));
 
             File folder;
             folder = new File(getPathIn() + UShuffle.getRandomDir());
@@ -490,13 +497,14 @@ public class LoopMatcher {
     /**
      * Process the files selected
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public void callProcessThreads() {
 
         CSVWriter writer;
         boolean genbank;
         String fileName, fileOut;
         final int MAX_HILOS = 10;
-        int secuencias;
+        int totalSecuencias;
         int nHilos = MAX_HILOS;
         int i;
         int count;
@@ -524,8 +532,6 @@ public class LoopMatcher {
                     return;
                 }
             }
-
-            Calendar.getInstance();
 
             // Generation of the iterator of {id,sequence}
             LinkedHashMap<String, DNASequence> fasta;
@@ -578,18 +584,19 @@ public class LoopMatcher {
             i = 1;
 
             ini = Calendar.getInstance();
-            secuencias = 0;
-
+            totalSecuencias = fasta.entrySet().size();
+                    
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
 
                 DNASequence element = entry.getValue();
                 Iterator<String> patternItr = getLoopPatterns().iterator();
                 count++;
-                secuencias++;
+                
                 LoopMatcherThread thread = new LoopMatcherThread(
                         isExtendedMode(), getAdditionalSequence(), 
                         getMaxLength(), getMinLength(), element, 
-                        getInputType(), patternItr, writer, isSearchReverse());
+                        getInputType(), patternItr, writer, isSearchReverse(),
+                        bundle);
 
                 if (i++ <= nHilos) {
                     thread.setLatch(latch);
@@ -608,6 +615,13 @@ public class LoopMatcher {
                         latch = new CountDownLatch(nHilos);
                     }
                 }
+                
+                // Print
+                if(count/totalSecuencias % 15 == 0){
+                    out.printf(getBundle()
+                            .getString("PROGRESO"), count/(double)totalSecuencias);
+                }
+                
             }
 
             if (latch.getCount() > 0) {
@@ -626,19 +640,22 @@ public class LoopMatcher {
             fasta.clear();
 
             out.print(java.text.MessageFormat
-                    .format(java.util.ResourceBundle.getBundle("resources/Bundle")
-                            .getString("SEQUENCES"), new Object[] {secuencias}));
+                    .format(getBundle()
+                            .getString("SEQUENCES"), new Object[] {totalSecuencias}));
             fin = Calendar.getInstance();
-            out.print(java.text.MessageFormat.format(java.util.ResourceBundle
-                    .getBundle("resources/Bundle").getString("TIME"), 
+            out.print(java.text.MessageFormat.format(getBundle().getString("TIME"), 
                     new Object[] {(fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000}));
             out.println();
 
         } catch (FileNotFoundException ex) {
             err.println(getBundle().getString("CANT_OPEN_FILE"));
-            err.println("ERROR: " + ex.getMessage());
+            err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
         } catch (Exception ex) {
-            err.println("ERROR: " + ex.getMessage());
+            err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
         } 
     }
 

@@ -25,6 +25,7 @@ import static com.laslo.core.SequenceAnalizer.*;
 import com.tools.OSValidator;
 import static java.lang.System.err;
 import static java.lang.System.out;
+import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import org.biojava.nbio.core.sequence.DNASequence;
@@ -48,6 +49,7 @@ public class LoopMatcherThread implements Runnable {
     private static Semaphore SEM;
     private static boolean started = false;
     private CountDownLatch latch;
+    private ResourceBundle bundle;
     
     /**
      * 
@@ -60,11 +62,12 @@ public class LoopMatcherThread implements Runnable {
      * @param patternItr
      * @param writer
      * @param searchReverse 
+     * @param bundle
      */
     public LoopMatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
-            CSVWriter writer, boolean searchReverse) {
+            CSVWriter writer, boolean searchReverse, ResourceBundle bundle) {
 
         int count;
         this.extendedMode = extendedMode;
@@ -76,6 +79,7 @@ public class LoopMatcherThread implements Runnable {
         this.patternItr = patternItr;
         this.writer = writer;
         this.searchReverse = searchReverse;
+        this.bundle = bundle;
 
         if (!started) {
 
@@ -85,12 +89,24 @@ public class LoopMatcherThread implements Runnable {
                 count -= 1;
             }
 
-            out.println("[Using " + count + " CPU cores.]");
+            out.println(java.text.MessageFormat.format(bundle
+                    .getString("USING_N_CORES"), new Object[] {count}));
             SEM = new Semaphore(count);
             started = true;
         }
     }
 
+    /**
+     * @return the bundle
+     */
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+    
+    public void setBundle(ResourceBundle bundle){
+        this.bundle = bundle;
+    }
+    
     /**
      *
      */
@@ -120,7 +136,9 @@ public class LoopMatcherThread implements Runnable {
                             getMinLength(), getInputType(), 
                             getAdditionalSequence());
                 } catch (InterruptedException ex) {
-                    err.println("ERROR: " + ex.getMessage());
+                    err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
                 } finally {
                     getSEM().release();
                 }
@@ -133,8 +151,11 @@ public class LoopMatcherThread implements Runnable {
                                 currentPattern, getWriter(), true, getMaxLength(), 
                                 getMinLength(), getInputType(), 
                                 getAdditionalSequence());
+                        
                     } catch (InterruptedException ex) {
-                        err.println("ERROR: " + ex.getMessage());
+                        err.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
                     } finally {
                         getSEM().release();
                     }
