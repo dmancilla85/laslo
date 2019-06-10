@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.System.err;
+import static java.lang.System.out;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class UShuffle {
         String ext = ".fasta";
         String fileName = "fruitfly_chen";
 
-        System.out.println("Iniciando...");
+        out.println("Iniciando...");
         // Generation of the iterator of {id,sequence}
         LinkedHashMap<String, DNASequence> fasta = null;
         try {

@@ -29,9 +29,9 @@ import javax.swing.SwingWorker;
 class GUISwingWorker extends
         SwingWorker<Integer, Void> {
 
-    private final JTextArea textArea;
-    private final JButton button;
-    private final LoopMatcher loop;
+    private JTextArea textArea;
+    private JButton button;
+    private LoopMatcher loop;
     private boolean ok;
 
     /**
@@ -53,7 +53,7 @@ class GUISwingWorker extends
      */
     @Override
     protected Integer doInBackground() throws Exception {
-        this.ok = this.loop.startReadingFiles();
+        this.setOk(this.getLoop().startReadingFiles());
         return 1;
     }
 
@@ -63,13 +63,61 @@ class GUISwingWorker extends
     @Override
     protected void done() {
         System.out.flush();
-        //button.setEnabled(false);
     }
 
-    /*@Override
-     protected void process(List<Object[]> chunks) {
-         for (Object[] row : chunks) {
-             tableModel.addRow(row);
-         }
-     }*/
+    /**
+     * @return the button
+     */
+    public JButton getButton() {
+        return button;
+    }
+
+    /**
+     * @return the loop
+     */
+    public LoopMatcher getLoop() {
+        return loop;
+    }
+
+    /**
+     * @return the textArea
+     */
+    public JTextArea getTextArea() {
+        return textArea;
+    }
+
+    /**
+     * @return the ok
+     */
+    public boolean isOk() {
+        return ok;
+    }
+
+    /**
+     * @param button the button to set
+     */
+    public void setButton(JButton button) {
+        this.button = button;
+    }
+
+    /**
+     * @param loop the loop to set
+     */
+    public void setLoop(LoopMatcher loop) {
+        this.loop = loop;
+    }
+
+    /**
+     * @param ok the ok to set
+     */
+    public void setOk(boolean ok) {
+        this.ok = ok;
+    }
+
+    /**
+     * @param textArea the textArea to set
+     */
+    public void setTextArea(JTextArea textArea) {
+        this.textArea = textArea;
+    }
 }

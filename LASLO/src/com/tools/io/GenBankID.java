@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import static java.lang.System.err;
 import static java.lang.System.out;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -127,7 +128,7 @@ public class GenBankID extends SourceFile {
             }
 
         } catch (IOException e) {
-            out.println("ERROR: " + e.getLocalizedMessage());
+            err.println("ERROR: " + e.getLocalizedMessage());
         }
 
         return proxy;
@@ -178,15 +179,15 @@ public class GenBankID extends SourceFile {
                     .readGenbankDNASequence(ncbiGenbank.openStream());
             
         } catch (MalformedURLException ex) {
-            System.out.println("ERROR: Malformed URL Exception. Cause: "
+            err.println("ERROR: Malformed URL Exception. Cause: "
                     + ex.getCause().getLocalizedMessage());
             dnaFile = null;
         } catch (IOException ex) {
 
             if (ex.getLocalizedMessage().contains("400")) {
-                System.out.println("ERROR: " + genBankId + " code not found.");
+                err.println("ERROR: " + genBankId + " code not found.");
             } else {
-                System.out.println("ERROR: IO Exception. Cause: "
+                err.println("ERROR: IO Exception. Cause: "
                         + ex.getLocalizedMessage());
             }
             dnaFile = null;

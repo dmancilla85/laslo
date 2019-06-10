@@ -20,6 +20,8 @@ package com.tools;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import static java.lang.System.err;
+import static java.lang.System.out;
 
 /**
  * 
@@ -35,21 +37,21 @@ public class OSValidator {
      */
     public static void main(String[] args) {
 
-        System.out.println(OS);
+        out.println(OS);
 
         if (isWindows()) {
-            System.out.println("This is Windows");
+            out.println("This is Windows");
         } else if (isMac()) {
-            System.out.println("This is Mac");
+            out.println("This is Mac");
         } else if (isUnix()) {
-            System.out.println("This is Unix or Linux");
+            out.println("This is Unix or Linux");
         } else if (isSolaris()) {
-            System.out.println("This is Solaris");
+            out.println("This is Solaris");
         } else {
-            System.out.println("Your OS is not support!!");
+            out.println("Your OS is not support!!");
         }
 
-        System.out.println("Number of cores: " + getNumberOfCPUCores());
+        out.println("Number of cores: " + getNumberOfCPUCores());
     }
 
     /**

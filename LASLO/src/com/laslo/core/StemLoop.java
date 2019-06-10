@@ -25,6 +25,7 @@ import com.tools.io.SourceFile;
 import com.tools.io.FlyBaseFastaID;
 import com.tools.io.EnsemblFastaID;
 import com.tools.io.GenBankID;
+import static java.lang.System.err;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -714,7 +715,7 @@ public class StemLoop {
             }
 
         } catch (Exception e) {
-            System.out.println("checkPairments-ERROR: " + e.getMessage());
+            err.println("checkPairments-ERROR: " + e.getMessage());
         }
         this.setHairpinStructure(aux.toString());
         this.setPercent_AU(AU / (double) (AU + CG + woobleCount));

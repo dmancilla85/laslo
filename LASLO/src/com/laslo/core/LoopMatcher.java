@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -385,7 +386,7 @@ public class LoopMatcher {
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            out.println("ERROR: " + e.getMessage());
+            err.println("ERROR: " + e.getMessage());
         }
     }
 
@@ -440,9 +441,9 @@ public class LoopMatcher {
                         }
 
                     } catch (IOException ex) {
-                        out.println("ERROR: " + ex.getMessage());
+                        err.println("ERROR: " + ex.getMessage());
                     } catch (Exception ex) {
-                        out.println("ERROR: " + ex.getMessage());
+                        err.println("ERROR: " + ex.getMessage());
                     }
                     UShuffle.makeShuffleSequences(getPathOut(), currentFile.getName(),
                             dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
@@ -514,8 +515,8 @@ public class LoopMatcher {
                     (new File(fileOut)).delete();
 
                 } catch (Exception io) {
-                    out.println(io.getMessage());
-                    out.flush();
+                    err.println(io.getMessage());
+                    err.flush();
                     return;
                 }
             }
@@ -534,14 +535,14 @@ public class LoopMatcher {
             }
 
             if (fasta.isEmpty()) {
-                out.println(getBundle().getString("INVALID_FILE_FORMAT"));
-                out.println(getBundle().getString("TRYING_TO_FIX"));
+                err.println(getBundle().getString("INVALID_FILE_FORMAT"));
+                err.println(getBundle().getString("TRYING_TO_FIX"));
                 boolean formatFile = FASTACorrector
                         .formatFile(getActualFile().getAbsolutePath());
                 if (formatFile) {
                     fasta = readFastaDNASequence(getActualFile(), false);
                 } else {
-                    out.println(getBundle().getString("CANT_PROCESS"));
+                    err.println(getBundle().getString("CANT_PROCESS"));
                     return;
                 }
             }
@@ -627,10 +628,10 @@ public class LoopMatcher {
             out.println();
 
         } catch (FileNotFoundException ex) {
-            out.println(getBundle().getString("CANT_OPEN_FILE"));
-            out.println("ERROR: " + ex.getMessage());
+            err.println(getBundle().getString("CANT_OPEN_FILE"));
+            err.println("ERROR: " + ex.getMessage());
         } catch (Exception ex) {
-            out.println("ERROR: " + ex.getMessage());
+            err.println("ERROR: " + ex.getMessage());
         } 
     }
 

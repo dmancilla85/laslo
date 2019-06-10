@@ -20,6 +20,7 @@ package com.laslo.core;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.io.InputSequence;
+import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -145,7 +146,7 @@ public class SequenceAnalizer {
                 hairpin_ = hairpin_.substring(0, k + 1);
                 
             } catch (IndexOutOfBoundsException e) {
-                out.println("Error: " + e.getMessage());
+                err.println("Error: " + e.getMessage());
             }
         }
 
@@ -289,7 +290,7 @@ public class SequenceAnalizer {
                             fold = new RNAfold(rnaSeq);
                             
                         } catch (InterruptedException ex) {
-                            out.println("Error. " + 
+                            err.println("Error. " + 
                                     SequenceAnalizer.class.getClass() 
                                     + ": "  + ex.getMessage());
                         } finally {
@@ -299,7 +300,7 @@ public class SequenceAnalizer {
                         hairpinModel = fold.getStructure();
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            out.println("Error. Not matching: " 
+                            err.println("Error. Not matching: " 
                                     + rnaSeq + " - "
                                     + hairpinModel);
                         }
@@ -318,7 +319,7 @@ public class SequenceAnalizer {
                 }
                 
             } catch (Exception e) {
-                out.println("ERROR: " + e.getMessage());
+                err.println("ERROR: " + e.getMessage());
             }
 
             // extract output variables from the sequence
@@ -401,7 +402,7 @@ public class SequenceAnalizer {
                 LoopMatcherThread.getMUTEX().acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                out.println("ERROR: " + ex.getMessage());
+                err.println("ERROR: " + ex.getMessage());
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -540,7 +541,7 @@ public class SequenceAnalizer {
                                         loopPos + loopLength + length);
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            out.println("Error. Not matching: " 
+                            err.println("Error. Not matching: " 
                                     + rnaSeq + " - "
                                     + hairpinModel);
                         }
@@ -558,7 +559,7 @@ public class SequenceAnalizer {
                 }
                 
             } catch (Exception e) {
-                out.println("ERROR: " + e.getMessage());
+                err.println("ERROR: " + e.getMessage());
             }
 
             // extract output variables from the sequence
@@ -641,7 +642,7 @@ public class SequenceAnalizer {
                 LoopMatcherThread.getMUTEX().acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                out.println("ERROR: " + ex.getMessage());
+                err.println("ERROR: " + ex.getMessage());
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }

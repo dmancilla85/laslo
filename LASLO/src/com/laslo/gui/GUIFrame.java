@@ -30,6 +30,7 @@ import static java.awt.event.WindowEvent.WINDOW_CLOSING;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import static java.lang.System.err;
 import static java.lang.System.exit;
 import static java.lang.System.out;
 import static java.lang.System.setErr;
@@ -1188,7 +1189,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 if(dnaFile == null)
                     throw new Exception("No se pudo conectar a NCBI.");
             } catch (Exception ex) {
-                out.println("ERROR: " + ex.getLocalizedMessage());
+                err.println("ERROR: " + ex.getLocalizedMessage());
                 setIsRunning(false);
                 return;
             }

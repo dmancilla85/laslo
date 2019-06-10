@@ -23,6 +23,7 @@ import com.tools.io.InputSequence;
 import java.util.Iterator;
 import static com.laslo.core.SequenceAnalizer.*;
 import com.tools.OSValidator;
+import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -119,7 +120,7 @@ public class LoopMatcherThread implements Runnable {
                             getMinLength(), getInputType(), 
                             getAdditionalSequence());
                 } catch (InterruptedException ex) {
-                    out.println("ERROR: " + ex.getMessage());
+                    err.println("ERROR: " + ex.getMessage());
                 } finally {
                     getSEM().release();
                 }
@@ -133,7 +134,7 @@ public class LoopMatcherThread implements Runnable {
                                 getMinLength(), getInputType(), 
                                 getAdditionalSequence());
                     } catch (InterruptedException ex) {
-                        out.println("ERROR: " + ex.getMessage());
+                        err.println("ERROR: " + ex.getMessage());
                     } finally {
                         getSEM().release();
                     }
