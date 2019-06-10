@@ -185,6 +185,7 @@ public class LoopMatcher {
      * 
      * @return 
      */
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public File[] getFileList() {
         return fileList;
     }
@@ -249,6 +250,7 @@ public class LoopMatcher {
      *
      * @return
      */
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public ArrayList<String> getLoopPatterns() {
         return loopPatterns;
     }
@@ -257,6 +259,7 @@ public class LoopMatcher {
      *
      * @param loopPatterns
      */
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     public void setLoopPatterns(ArrayList<String> loopPatterns) {
         this.loopPatterns = loopPatterns;
     }
@@ -422,7 +425,7 @@ public class LoopMatcher {
         }
 
         if (this.isMakeRandoms()) {
-            out.print("Making random sequences... ");
+            out.print(java.util.ResourceBundle.getBundle("resources/Bundle").getString("MAKING_RANDOM_SEQUENCES"));
             for (File currentFile : getFileList()) {
                 if (currentFile.isFile()
                         && (currentFile.toString().endsWith(getFASTA_EXT())
@@ -449,7 +452,8 @@ public class LoopMatcher {
                             dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
                 }
             }
-            out.print("Done.\n");
+            out.print(java.util.ResourceBundle
+                    .getBundle("resources/Bundle").getString("DONE"));
 
             File folder;
             folder = new File(getPathIn() + UShuffle.getRandomDir());
@@ -503,7 +507,7 @@ public class LoopMatcher {
 
         try {
             fileName = getActualFile().getName();
-            genbank = false;
+            //genbank = false;
             out.println(java.text.MessageFormat.format(getBundle()
                     .getString("FILE_PRINT"), new Object[]{fileName})); 
             out.flush();
@@ -621,10 +625,13 @@ public class LoopMatcher {
             writer.close();
             fasta.clear();
 
-            out.print(" Sequences: " + secuencias);
+            out.print(java.text.MessageFormat
+                    .format(java.util.ResourceBundle.getBundle("resources/Bundle")
+                            .getString("SEQUENCES"), new Object[] {secuencias}));
             fin = Calendar.getInstance();
-            out.print(" Time: " + (fin.getTimeInMillis() - 
-                    ini.getTimeInMillis()) / 1000 + " s.");
+            out.print(java.text.MessageFormat.format(java.util.ResourceBundle
+                    .getBundle("resources/Bundle").getString("TIME"), 
+                    new Object[] {(fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000}));
             out.println();
 
         } catch (FileNotFoundException ex) {

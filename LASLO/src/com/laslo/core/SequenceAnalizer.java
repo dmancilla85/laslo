@@ -21,7 +21,6 @@ import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.io.InputSequence;
 import static java.lang.System.err;
-import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.biojava.nbio.core.sequence.DNASequence;
 import org.biojava.nbio.core.sequence.features.FeatureInterface;
 import org.biojava.nbio.core.sequence.features.Qualifier;
-import org.biojava.nbio.core.sequence.features.TextFeature;
 
 /**
  * @author David
@@ -49,7 +47,7 @@ public class SequenceAnalizer {
      * @param seq
      * @return A stem-loop structure (Vienna bracket format)
      */
-    @SuppressWarnings("empty-statement")
+    @SuppressWarnings({"empty-statement", "ValueOfIncrementOrDecrementUsed"})
     public static String isValidHairpin(int minLength, String hairpin, 
             int loopLength, int loopPos, String seq) {
         
@@ -165,8 +163,8 @@ public class SequenceAnalizer {
     /**
      * Analize the sequence to find potential stem-loop structures
      * <p>
-     * <br><b>Implementation details:
-     * * It calls RNAFold</b></br>
+     * <b>Implementation details:
+     * * It calls RNAFold</b>
      * Note: Check if mutEx are working well.
      * </p>
      * @note Check when fail with Genbank tags
@@ -245,9 +243,14 @@ public class SequenceAnalizer {
                         synonym = ((Qualifier) 
                                 ((List) (qual.get("gene_synonym"))).get(0))
                                 .getValue();
+                        
+                        try{
                         note = ((Qualifier) 
                                 ((List) (qual.get("note"))).get(0))
                                 .getValue();
+                        } catch(Exception e){
+                            note = "null";
+                        }
                         id = fastaSeq.getAccession().getID();
                         cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
                                 .toArray()[0]).getSource();
@@ -260,7 +263,7 @@ public class SequenceAnalizer {
                     id = auxH[3];
                     cds = auxH[4];
                 }
-                slr.setTags(gene, synonym, id, note, cds);
+                slr.setTags(gene, synonym, note, id, cds);
             }
 
             try {  // 1. extract the full stem-loop sequence
@@ -300,7 +303,7 @@ public class SequenceAnalizer {
                         hairpinModel = fold.getStructure();
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            err.println("Error. Not matching: " 
+                            err.println(java.util.ResourceBundle.getBundle("resources/Bundle").getString("ERROR_NOT_MATCHING") 
                                     + rnaSeq + " - "
                                     + hairpinModel);
                         }
@@ -410,8 +413,6 @@ public class SequenceAnalizer {
 
         size = slrList.size();
         slrList.clear();
-        slrList = null;
-        slr = null;
 
         return size;
     }
@@ -419,9 +420,9 @@ public class SequenceAnalizer {
     /**
      * Analize the sequence to find potential stem-loop structures
      * <p>
-     * <br><b>Implementation details:
+     * <b>Implementation details:
      * * Compares with global prediction
-     * * It calls RNAFold</b></br>
+     * * It calls RNAFold</b>
      * Note: Check if mutEx are working well.
      * </p>
      * @param fastaSeq
@@ -907,7 +908,7 @@ public class SequenceAnalizer {
      * @return A regEx pattern. 
      */
     public static String toRegularExpression(String fastaPattern) {
-        String regExp = null;
+        String regExp;
         boolean extendedReplace = true;
 
         regExp = fastaPattern.replaceAll("N", "[AUTGC]"); //$NON-NLS-1$ 
@@ -930,10 +931,10 @@ public class SequenceAnalizer {
     /**
      * To search for repeated tracts as CA[N]
      * @note Not tested yet
-     * @param rna
-     * @param sequence
+     * @param rnaSequence
+     * @param slippage
      * @param nMin
-     * @return
+     * @return 
      */
     public static int findSlippageSequence(String rnaSequence, String slippage,
             int nMin) {
