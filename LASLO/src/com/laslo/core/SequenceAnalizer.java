@@ -40,25 +40,26 @@ import org.biojava.nbio.core.sequence.features.Qualifier;
 public class SequenceAnalizer {
 
     private static ResourceBundle bundle;
-    
+
     /**
-     * 
-     * @param newBundle 
+     *
+     * @param newBundle
      */
-    public static void setBundle(ResourceBundle newBundle){
+    public static void setBundle(ResourceBundle newBundle) {
         bundle = newBundle;
     }
-    
+
     /**
-     * 
+     *
      * @return current bundle
      */
-    public static ResourceBundle getBundle(){
+    public static ResourceBundle getBundle() {
         return bundle;
     }
-    
+
     /**
      * Validates if the predicted Vienna structure has the pattern desired.
+     *
      * @param minLength
      * @param hairpin
      * @param loopLength
@@ -67,9 +68,9 @@ public class SequenceAnalizer {
      * @return A stem-loop structure (Vienna bracket format)
      */
     @SuppressWarnings({"empty-statement", "ValueOfIncrementOrDecrementUsed"})
-    public static String isValidHairpin(int minLength, String hairpin, 
+    public static String isValidHairpin(int minLength, String hairpin,
             int loopLength, int loopPos, String seq) {
-        
+
         boolean ret;
         boolean begin = true;
         String extremoIzq;
@@ -78,20 +79,20 @@ public class SequenceAnalizer {
         int stemLength = (hairpin.length() - loopLength) / 2;
         int newLength = stemLength;
         hairpin_ = "";
-        
+
         // Pasos
         // 0. Verificar que esten los 3 simbolos
-        ret = hairpin.indexOf('.') >= 0 && hairpin.indexOf('(') >= 0 && 
-                hairpin.indexOf(')') >= 0;
+        ret = hairpin.indexOf('.') >= 0 && hairpin.indexOf('(') >= 0
+                && hairpin.indexOf(')') >= 0;
 
         // 1. Verificar que en la posición del loop no haya brackets
         ret = ret && hairpin.substring(stemLength, stemLength + loopLength)
                 .replaceAll("\\.", "").length() == 0; //NOI18N
-        
+
         // 1'. Verificar que haya un cierre
         if (ret) {
-            ret = hairpin.charAt(stemLength - 1) == '(' && 
-                    hairpin.charAt(stemLength + loopLength) == ')';
+            ret = hairpin.charAt(stemLength - 1) == '('
+                    && hairpin.charAt(stemLength + loopLength) == ')';
         }
 
         // 2. Analizar lado izq. y derecho del stem desde extremo 5',
@@ -103,18 +104,22 @@ public class SequenceAnalizer {
 
             try {
                 for (int i = 0; i < stemLength; i++) {
-                    if (extremoIzq.charAt(i) == '.' || 
-                            extremoIzq.charAt(i) == ')') {
+                    if (extremoIzq.charAt(i) == '.'
+                            || extremoIzq.charAt(i) == ')') {
                         if (begin) {
                             newLength--;
                             begin = true;
-                        } else if (extremoIzq.charAt(i) == ')') { ret = false;}
-                    } else { begin = false; }
+                        } else if (extremoIzq.charAt(i) == ')') {
+                            ret = false;
+                        }
+                    } else {
+                        begin = false;
+                    }
                 }
 
-                hairpin_ = hairpin.substring(stemLength - newLength, 
+                hairpin_ = hairpin.substring(stemLength - newLength,
                         hairpin.length() - (stemLength - newLength));
-                
+
                 stemLength = newLength;
 
                 // 2.b 	Si encuentra un . o un ( en el ext derecho, remover base 
@@ -122,7 +127,7 @@ public class SequenceAnalizer {
                 // Repetir 2.b hasta que complete el recorrido. 	
                 extremoDer = hairpin_.substring(stemLength + loopLength,
                         hairpin_.length());
-                
+
                 begin = true;
 
                 for (int i = stemLength - 1; i >= 0; i--) {
@@ -147,7 +152,7 @@ public class SequenceAnalizer {
                 int auxR = StringUtils.countMatches(hairpin_, ")");
                 int auxL = StringUtils.countMatches(hairpin_, "(");
                 int i = hairpin_.lastIndexOf("(");
-                
+
                 while (auxL > 0 && auxR > 0) {
                     if (hairpin_.charAt(i--) == '(') {
                         auxR--;
@@ -161,33 +166,33 @@ public class SequenceAnalizer {
                 for (k = hairpin_.length() - 1; hairpin_.charAt(k) == '.'; k--);
 
                 hairpin_ = hairpin_.substring(0, k + 1);
-                
+
             } catch (IndexOutOfBoundsException e) {
                 err.println(java.text.MessageFormat.format(
-                            getBundle()
-                                    .getString("ERROR_EX"), new Object[] {e.getMessage()}));
+                        getBundle()
+                                .getString("ERROR_EX"), new Object[]{e.getMessage()}));
             }
         }
 
         if (ret) {
-            ret = StringUtils.countMatches(hairpin_, "(") >= minLength && 
-                    StringUtils.countMatches(hairpin_, ")") >= minLength;
+            ret = StringUtils.countMatches(hairpin_, "(") >= minLength
+                    && StringUtils.countMatches(hairpin_, ")") >= minLength;
         }
 
         // Si la longitud es menor a la esperada, rechazar.
         if (!ret) {
             return ""; //NOI18N
-        } 
+        }
         return hairpin_;
     }
-    
+
     /**
      * Analize the sequence to find potential stem-loop structures
      * <p>
-     * <b>Implementation details:
-     * * It calls RNAFold</b>
+     * <b>Implementation details: * It calls RNAFold</b>
      * Note: Check if mutEx are working well.
      * </p>
+     *
      * @note Check when fail with Genbank tags
      * @param fastaSeq
      * @param stemLoopPattern
@@ -199,9 +204,9 @@ public class SequenceAnalizer {
      * @param additionalSeq
      * @return The number of valids stem-loops detected
      */
-    public static synchronized int sequenceResearch(DNASequence fastaSeq, 
-            String stemLoopPattern, CSVWriter writer, boolean invert, 
-            int maxLength, int minLength, InputSequence inputType, 
+    public static synchronized int sequenceResearch(DNASequence fastaSeq,
+            String stemLoopPattern, CSVWriter writer, boolean invert,
+            int maxLength, int minLength, InputSequence inputType,
             String additionalSeq) {
 
         List<StemLoop> slrList = new ArrayList<>();
@@ -209,7 +214,7 @@ public class SequenceAnalizer {
         int size;
         int posAux;
         int k = 1;
-        int loopPos; 
+        int loopPos;
         int sequenceLength;
         int loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
@@ -218,10 +223,10 @@ public class SequenceAnalizer {
         String synonym = "";
         String id = "";
         String cds = "";
-        String rnaSequence; 
+        String rnaSequence;
         String stemLoop;
-        String rnaLoop; 
-        String rnaSeq; 
+        String rnaLoop;
+        String rnaSeq;
         String hairpinModel;
         hairpinModel = "";
         rnaSequence = fastaSeq.getSequenceAsString().replace('T', 'U');
@@ -261,15 +266,13 @@ public class SequenceAnalizer {
                     if (!qual.isEmpty()) {
                         gene = ((Qualifier) ((List) (qual.get("gene")))
                                 .get(0)).getValue();
-                        synonym = ((Qualifier) 
-                                ((List) (qual.get("gene_synonym"))).get(0))
+                        synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
                                 .getValue();
-                        
-                        try{
-                        note = ((Qualifier) 
-                                ((List) (qual.get("note"))).get(0))
-                                .getValue();
-                        } catch(Exception e){
+
+                        try {
+                            note = ((Qualifier) ((List) (qual.get("note"))).get(0))
+                                    .getValue();
+                        } catch (Exception e) {
                             note = "null";
                         }
                         id = fastaSeq.getAccession().getID();
@@ -292,17 +295,17 @@ public class SequenceAnalizer {
                         && (loopPos + loopLength + length) < sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
-                    
+
                     // 2.a first validation of 1st loop close pairs
                     isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
                             rnaSequence.charAt(loopPos + rnaLoop.length()));
 
                     // 2.b Validation of 2nd loop close pairs
                     if (isValidHairpin) {
-                        isValidHairpin = 
-                                isRNAPair(rnaSequence.charAt(loopPos - 2),
-                                rnaSequence.charAt(loopPos + rnaLoop.length() 
-                                        + 1));
+                        isValidHairpin
+                                = isRNAPair(rnaSequence.charAt(loopPos - 2),
+                                        rnaSequence.charAt(loopPos + rnaLoop.length()
+                                                + 1));
                     }
 
                     // 3. Continue validation
@@ -312,7 +315,7 @@ public class SequenceAnalizer {
                             LoopMatcherThread.getSEM().acquire();
                             // call RNAfold aplication
                             fold = new RNAfold(rnaSeq);
-                            
+
                         } catch (InterruptedException ex) {
                             err.printf(getBundle().getString("ERROR_CLASE"),
                                     SequenceAnalizer.class.getClass(),
@@ -320,7 +323,7 @@ public class SequenceAnalizer {
                         } finally {
                             LoopMatcherThread.getSEM().release();
                         }
-                        
+
                         hairpinModel = fold.getStructure();
 
                         if (rnaSeq.length() != hairpinModel.length()) {
@@ -328,7 +331,7 @@ public class SequenceAnalizer {
                                     rnaSeq, hairpinModel);
                         }
                         // check minimum free energy, must be < 0
-                        if (fold.getMfe() >= 0.0 ) {
+                        if (fold.getMfe() >= 0.0) {
                             isValidHairpin = false;
                         } else {
                             // verify hairpin structure
@@ -340,11 +343,11 @@ public class SequenceAnalizer {
                 } else { // stem-loop out of bounds
                     isValidHairpin = false;
                 }
-                
+
             } catch (Exception e) {
                 err.println(java.text.MessageFormat.format(
-                            getBundle()
-                                    .getString("ERROR_EX"), new Object[] {e.getMessage()}));
+                        getBundle()
+                                .getString("ERROR_EX"), new Object[]{e.getMessage()}));
             }
 
             // extract output variables from the sequence
@@ -411,12 +414,12 @@ public class SequenceAnalizer {
 
                 slr.setRelativePos(slr.getStartsAt()
                         / (double) rnaSequence.length());
-                
+
                 // Add element to global list
                 slrList.add(slr);
             }
         }
-        
+
         Iterator<StemLoop> itr = slrList.iterator();
 
         // Write to file
@@ -428,8 +431,8 @@ public class SequenceAnalizer {
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
                 err.println(java.text.MessageFormat.format(
-                            getBundle()
-                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+                        getBundle()
+                                .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -444,11 +447,11 @@ public class SequenceAnalizer {
     /**
      * Analize the sequence to find potential stem-loop structures
      * <p>
-     * <b>Implementation details:
-     * * Compares with global prediction
-     * * It calls RNAFold</b>
+     * <b>Implementation details: * Compares with global prediction * It calls
+     * RNAFold</b>
      * Note: Check if mutEx are working well.
      * </p>
+     *
      * @param fastaSeq
      * @param viennaStructure
      * @param stemLoopPattern
@@ -458,19 +461,19 @@ public class SequenceAnalizer {
      * @param minLength
      * @param inputType
      * @param additionalSeq
-     * @return 
+     * @return
      */
-    public static int sequenceExtendedResearch( DNASequence fastaSeq, 
-            String viennaStructure, String stemLoopPattern, CSVWriter writer, 
-            boolean invert, int maxLength, int minLength, 
+    public static int sequenceExtendedResearch(DNASequence fastaSeq,
+            String viennaStructure, String stemLoopPattern, CSVWriter writer,
+            boolean invert, int maxLength, int minLength,
             InputSequence inputType, String additionalSeq) {
-        
+
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
         int size;
         int posAux;
         int k = 1;
-        int loopPos; 
+        int loopPos;
         int sequenceLength;
         int loopLength = stemLoopPattern.length();
         boolean isValidHairpin;
@@ -479,10 +482,10 @@ public class SequenceAnalizer {
         String synonym = "";
         String id = "";
         String cds = "";
-        String rnaSequence; 
+        String rnaSequence;
         String stemLoop;
-        String rnaLoop; 
-        String rnaSeq; 
+        String rnaLoop;
+        String rnaSeq;
         String hairpinModel;
         hairpinModel = "";
         rnaSequence = fastaSeq.getSequenceAsString().replace('T', 'U');
@@ -519,12 +522,14 @@ public class SequenceAnalizer {
                     if (!qual.isEmpty()) {
                         gene = ((Qualifier) ((List) (qual.get("gene")))
                                 .get(0)).getValue();
-                        synonym = ((Qualifier) 
-                                ((List) (qual.get("gene_synonym"))).get(0))
+                        synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
                                 .getValue();
-                        note = ((Qualifier) 
-                                ((List) (qual.get("note"))).get(0))
-                                .getValue();
+                        try {
+                            note = ((Qualifier) ((List) (qual.get("note"))).get(0))
+                                    .getValue();
+                        } catch (Exception e) {
+                            note = "null";
+                        }
                         id = fastaSeq.getAccession().getID();
                         cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
                                 .toArray()[0]).getSource();
@@ -537,7 +542,7 @@ public class SequenceAnalizer {
                     id = auxH[3];
                     cds = auxH[4];
                 }
-                slr.setTags(gene, synonym, id, note, cds);
+                slr.setTags(gene, synonym, note, id, cds);
             }
 
             try {  // 1. extract the full stem-loop sequence
@@ -545,22 +550,22 @@ public class SequenceAnalizer {
                         && (loopPos + loopLength + length) < sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
-                    
+
                     // 2.a first validation of 1st loop close pairs
                     isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
                             rnaSequence.charAt(loopPos + rnaLoop.length()));
 
                     // 2.b Validation of 2nd loop close pairs
                     if (isValidHairpin) {
-                        isValidHairpin = 
-                                isRNAPair(rnaSequence.charAt(loopPos - 2),
-                                rnaSequence.charAt(loopPos + rnaLoop.length() 
-                                        + 1));
+                        isValidHairpin
+                                = isRNAPair(rnaSequence.charAt(loopPos - 2),
+                                        rnaSequence.charAt(loopPos + rnaLoop.length()
+                                                + 1));
                     }
 
                     // 3. Continue validation
                     if (isValidHairpin) {
-                        
+
                         hairpinModel = viennaStructure
                                 .substring(loopPos - length,
                                         loopPos + loopLength + length);
@@ -569,23 +574,22 @@ public class SequenceAnalizer {
                             err.printf(getBundle().getString("ERRORNOTMATCHING"),
                                     rnaSeq, hairpinModel);
                         }
-                        
+
                         // check minimum free energy, must be < 0 ..not here..
-                   
                         // verify hairpin structure
-                        hairpinModel = isValidHairpin(minLength, hairpinModel, 
+                        hairpinModel = isValidHairpin(minLength, hairpinModel,
                                 loopLength, loopPos, rnaSeq);
-                        
+
                         isValidHairpin = hairpinModel.length() > 0;
                     }
                 } else { // stem-loop out of bounds
                     isValidHairpin = false;
                 }
-                
+
             } catch (Exception e) {
                 err.println(java.text.MessageFormat.format(
-                            getBundle().getString("ERROR_EX"), 
-                        new Object[] {e.getMessage()}));
+                        getBundle().getString("ERROR_EX"),
+                        new Object[]{e.getMessage()}));
             }
 
             // extract output variables from the sequence
@@ -652,12 +656,12 @@ public class SequenceAnalizer {
 
                 slr.setRelativePos(slr.getStartsAt()
                         / (double) rnaSequence.length());
-                
+
                 // Add element to global list
                 slrList.add(slr);
             }
         }
-        
+
         Iterator<StemLoop> itr = slrList.iterator();
 
         // Write to file
@@ -669,7 +673,7 @@ public class SequenceAnalizer {
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
                 err.println(java.text.MessageFormat.format(
-                            getBundle().getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+                        getBundle().getString("ERROR_EX"), new Object[]{ex.getMessage()}));
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -703,6 +707,7 @@ public class SequenceAnalizer {
 
     /**
      * Compare two bases to determine if are complementary (DNA)
+     *
      * @param base1
      * @param base2
      * @return True if are complementary DNA
@@ -731,6 +736,7 @@ public class SequenceAnalizer {
 
     /**
      * Reverse the sequence
+     *
      * @param source
      * @return Reversed sequence
      */
@@ -746,8 +752,9 @@ public class SequenceAnalizer {
     }
 
     /**
-     * Compare two bases to determine if are pairing bases (RNA)
-     * * Includes wooble pairs.
+     * Compare two bases to determine if are pairing bases (RNA) * Includes
+     * wooble pairs.
+     *
      * @param base1
      * @param base2
      * @return True if are complementary.
@@ -762,25 +769,13 @@ public class SequenceAnalizer {
     }
 
     /**
-     * Compare two bases to determine if are complementary (RNA)
-     * Uses the IUPAC nucleic acid codes: 
-     * * A --> adenosine 
-     * * M --> A C (amino) 
-     * * C --> cytidine 
-     * * S --> G C (strong) 
-     * * G --> guanine 
-     * * W --> A T (weak) 
-     * * T -->  thymidine 
-     * * B --> G T C 
-     * * U --> uridine 
-     * * D --> G A T 
-     * * R --> G A (purine) 
-     * * H --> A C T 
-     * * Y --> T C (pyrimidine) 
-     * * V --> G C A 
-     * * K --> G T (keto) 
-     * * N --> A G C T (any) 
-     * * - gap of indeterminate length 
+     * Compare two bases to determine if are complementary (RNA) Uses the IUPAC
+     * nucleic acid codes: * A --> adenosine * M --> A C (amino) * C -->
+     * cytidine * S --> G C (strong) * G --> guanine * W --> A T (weak) * T -->
+     * thymidine * B --> G T C * U --> uridine * D --> G A T * R --> G A
+     * (purine) * H --> A C T * Y --> T C (pyrimidine) * V --> G C A * K --> G T
+     * (keto) * N --> A G C T (any) * - gap of indeterminate length
+     *
      * @param base1
      * @param base2
      * @return True if are complementary (RNA).
@@ -822,7 +817,7 @@ public class SequenceAnalizer {
     }
 
     /**
-     * 
+     *
      * @param base1
      * @param base2
      * @return True if the bases can't be paired.
@@ -837,25 +832,13 @@ public class SequenceAnalizer {
     }
 
     /**
-     * Check for wooble pairments in RNA.
-     * Uses the IUPAC nucleic acid codes:
-     * * A --> adenosine 
-     * * M --> A C (amino) 
-     * * C --> cytidine 
-     * * S --> G C (strong) 
-     * * G --> guanine 
-     * * W --> A T (weak) 
-     * * T -->  thymidine 
-     * * B --> G T C 
-     * * U --> uridine 
-     * * D --> G A T 
-     * * R --> G A (purine) 
-     * * H --> A C T 
-     * * Y --> T C (pyrimidine) 
-     * * V --> G C A 
-     * * K --> G T (keto) 
-     * * N --> A G C T (any) 
-     * * - gap of indeterminate length 
+     * Check for wooble pairments in RNA. Uses the IUPAC nucleic acid codes: * A
+     * --> adenosine * M --> A C (amino) * C --> cytidine * S --> G C (strong) *
+     * G --> guanine * W --> A T (weak) * T --> thymidine * B --> G T C * U -->
+     * uridine * D --> G A T * R --> G A (purine) * H --> A C T * Y --> T C
+     * (pyrimidine) * V --> G C A * K --> G T (keto) * N --> A G C T (any) * -
+     * gap of indeterminate length
+     *
      * @param base1
      * @param base2
      * @return
@@ -930,8 +913,9 @@ public class SequenceAnalizer {
 
     /**
      * Convert the IUPAC code sequence to regEx patterns
+     *
      * @param fastaPattern
-     * @return A regEx pattern. 
+     * @return A regEx pattern.
      */
     public static String toRegularExpression(String fastaPattern) {
         String regExp;
@@ -956,15 +940,16 @@ public class SequenceAnalizer {
 
     /**
      * To search for repeated tracts as CA[N]
+     *
      * @note Not tested yet
      * @param rnaSequence
      * @param slippage
      * @param nMin
-     * @return 
+     * @return
      */
     public static int findSlippageSequence(String rnaSequence, String slippage,
             int nMin) {
-      
+
         int init = 0, n = 0, position = 0, indexOf;
 
         indexOf = rnaSequence.indexOf(slippage, init);
@@ -990,6 +975,7 @@ public class SequenceAnalizer {
 
     /**
      * Older function to check for potential pairments inside the loop
+     *
      * @note Replaced by isValidHairpin
      * @param loop
      * @return True if the loop if free of pairments

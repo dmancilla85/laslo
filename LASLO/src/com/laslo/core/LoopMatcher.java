@@ -510,7 +510,7 @@ public class LoopMatcher {
     /**
      * Process the files selected
      */
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+    @SuppressWarnings({"ValueOfIncrementOrDecrementUsed", "empty-statement"})
     public void callProcessThreads() {
 
         CSVWriter writer;
@@ -525,15 +525,22 @@ public class LoopMatcher {
         ExecutorService pool;
         CountDownLatch latch;
         Calendar ini, fin;
+        String mode = "local";
+        
+        if(this.extendedMode){
+            mode = "global";
+        }
 
         try {
             fileName = getActualFile().getName();
             //genbank = false;
-            out.println(java.text.MessageFormat.format(getBundle()
+            out.print(java.text.MessageFormat.format(getBundle()
                     .getString("FILE_PRINT"), new Object[]{fileName})); 
             out.flush();
             fileName = fileName.replaceFirst("[.][^.]+$", ""); 
-            fileOut = this.getPathOut() + "\\" + fileName + getCSV_EXT();
+            fileOut = this.getPathOut() + "\\" + fileName + "." +
+                    mode + "." + this.minLength + "." + this.maxLength +
+                    getCSV_EXT();
 
             if (new File(fileOut).exists()) {
                 try {
@@ -658,13 +665,18 @@ public class LoopMatcher {
             writer.close();
             fasta.clear();
 
-            out.print(java.text.MessageFormat
+            fin = Calendar.getInstance();
+            //getBundle().getString("SUMMARY")
+            out.printf(" = {%d secuencias} - Tiempo: %3.2fs.\n", 
+                    totalSecuencias, 
+                    (fin.getTimeInMillis() - ini.getTimeInMillis()) / (double)1000);
+            
+            /*out.print(java.text.MessageFormat
                     .format(getBundle()
                             .getString("SEQUENCES"), new Object[] {totalSecuencias}));
-            fin = Calendar.getInstance();
             out.print(java.text.MessageFormat.format(getBundle().getString("TIME"), 
                     new Object[] {(fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000}));
-            out.println();
+            out.println();*/
 
         } catch (FileNotFoundException ex) {
             err.println(getBundle().getString("CANT_OPEN_FILE"));

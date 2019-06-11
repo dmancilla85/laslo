@@ -27,7 +27,6 @@ import static com.tools.io.InputSequence.GENERIC;
 import static java.awt.EventQueue.invokeLater;
 import java.awt.event.WindowEvent;
 import static java.awt.event.WindowEvent.WINDOW_CLOSING;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -92,7 +91,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jProgressBar1.setMaximum(100);
         this.jProgressBar1.setStringPainted(true);
         this.jTabInput.setSelectedIndex(0);
-
+        
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
         PrintStream ps = new PrintStream(taos);
         setOut(ps);
@@ -777,8 +776,8 @@ public class GUIFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         final JFileChooser fc = new JFileChooser();
         JFrame myFrame = new JFrame();
-        File file = null;
-        boolean isFolder = true;
+        File file;
+        boolean isFolder;
         this.listOfFiles = null;
 
         // In response to a button click:
@@ -869,6 +868,8 @@ public class GUIFrame extends javax.swing.JFrame {
         if(worker != null){
             if(!worker.isCancelled() && !worker.isDone()){
                 worker.cancel(true);
+                jProgressBar1.setValue(0);
+                setIsRunning(false);
             }
         }
         
@@ -999,9 +1000,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.isRunning = value;
         this.jBtnStart.setEnabled(!value);
         this.jLblError.setText("");
+        this.jBtnStop.setEnabled(value);
 
         if (value) {
-            out.println(bundle.getString("STARTING_PROCESS"));
+            //out.println(bundle.getString("STARTING_PROCESS"));
             this.jBtnStart.setText(bundle.getString("WAIT"));
         } else {
             this.jBtnStart.setText(bundle.getString("START"));
@@ -1241,6 +1243,7 @@ public class GUIFrame extends javax.swing.JFrame {
         
         worker.execute();
         out.println();
+        MessageBox.show(bundle.getString("END_MSG"), "END_TITLE");
         setIsRunning(false);
     }
 }
