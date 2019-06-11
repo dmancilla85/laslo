@@ -20,7 +20,6 @@ package com.tools;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import static java.lang.System.err;
 import static java.lang.System.out;
 
 /**
@@ -51,7 +50,7 @@ public class OSValidator {
             out.println("Your OS is not support!!");
         }
 
-        out.println("Number of cores: " + getNumberOfCPUCores());
+        //out.println("Number of cores: " + getNumberOfCPUCores());
     }
 
     /**

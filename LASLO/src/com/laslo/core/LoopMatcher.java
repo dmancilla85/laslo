@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import static java.lang.Math.round;
 import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import org.biojava.nbio.core.sequence.DNASequence;
 import java.util.ResourceBundle;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
+import javax.swing.JProgressBar;
 
 /**
  * @author David
@@ -70,6 +72,8 @@ public class LoopMatcher {
     private File actualFile;
     private String additionalSequence;
     private boolean searchReverse;
+    private int progress;
+    private JProgressBar jpBar;
 
     /**
      *
@@ -101,6 +105,7 @@ public class LoopMatcher {
         this.fileList = null;
         this.extendedMode = false;
         this.makeRandoms = false;
+        this.progress = 0;
         this.numberOfRandoms = 0;
         this.additionalSequence = additionalSequence;
         this.kLetRandoms = kLetRandoms;
@@ -127,6 +132,10 @@ public class LoopMatcher {
         return extendedMode;
     }
 
+    public void setProgressBar(JProgressBar bar){
+        this.jpBar = bar;
+    }
+    
     /**
      * 
      * @param extendedMode 
@@ -149,6 +158,10 @@ public class LoopMatcher {
      */
     public void setSearchReverse(boolean searchReverse) {
         this.searchReverse = searchReverse;
+    }
+    
+    public int getProgress(){
+        return this.progress;
     }
 
     /**
@@ -485,7 +498,7 @@ public class LoopMatcher {
         out.print(java.text.MessageFormat.format(getBundle()
                 .getString("TOTAL_TIME"),
                 new Object[]{((fin.getTimeInMillis() 
-                        - ini.getTimeInMillis()) / 1000)}) + " s.");
+                        - ini.getTimeInMillis()) / 1000)}));
 
         out.flush();
 
@@ -585,6 +598,7 @@ public class LoopMatcher {
 
             ini = Calendar.getInstance();
             totalSecuencias = fasta.entrySet().size();
+            this.progress = 0;
                     
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
 
@@ -598,6 +612,9 @@ public class LoopMatcher {
                         getInputType(), patternItr, writer, isSearchReverse(),
                         bundle);
 
+                this.progress = (int)round(count/(double)totalSecuencias * 100);
+                jpBar.setValue(progress);
+                
                 if (i++ <= nHilos) {
                     thread.setLatch(latch);
                     pool.execute(thread);
@@ -617,24 +634,26 @@ public class LoopMatcher {
                 }
                 
                 // Print
-                if(count/totalSecuencias % 15 == 0){
+                /*if(this.progress % 15 == 0 || this.progress % 6 == 0){
                     out.printf(getBundle()
-                            .getString("PROGRESO"), count/(double)totalSecuencias);
-                }
+                            .getString("PROGRESO"), 
+                            this.progress);
+                }*/
                 
             }
+            
+            jpBar.setValue(100);
 
             if (latch.getCount() > 0) {
                 latch.await();
                 pool.shutdown();
             }
-
-            if (latch.getCount() > 0) {
-                latch.await();
+            
+            if(!pool.isShutdown()){
                 pool.shutdown();
             }
-
-            pool.shutdown();
+            
+            while(!pool.isTerminated());
 
             writer.close();
             fasta.clear();

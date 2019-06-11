@@ -27,6 +27,7 @@ import static com.tools.io.InputSequence.GENERIC;
 import static java.awt.EventQueue.invokeLater;
 import java.awt.event.WindowEvent;
 import static java.awt.event.WindowEvent.WINDOW_CLOSING;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -78,7 +79,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
-        this.fromLocalPath = true;
+        //this.fromLocalPath = true;
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLblWoobles.setVisible(false);
@@ -87,7 +88,9 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jcbExtended.setSelected(false);
         this.jcbExtended.setVisible(true); // temporario
         this.jcbMakeRandoms.setSelected(false);
-
+        this.jProgressBar1.setMinimum(0);
+        this.jProgressBar1.setMaximum(100);
+        this.jProgressBar1.setStringPainted(true);
         this.jTabInput.setSelectedIndex(0);
 
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
@@ -105,8 +108,6 @@ public class GUIFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel6 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
         jPanOutput = new javax.swing.JPanel();
         jcbMakeRandoms = new javax.swing.JCheckBox();
         jcbExtended = new javax.swing.JCheckBox();
@@ -132,10 +133,12 @@ public class GUIFrame extends javax.swing.JFrame {
         jftAdditionalSeq = new javax.swing.JFormattedTextField();
         jlSingleSequence = new javax.swing.JLabel();
         jPanConsole = new javax.swing.JPanel();
-        jBStart = new javax.swing.JButton();
+        jBtnStart = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTAConsole = new javax.swing.JTextArea();
         jLblError = new javax.swing.JLabel();
+        jBtnStop = new javax.swing.JButton();
+        jProgressBar1 = new javax.swing.JProgressBar();
         jTabInput = new javax.swing.JTabbedPane();
         jPanFile = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -155,30 +158,8 @@ public class GUIFrame extends javax.swing.JFrame {
         jRBes_AR = new javax.swing.JRadioButtonMenuItem();
         jMIAbout = new javax.swing.JMenuItem();
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("LASLO v1.00");
+        setTitle("LASLO");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         setIconImage(new ImageIcon(getClass().getResource("/resources/noun_655767_cc.png")).getImage());
         setLocationByPlatform(true);
@@ -453,18 +434,19 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jLblInput.getAccessibleContext().setAccessibleName("");
 
-        jBStart.setText(bundle.getString("START")); // NOI18N
-        jBStart.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jBStart.addActionListener(new java.awt.event.ActionListener() {
+        jBtnStart.setText(bundle.getString("START")); // NOI18N
+        jBtnStart.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jBtnStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBStartActionPerformed(evt);
+                jBtnStartActionPerformed(evt);
             }
         });
 
         jTAConsole.setEditable(false);
-        jTAConsole.setBackground(new java.awt.Color(204, 204, 204));
+        jTAConsole.setBackground(new java.awt.Color(51, 51, 51));
         jTAConsole.setColumns(20);
         jTAConsole.setFont(new java.awt.Font("Consolas", 0, 13)); // NOI18N
+        jTAConsole.setForeground(new java.awt.Color(255, 255, 255));
         jTAConsole.setLineWrap(true);
         jTAConsole.setRows(5);
         jTAConsole.setToolTipText("");
@@ -474,9 +456,23 @@ public class GUIFrame extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTAConsole);
         jTAConsole.getAccessibleContext().setAccessibleName(bundle.getString("MONITOR")); // NOI18N
 
-        jLblError.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        jLblError.setFont(new java.awt.Font("Calibri", 2, 14)); // NOI18N
         jLblError.setForeground(new java.awt.Color(255, 0, 0));
         jLblError.setText(bundle.getString("ERROR")); // NOI18N
+
+        jBtnStop.setText(bundle.getString("STOP_BTN")); // NOI18N
+        jBtnStop.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jBtnStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnStopActionPerformed(evt);
+            }
+        });
+
+        jProgressBar1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jProgressBar1PropertyChange(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanConsoleLayout = new javax.swing.GroupLayout(jPanConsole);
         jPanConsole.setLayout(jPanConsoleLayout);
@@ -487,9 +483,14 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addGroup(jPanConsoleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2)
                     .addGroup(jPanConsoleLayout.createSequentialGroup()
-                        .addComponent(jBStart, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLblError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanConsoleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanConsoleLayout.createSequentialGroup()
+                                .addComponent(jBtnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLblError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jBtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())))
         );
         jPanConsoleLayout.setVerticalGroup(
@@ -497,10 +498,13 @@ public class GUIFrame extends javax.swing.JFrame {
             .addGroup(jPanConsoleLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanConsoleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBStart)
-                    .addComponent(jLblError))
+                    .addComponent(jBtnStart)
+                    .addComponent(jLblError)
+                    .addComponent(jBtnStop))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jTabInput.setBackground(javax.swing.UIManager.getDefaults().getColor("windowBorder"));
@@ -564,7 +568,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jButtonIn, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabInput.addTab(bundle.getString("TAB_FILE"), jPanFile); // NOI18N
@@ -721,11 +725,11 @@ public class GUIFrame extends javax.swing.JFrame {
         this.dispatchEvent(new WindowEvent(this, WINDOW_CLOSING));
     }//GEN-LAST:event_jMIExitActionPerformed
 
-    private void jBStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBStartActionPerformed
+    private void jBtnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStartActionPerformed
         // TODO add your handling code here:
         // Llamar a método unificador
         this.start();
-    }//GEN-LAST:event_jBStartActionPerformed
+    }//GEN-LAST:event_jBtnStartActionPerformed
 
     private void jSpinMinLengthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinMinLengthStateChanged
         // TODO add your handling code here:
@@ -860,6 +864,20 @@ public class GUIFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTabInputStateChanged
 
+    private void jBtnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStopActionPerformed
+        // TODO add your handling code here:
+        if(worker != null){
+            if(!worker.isCancelled() && !worker.isDone()){
+                worker.cancel(true);
+            }
+        }
+        
+    }//GEN-LAST:event_jBtnStopActionPerformed
+
+    private void jProgressBar1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jProgressBar1PropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jProgressBar1PropertyChange
+
     /**
      * @param args the command line arguments
      */
@@ -888,7 +906,8 @@ public class GUIFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBStart;
+    private javax.swing.JButton jBtnStart;
+    private javax.swing.JButton jBtnStop;
     private javax.swing.JButton jButtonIn;
     private javax.swing.JButton jButtonOut;
     private javax.swing.JLabel jLabel4;
@@ -912,8 +931,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanOnline;
     private javax.swing.JPanel jPanOptions;
     private javax.swing.JPanel jPanOutput;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JRadioButtonMenuItem jRBen_EN;
     private javax.swing.JRadioButtonMenuItem jRBes_AR;
     private javax.swing.JScrollPane jScrollPane1;
@@ -944,7 +962,8 @@ public class GUIFrame extends javax.swing.JFrame {
     private final LoopMatcher loopCatcher;
     private File[] listOfFiles;
     private boolean isRunning;
-    private final boolean fromLocalPath;
+    //private final boolean fromLocalPath;
+    private GUISwingWorker worker;
 
     /**
      *
@@ -978,14 +997,14 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     public void setIsRunning(boolean value) {
         this.isRunning = value;
-        this.jBStart.setEnabled(!value);
+        this.jBtnStart.setEnabled(!value);
         this.jLblError.setText("");
 
         if (value) {
             out.println(bundle.getString("STARTING_PROCESS"));
-            this.jBStart.setText(bundle.getString("WAIT"));
+            this.jBtnStart.setText(bundle.getString("WAIT"));
         } else {
-            this.jBStart.setText(bundle.getString("START"));
+            this.jBtnStart.setText(bundle.getString("START"));
             this.jTAConsole.setText("");
         }
     }
@@ -1198,9 +1217,6 @@ public class GUIFrame extends javax.swing.JFrame {
 
         // Start process
         out.flush();
-        out.println(bundle.getBaseBundleName() + " - " + bundle.getLocale().toString());
-        
-        
         loopCatcher.setBundle(bundle);
         loopCatcher.setLoopPatterns(loopList);
         loopCatcher.setAdditionalSequence(this.jftAdditionalSeq.getText().trim());
@@ -1217,8 +1233,12 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setkLetRandoms(klet);
         loopCatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
         
-        GUISwingWorker worker = new GUISwingWorker(this.jTAConsole,
-                this.jBStart, this.loopCatcher);
+        // Add progress bar
+        loopCatcher.setProgressBar(jProgressBar1);
+        
+        worker = new GUISwingWorker(this.jTAConsole,
+                this.jBtnStart, this.loopCatcher);
+        
         worker.execute();
         out.println();
         setIsRunning(false);

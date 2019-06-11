@@ -19,6 +19,7 @@ package com.laslo.gui;
 
 import com.laslo.core.LoopMatcher;
 import javax.swing.JButton;
+//import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 
@@ -32,7 +33,9 @@ class GUISwingWorker extends
     private JTextArea textArea;
     private JButton button;
     private LoopMatcher loop;
+    //private JProgressBar jp;
     private boolean ok;
+    private int progress;
 
     /**
      * 
@@ -46,6 +49,8 @@ class GUISwingWorker extends
         this.loop = loop;
         this.button = button;
         this.ok = true;
+        this.progress = 0;
+        //this.jp = jp;
     }
 
     /**
@@ -53,7 +58,12 @@ class GUISwingWorker extends
      */
     @Override
     protected Integer doInBackground() throws Exception {
-        this.setOk(this.getLoop().startReadingFiles());
+        LoopMatcher lm = this.getLoop();
+        this.setOk(lm.startReadingFiles());
+        //progress = lm.getProgress();
+        //setProgress(progress);
+        //jp.setValue(progress);
+        //System.out.println("task: " + lm.getProgress());
         return 1;
     }
 
@@ -114,10 +124,23 @@ class GUISwingWorker extends
         this.ok = ok;
     }
 
+    public void setTaskProgress(int progress){
+        if(progress < 0) {
+            this.progress = 0;
+        } else {
+            this.progress = progress;
+        }
+    }
+    
+    public int getTaskProgress(){
+        return this.progress;
+    }
+    
     /**
      * @param textArea the textArea to set
      */
     public void setTextArea(JTextArea textArea) {
         this.textArea = textArea;
     }
+    
 }

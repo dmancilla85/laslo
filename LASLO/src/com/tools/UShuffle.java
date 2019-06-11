@@ -102,7 +102,9 @@ public class UShuffle {
         mkdirs = new File(path + RANDOM_PATH).mkdirs();
 
         if (!mkdirs) {
-            err.println("Error: Failed to create new 'shuffled' path.");
+            if (!new File(path + RANDOM_PATH).exists()) {
+                err.println("<Error: Failed to create new 'shuffled' path.>");
+            }
         }
 
         for (int i = 1; i <= nRandoms; i++) {
@@ -116,7 +118,7 @@ public class UShuffle {
                     delete = (new File(destiny)).delete();
 
                     if (!delete) {
-                        err.println("Error: Failed to delete old shuffled file.");
+                        err.println("<Error: Failed to delete old shuffled file.>");
                     }
                 }
 
@@ -124,23 +126,30 @@ public class UShuffle {
 
                 FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
                 try (BufferedWriter bw = new BufferedWriter(fw)) {
-                    
+
                     for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
                         DNASequence element = entry.getValue();
 
                         if (!isGenBank) {
                             header = element.getOriginalHeader();
                         } else {
-                            Map qual = ((FeatureInterface) element.getFeaturesByType("gene")
+                            Map qual = ((FeatureInterface) 
+                                    element.getFeaturesByType("gene")
                                     .toArray()[0]).getQualifiers();
 
                             if (!qual.isEmpty()) {
-                                gene = ((Qualifier) ((List) (qual.get("gene"))).get(0))
-                                        .getValue();
-                                synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                                        .getValue();
-                                note = ((Qualifier) ((List) (qual.get("note"))).get(0))
-                                        .getValue();
+                                gene = ((Qualifier) ((List) 
+                                        (qual.get("gene"))).get(0)).getValue();
+                                synonym = ((Qualifier) ((List) 
+                                        (qual.get("gene_synonym"))).get(0)).getValue();
+
+                                try {
+                                    note = ((Qualifier) ((List) 
+                                            (qual.get("note"))).get(0)).getValue();
+                                } catch (Exception e) {
+                                    note = "null";
+                                }
+
                                 id = element.getAccession().getID();
                                 cds = ((FeatureInterface) element.getFeaturesByType("CDS")
                                         .toArray()[0]).getSource();

@@ -30,10 +30,10 @@ public class AboutFrame extends javax.swing.JFrame {
      * Creates new form AboutFrame
      */
     public AboutFrame() {
-        aboutText = "LASLO v1.0 - README\n" +
+        aboutText = "LASLO v1.0 - README\n\n" +
         "Introduction\n" +
         "Multi-threaded application that searches for hairpin structures in cDNA / mRNA sequences (FASTA or GenBank) with specific consensus sequences in the loop. It implements RNAfold to predict the structure of the sequence, and UShuffle to generate random sequences with conservation of the k-nucleotide frequency.\n" +
-        "\n" +
+        "\n\n" +
         "Requirements\n" +
         "JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences.\n" +
         "\n" +
@@ -58,7 +58,7 @@ public class AboutFrame extends javax.swing.JFrame {
         this.setSize(640, 480);
         this.jTextArea1.setText(aboutText);
         this.jTextArea1.setCaretPosition(0);
-        this.jTxtInfo.setText("Developed by RNA Celular Biology Lab at Leloir Institute. \u00A9 2018.\n\n" + 
+        this.jTxtInfo.setText("\nDeveloped by RNA Celular Biology Lab at Leloir Institute. \u00A9 2018.\n\n" + 
                 "Lab website: https://www.leloir.org.ar/boccaccio/\n" +
                 "Programmer: David A. Mancilla\ne-mail: david.a.m@live.com");
     }
@@ -111,14 +111,15 @@ public class AboutFrame extends javax.swing.JFrame {
         });
 
         jTxtInfo.setEditable(false);
-        jTxtInfo.setBackground(new java.awt.Color(204, 204, 204));
+        jTxtInfo.setBackground(javax.swing.UIManager.getDefaults().getColor("Panel.background"));
         jTxtInfo.setColumns(20);
-        jTxtInfo.setFont(new java.awt.Font("Calibri Light", 2, 14)); // NOI18N
+        jTxtInfo.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jTxtInfo.setLineWrap(true);
         jTxtInfo.setRows(5);
         jTxtInfo.setTabSize(4);
         jTxtInfo.setWrapStyleWord(true);
-        jTxtInfo.setBorder(new javax.swing.border.MatteBorder(null));
+        jTxtInfo.setAutoscrolls(false);
+        jTxtInfo.setBorder(null);
         jScrollPane1.setViewportView(jTxtInfo);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -136,11 +137,12 @@ public class AboutFrame extends javax.swing.JFrame {
                         .addComponent(jScrollPane2))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1)))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -149,8 +151,8 @@ public class AboutFrame extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
                 .addContainerGap())
