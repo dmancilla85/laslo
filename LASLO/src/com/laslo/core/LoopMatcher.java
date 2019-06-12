@@ -516,12 +516,12 @@ public class LoopMatcher {
         CSVWriter writer;
         boolean genbank;
         String fileName, fileOut;
-        final int MAX_HILOS = 10;
+        final int MAX_HILOS = 25;
         int totalSecuencias;
         int nHilos = MAX_HILOS;
         int i;
-        int count;
-        count = 0;
+        int count, latchs;
+        
         ExecutorService pool;
         CountDownLatch latch;
         Calendar ini, fin;
@@ -533,7 +533,6 @@ public class LoopMatcher {
 
         try {
             fileName = getActualFile().getName();
-            //genbank = false;
             out.print(java.text.MessageFormat.format(getBundle()
                     .getString("FILE_PRINT"), new Object[]{fileName})); 
             out.flush();
@@ -584,8 +583,8 @@ public class LoopMatcher {
             } else {
                 this.setInputType(InputSequence.GENBANK);
             }
-
-            int listSize = fasta.size();
+            
+            totalSecuencias = fasta.entrySet().size();
 
             writer = new CSVWriter(new FileWriter(fileOut), ';',
                     CSVWriter.DEFAULT_QUOTE_CHARACTER,
@@ -595,24 +594,24 @@ public class LoopMatcher {
                     .split(";")); 
 
             // II. Transcript level
-            if (listSize < nHilos) {
-                nHilos = listSize;
+            if (totalSecuencias < nHilos) {
+                nHilos = totalSecuencias;
             }
 
-            pool = Executors.newFixedThreadPool(listSize);
+            pool = Executors.newFixedThreadPool(nHilos);
             latch = new CountDownLatch(nHilos);
-            i = 1;
+            latchs = nHilos;
+            i = 0;
 
             ini = Calendar.getInstance();
-            totalSecuencias = fasta.entrySet().size();
             this.progress = 0;
+            count = 1;
                     
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
 
                 DNASequence element = entry.getValue();
                 Iterator<String> patternItr = getLoopPatterns().iterator();
-                count++;
-                
+               
                 LoopMatcherThread thread = new LoopMatcherThread(
                         isExtendedMode(), getAdditionalSequence(), 
                         getMaxLength(), getMinLength(), element, 
@@ -622,21 +621,28 @@ public class LoopMatcher {
                 this.progress = (int)round(count/(double)totalSecuencias * 100);
                 jpBar.setValue(progress);
                 
-                if (i++ <= nHilos) {
+                if (i++ < nHilos) {
+                    out.println("Seq: " + count + " - Thread latch #" + i);
                     thread.setLatch(latch);
+                    latchs++;
                     pool.execute(thread);
                 } else {
                     i = 1;
                     latch.await();
                     pool.shutdown();
                     
-                    if (fasta.size() - count < nHilos) {
-                        nHilos = fasta.size() - count;
+                    if (totalSecuencias - count < nHilos) {
+                        nHilos = totalSecuencias - count + 1;
                     }
+                    
+                    // wait for pool ending
+                    while(!pool.isTerminated());
                     
                     if (nHilos > 0) {
                         pool = Executors.newFixedThreadPool(nHilos);
                         latch = new CountDownLatch(nHilos);
+                        thread.setLatch(latch);
+                        pool.execute(thread);
                     }
                 }
                 
@@ -646,37 +652,27 @@ public class LoopMatcher {
                             .getString("PROGRESO"), 
                             this.progress);
                 }*/
-                
+                count++;
             }
-            
-            jpBar.setValue(100);
 
             if (latch.getCount() > 0) {
                 latch.await();
-                pool.shutdown();
-            }
-            
-            if(!pool.isShutdown()){
+                //out.println("{**now Latch must to be zero:" + latch.getCount() + "}");
                 pool.shutdown();
             }
             
             while(!pool.isTerminated());
+            //out.println("{**Pool terminated: " + pool.isTerminated() + "}");
+            
 
             writer.close();
             fasta.clear();
 
             fin = Calendar.getInstance();
-            //getBundle().getString("SUMMARY")
-            out.printf(" = {%d secuencias} - Tiempo: %3.2fs.\n", 
+            
+            out.printf(getBundle().getString("SUMMARY"), 
                     totalSecuencias, 
                     (fin.getTimeInMillis() - ini.getTimeInMillis()) / (double)1000);
-            
-            /*out.print(java.text.MessageFormat
-                    .format(getBundle()
-                            .getString("SEQUENCES"), new Object[] {totalSecuencias}));
-            out.print(java.text.MessageFormat.format(getBundle().getString("TIME"), 
-                    new Object[] {(fin.getTimeInMillis() - ini.getTimeInMillis()) / 1000}));
-            out.println();*/
 
         } catch (FileNotFoundException ex) {
             err.println(getBundle().getString("CANT_OPEN_FILE"));
@@ -688,6 +684,8 @@ public class LoopMatcher {
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
         } 
+        
+        jpBar.setValue(100);
     }
 
     /**

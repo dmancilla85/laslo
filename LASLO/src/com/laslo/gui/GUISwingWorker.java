@@ -18,8 +18,8 @@
 package com.laslo.gui;
 
 import com.laslo.core.LoopMatcher;
+import static java.lang.System.out;
 import javax.swing.JButton;
-//import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 
@@ -33,7 +33,7 @@ class GUISwingWorker extends
     private JTextArea textArea;
     private JButton button;
     private LoopMatcher loop;
-    //private JProgressBar jp;
+    private final GUIFrame frame;
     private boolean ok;
     private int progress;
 
@@ -44,13 +44,13 @@ class GUISwingWorker extends
      * @param loop 
      */
     public GUISwingWorker(JTextArea textArea, JButton button,
-            LoopMatcher loop) {
+            LoopMatcher loop, GUIFrame frame) {
         this.textArea = textArea;
         this.loop = loop;
         this.button = button;
         this.ok = true;
         this.progress = 0;
-        //this.jp = jp;
+        this.frame = frame;
     }
 
     /**
@@ -60,10 +60,6 @@ class GUISwingWorker extends
     protected Integer doInBackground() throws Exception {
         LoopMatcher lm = this.getLoop();
         this.setOk(lm.startReadingFiles());
-        //progress = lm.getProgress();
-        //setProgress(progress);
-        //jp.setValue(progress);
-        //System.out.println("task: " + lm.getProgress());
         return 1;
     }
 
@@ -72,7 +68,10 @@ class GUISwingWorker extends
      */
     @Override
     protected void done() {
-        System.out.flush();
+        out.flush();
+        MessageBox.show(frame.getCurrentBundle().getString("END_MSG"), 
+                frame.getCurrentBundle().getString("END_TITLE"));
+        frame.setIsRunning(false);
     }
 
     /**

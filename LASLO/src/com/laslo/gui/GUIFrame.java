@@ -44,7 +44,9 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
+import java.util.logging.Level;
 import static java.util.logging.Level.SEVERE;
+import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -1003,11 +1005,10 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jBtnStop.setEnabled(value);
 
         if (value) {
-            //out.println(bundle.getString("STARTING_PROCESS"));
-            this.jBtnStart.setText(bundle.getString("WAIT"));
-        } else {
-            this.jBtnStart.setText(bundle.getString("START"));
             this.jTAConsole.setText("");
+            //this.jBtnStart.setText(bundle.getString("WAIT"));
+        } else {
+            //this.jBtnStart.setText(bundle.getString("START"));
         }
     }
 
@@ -1199,7 +1200,9 @@ public class GUIFrame extends javax.swing.JFrame {
             try {
                 dnaFile = GenBankID.downLoadSequenceForId(jTAGenes.getText()
                         .replaceAll(" ", ""));
-
+                // sleep a while
+                Thread.sleep(250);
+                
                 if (dnaFile == null) {
                     throw new Exception(bundle.getString("CANT_CONNECT_NCBI"));
                 }
@@ -1213,9 +1216,6 @@ public class GUIFrame extends javax.swing.JFrame {
             this.listOfFiles[0] = new File(pathIn);
 
         }
-
-        // Clean console
-        this.jTAConsole.setText("");
 
         // Start process
         out.flush();
@@ -1239,11 +1239,12 @@ public class GUIFrame extends javax.swing.JFrame {
         loopCatcher.setProgressBar(jProgressBar1);
         
         worker = new GUISwingWorker(this.jTAConsole,
-                this.jBtnStart, this.loopCatcher);
+                this.jBtnStart, this.loopCatcher, this);
         
         worker.execute();
-        out.println();
-        MessageBox.show(bundle.getString("END_MSG"), "END_TITLE");
-        setIsRunning(false);
+    }
+    
+    public ResourceBundle getCurrentBundle(){
+        return this.bundle;
     }
 }

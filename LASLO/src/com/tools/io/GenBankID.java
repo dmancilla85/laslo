@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import static java.lang.System.err;
-import static java.lang.System.out;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -145,15 +144,9 @@ public class GenBankID extends SourceFile {
                 
         LinkedHashMap<String, DNASequence> dnaFile;
         String request;
-        //String idFormatted = genBankId;
         URL ncbiGenbank;
         request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text", 
                 genBankId);
-
-        /*if (idFormatted.contains(".")) {
-            idFormatted = idFormatted
-                    .substring(0, idFormatted.lastIndexOf("."));
-        }*/
 
         try {
             String proxyConn = getProxyConfiguration();
@@ -203,7 +196,8 @@ public class GenBankID extends SourceFile {
     public static void main(String[] args) {
 
         try {
-            downLoadSequenceForId("NM_001275794.1,NM_005690");
+            LinkedHashMap<String, DNASequence> downLoadSequenceForId;
+            downLoadSequenceForId = downLoadSequenceForId("NM_001275794.1,NM_005690");
         } catch (Exception ex) {
             Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -294,8 +288,8 @@ public class GenBankID extends SourceFile {
         String[] parts = cds.split("\\.\\.");
 
         if (parts.length > 0) {
-            this.setCdsStart((int) new Integer(parts[0]));
-            this.setCdsEnd((int) new Integer(parts[1]));
+            this.setCdsStart(new Integer(parts[0]));
+            this.setCdsEnd(new Integer(parts[1]));
         }
     }
 

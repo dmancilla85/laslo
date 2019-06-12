@@ -69,7 +69,7 @@ public class LoopMatcherThread implements Runnable {
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse, ResourceBundle bundle) {
 
-        int count;
+        int countThreads;
         this.extendedMode = extendedMode;
         this.additionalSequence = additionalSequence;
         this.maxLength = maxLength;
@@ -83,15 +83,16 @@ public class LoopMatcherThread implements Runnable {
 
         if (!started) {
 
-            count = OSValidator.getNumberOfCPUCores();
-
-            if (count > 1) {
-                count -= 1;
-            }
+            countThreads = OSValidator.getNumberOfCPUCores();
+            countThreads-=1;
+            
+            /*if (countThreads > 1) {
+                countThreads -= 1;
+            }*/
 
             out.println(java.text.MessageFormat.format(bundle
-                    .getString("USING_N_CORES"), new Object[] {count}));
-            SEM = new Semaphore(count);
+                    .getString("USING_N_CORES"), new Object[] {countThreads}));
+            SEM = new Semaphore(countThreads);
             started = true;
         }
     }
