@@ -30,9 +30,7 @@ import static java.awt.event.WindowEvent.WINDOW_CLOSING;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import static java.lang.System.err;
 import static java.lang.System.exit;
-import static java.lang.System.out;
 import static java.lang.System.setErr;
 import static java.lang.System.setOut;
 import java.net.MalformedURLException;
@@ -40,23 +38,24 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
-import java.util.logging.Level;
 import static java.util.logging.Level.SEVERE;
-import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.DIRECTORIES_ONLY;
 import static javax.swing.JFileChooser.FILES_AND_DIRECTORIES;
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.biojava.nbio.core.sequence.DNASequence;
 
 /**
  *
@@ -70,7 +69,7 @@ public class GUIFrame extends javax.swing.JFrame {
      * @throws java.io.IOException
      */
     public GUIFrame() throws IOException {
-        loopCatcher = new LoopMatcher();
+        loopMatcher = new LoopMatcher();
         isRunning = false;
         this.locale = new Locale("es", "AR");
         this.bundle = getBundle("resources/Bundle", locale);
@@ -93,7 +92,8 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jProgressBar1.setMaximum(100);
         this.jProgressBar1.setStringPainted(true);
         this.jTabInput.setSelectedIndex(0);
-        
+        this.geneList = new ArrayList<>();
+
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
         PrintStream ps = new PrintStream(taos);
         setOut(ps);
@@ -867,14 +867,14 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jBtnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStopActionPerformed
         // TODO add your handling code here:
-        if(worker != null){
-            if(!worker.isCancelled() && !worker.isDone()){
+        if (worker != null) {
+            if (!worker.isCancelled() && !worker.isDone()) {
                 worker.cancel(true);
                 jProgressBar1.setValue(0);
                 setIsRunning(false);
             }
         }
-        
+
     }//GEN-LAST:event_jBtnStopActionPerformed
 
     private void jProgressBar1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jProgressBar1PropertyChange
@@ -962,11 +962,13 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private Locale locale;
     private final ResourceBundle bundle;
-    private final LoopMatcher loopCatcher;
+    private final LoopMatcher loopMatcher;
     private File[] listOfFiles;
     private boolean isRunning;
-    //private final boolean fromLocalPath;
+    private ArrayList<String> geneList;
     private GUISwingWorker worker;
+    private String pathIn;
+    private String pathOut;
 
     /**
      *
@@ -990,8 +992,8 @@ public class GUIFrame extends javax.swing.JFrame {
             default:
                 origin = GENERIC;
         }
-        
-        this.loopCatcher.setInputType(origin);
+
+        this.loopMatcher.setInputType(origin);
     }
 
     /**
@@ -1003,13 +1005,6 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jBtnStart.setEnabled(!value);
         this.jLblError.setText("");
         this.jBtnStop.setEnabled(value);
-
-        if (value) {
-            this.jTAConsole.setText("");
-            //this.jBtnStart.setText(bundle.getString("WAIT"));
-        } else {
-            //this.jBtnStart.setText(bundle.getString("START"));
-        }
     }
 
     /**
@@ -1050,8 +1045,7 @@ public class GUIFrame extends javax.swing.JFrame {
                 return isValid;
             }
 
-            geneList.addAll(asList(this.jTAGenes.getText().split(",")));
-
+            //geneList.addAll(asList(txtTemp.split(",")));
             for (int i = 0; i < geneList.size() && isValid; i++) {
                 aux = geneList.get(i);
                 aux = aux.trim();
@@ -1115,6 +1109,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
     /**
      * Check Internet connection
+     *
      * @return True if internet is available.
      */
     private static boolean netIsAvailable() {
@@ -1163,20 +1158,20 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         int max, min, wooble, mismatch, randoms, klet;
-        String pathOut = this.jTFPathOut.getText();
-        String pathIn = this.jTFPathIn.getText();
+        pathOut = this.jTFPathOut.getText();
+        pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
-        ArrayList<String> loopList, geneList;
+        ArrayList<String> loopList;
         loopList = new ArrayList<>();
-        geneList = new ArrayList<>();
-        LinkedHashMap<String, DNASequence> dnaFile;
+        //LinkedHashMap<String, DNASequence> dnaFile;
 
         if (!this.jTAGenes.getText().isEmpty()) {
             geneList.clear();
-            geneList.addAll(asList(this.jTAGenes.getText().split(",")));
+            String txtTemp = this.jTAGenes.getText();
+            txtTemp = txtTemp.replace("\n", "").replace("\r", "");
+            txtTemp = txtTemp.replace(" ", "");
+            geneList.addAll(asList(txtTemp.split(",")));
         }
-
-        this.jLblError.setText("");
 
         // Values
         min = new Integer(this.jSpinMinLength.getValue().toString());
@@ -1196,55 +1191,113 @@ public class GUIFrame extends javax.swing.JFrame {
             return;
         }
 
-        if (jTabInput.getSelectedIndex() == 1) {
+        this.jLblError.setText("");
+        this.jTAConsole.setText("");
+
+        /*if (jTabInput.getSelectedIndex() == 1) {
+
             try {
-                dnaFile = GenBankID.downLoadSequenceForId(jTAGenes.getText()
-                        .replaceAll(" ", ""));
-                // sleep a while
-                Thread.sleep(250);
-                
-                if (dnaFile == null) {
-                    throw new Exception(bundle.getString("CANT_CONNECT_NCBI"));
-                }
+                dnaFile = GenBankID.downLoadSequenceForId(geneList);
+
             } catch (Exception ex) {
                 err.println("ERROR: " + ex.getLocalizedMessage());
                 setIsRunning(false);
                 return;
             }
-            pathIn = GenBankID.makeFile(pathOut, dnaFile);
+
+            // call the file as the first ncbi id
+            pathIn = GenBankID.makeFile(pathOut, dnaFile,
+                    geneList.get(0).trim());
+
+            if (pathIn == null) {
+                err.println("Error fatal: Fallo al obtener secuencias de NCBI.");
+                setIsRunning(false);
+                return;
+            }
+
             this.listOfFiles = new File[1];
             this.listOfFiles[0] = new File(pathIn);
 
-        }
-
+        }*/
         // Start process
-        out.flush();
-        loopCatcher.setBundle(bundle);
-        loopCatcher.setLoopPatterns(loopList);
-        loopCatcher.setAdditionalSequence(this.jftAdditionalSeq.getText().trim());
-        loopCatcher.setMaxLength(max);
-        loopCatcher.setMinLength(min);
-        loopCatcher.setMaxMismatch(mismatch);
-        loopCatcher.setMaxWooble(wooble);
-        loopCatcher.setPathOut(pathOut);
-        loopCatcher.setPathIn(pathIn);
-        loopCatcher.setFileList(this.listOfFiles);
-        loopCatcher.setIsExtendedMode(this.jcbExtended.isSelected());
-        loopCatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
-        loopCatcher.setNumberOfRandoms(randoms);
-        loopCatcher.setkLetRandoms(klet);
-        loopCatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
-        
+        loopMatcher.setBundle(bundle);
+        loopMatcher.setLoopPatterns(loopList);
+        loopMatcher.setAdditionalSequence(this.jftAdditionalSeq.getText().trim());
+        loopMatcher.setMaxLength(max);
+        loopMatcher.setMinLength(min);
+        loopMatcher.setMaxMismatch(mismatch);
+        loopMatcher.setMaxWooble(wooble);
+        loopMatcher.setPathOut(pathOut);
+        loopMatcher.setPathIn(pathIn);
+        loopMatcher.setFileList(this.listOfFiles);
+        loopMatcher.setIsExtendedMode(this.jcbExtended.isSelected());
+        loopMatcher.setMakeRandoms(this.jcbMakeRandoms.isSelected());
+        loopMatcher.setNumberOfRandoms(randoms);
+        loopMatcher.setkLetRandoms(klet);
+        loopMatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
+
         // Add progress bar
-        loopCatcher.setProgressBar(jProgressBar1);
-        
-        worker = new GUISwingWorker(this.jTAConsole,
-                this.jBtnStart, this.loopCatcher, this);
-        
+        loopMatcher.setProgressBar(jProgressBar1);
+
+        worker = new GUISwingWorker(this);
+
         worker.execute();
     }
-    
-    public ResourceBundle getCurrentBundle(){
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getGeneList() {
+        return Collections.unmodifiableList(this.geneList);
+    }
+
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
+    public void setGeneList(ArrayList<String> newGeneList) {
+        this.geneList = newGeneList;
+    }
+
+    public JTextArea getTxtConsole() {
+        return this.jTAConsole;
+    }
+
+    public JButton getJBtnStart() {
+        return this.jBtnStart;
+    }
+
+    public LoopMatcher getLoopMatcher() {
+        return this.loopMatcher;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public JTabbedPane getTab1() {
+        return this.jTabInput;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ResourceBundle getCurrentBundle() {
         return this.bundle;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getPathIn() {
+        return this.pathIn;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getPathOut() {
+        return this.pathOut;
     }
 }

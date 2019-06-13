@@ -264,10 +264,20 @@ public class SequenceAnalizer {
                             .toArray()[0]).getQualifiers();
 
                     if (!qual.isEmpty()) {
-                        gene = ((Qualifier) ((List) (qual.get("gene")))
-                                .get(0)).getValue();
-                        synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                                .getValue();
+
+                        try {
+                            gene = ((Qualifier) ((List) (qual.get("gene")))
+                                    .get(0)).getValue();
+                        } catch (Exception e) {
+                            gene = "null";
+                        }
+
+                        try {
+                            synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
+                                    .getValue();
+                        } catch (Exception e) {
+                            synonym = "null";
+                        }
 
                         try {
                             note = ((Qualifier) ((List) (qual.get("note"))).get(0))
@@ -520,16 +530,28 @@ public class SequenceAnalizer {
                             .toArray()[0]).getQualifiers();
 
                     if (!qual.isEmpty()) {
-                        gene = ((Qualifier) ((List) (qual.get("gene")))
-                                .get(0)).getValue();
-                        synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                                .getValue();
+                        
+                        try {
+                            gene = ((Qualifier) ((List) (qual.get("gene")))
+                                    .get(0)).getValue();
+                        } catch (Exception e) {
+                            gene = "null";
+                        }
+
+                        try {
+                            synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
+                                    .getValue();
+                        } catch (Exception e) {
+                            synonym = "null";
+                        }
+
                         try {
                             note = ((Qualifier) ((List) (qual.get("note"))).get(0))
                                     .getValue();
                         } catch (Exception e) {
                             note = "null";
                         }
+                        
                         id = fastaSeq.getAccession().getID();
                         cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
                                 .toArray()[0]).getSource();

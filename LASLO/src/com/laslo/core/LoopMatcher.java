@@ -520,7 +520,7 @@ public class LoopMatcher {
         int totalSecuencias;
         int nHilos = MAX_HILOS;
         int i;
-        int count, latchs;
+        int count;
         
         ExecutorService pool;
         CountDownLatch latch;
@@ -600,7 +600,6 @@ public class LoopMatcher {
 
             pool = Executors.newFixedThreadPool(nHilos);
             latch = new CountDownLatch(nHilos);
-            latchs = nHilos;
             i = 0;
 
             ini = Calendar.getInstance();
@@ -624,7 +623,6 @@ public class LoopMatcher {
                 if (i++ < nHilos) {
                     out.println("Seq: " + count + " - Thread latch #" + i);
                     thread.setLatch(latch);
-                    latchs++;
                     pool.execute(thread);
                 } else {
                     i = 1;
@@ -657,13 +655,10 @@ public class LoopMatcher {
 
             if (latch.getCount() > 0) {
                 latch.await();
-                //out.println("{**now Latch must to be zero:" + latch.getCount() + "}");
                 pool.shutdown();
             }
             
-            while(!pool.isTerminated());
-            //out.println("{**Pool terminated: " + pool.isTerminated() + "}");
-            
+            while(!pool.isTerminated());           
 
             writer.close();
             fasta.clear();

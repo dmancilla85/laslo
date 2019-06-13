@@ -50,9 +50,9 @@ public class LoopMatcherThread implements Runnable {
     private static boolean started = false;
     private CountDownLatch latch;
     private ResourceBundle bundle;
-    
+
     /**
-     * 
+     *
      * @param extendedMode
      * @param additionalSequence
      * @param maxLength
@@ -61,7 +61,7 @@ public class LoopMatcherThread implements Runnable {
      * @param inputType
      * @param patternItr
      * @param writer
-     * @param searchReverse 
+     * @param searchReverse
      * @param bundle
      */
     public LoopMatcherThread(boolean extendedMode, String additionalSequence,
@@ -69,7 +69,7 @@ public class LoopMatcherThread implements Runnable {
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse, ResourceBundle bundle) {
 
-        int countThreads;
+        final int countThreads;
         this.extendedMode = extendedMode;
         this.additionalSequence = additionalSequence;
         this.maxLength = maxLength;
@@ -83,15 +83,14 @@ public class LoopMatcherThread implements Runnable {
 
         if (!started) {
 
-            countThreads = OSValidator.getNumberOfCPUCores();
-            countThreads-=1;
-            
+            countThreads = OSValidator.getNumberOfCPUCores() - 1;
+
             /*if (countThreads > 1) {
                 countThreads -= 1;
             }*/
 
-            out.println(java.text.MessageFormat.format(bundle
-                    .getString("USING_N_CORES"), new Object[] {countThreads}));
+ /*out.println(java.text.MessageFormat.format(bundle
+                    .getString("USING_N_CORES"), new Object[] {countThreads}));*/
             SEM = new Semaphore(countThreads);
             started = true;
         }
@@ -103,11 +102,15 @@ public class LoopMatcherThread implements Runnable {
     public ResourceBundle getBundle() {
         return bundle;
     }
-    
-    public void setBundle(ResourceBundle bundle){
+
+    /**
+     *
+     * @param bundle
+     */
+    public void setBundle(ResourceBundle bundle) {
         this.bundle = bundle;
     }
-    
+
     /**
      *
      */
@@ -128,52 +131,52 @@ public class LoopMatcherThread implements Runnable {
 
             // 1. Stem research
             if (isExtendedMode()) {
-                
+
                 try {
                     getSEM().acquire();
-                    sequenceExtendedResearch(getDnaElement(), 
+                    sequenceExtendedResearch(getDnaElement(),
                             fold.getStructure(),
-                            currentPattern, getWriter(), false, getMaxLength(), 
-                            getMinLength(), getInputType(), 
+                            currentPattern, getWriter(), false, getMaxLength(),
+                            getMinLength(), getInputType(),
                             getAdditionalSequence());
                 } catch (InterruptedException ex) {
                     err.println(java.text.MessageFormat.format(
                             getBundle()
-                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+                                    .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
                 } finally {
                     getSEM().release();
                 }
-                
+
                 if (isSearchReverse()) {
                     try {
                         getSEM().acquire();
                         sequenceExtendedResearch(getDnaElement(),
-                                fold.getStructure(), 
-                                currentPattern, getWriter(), true, getMaxLength(), 
-                                getMinLength(), getInputType(), 
+                                fold.getStructure(),
+                                currentPattern, getWriter(), true, getMaxLength(),
+                                getMinLength(), getInputType(),
                                 getAdditionalSequence());
-                        
+
                     } catch (InterruptedException ex) {
                         err.println(java.text.MessageFormat.format(
-                            getBundle()
-                                    .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+                                getBundle()
+                                        .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
                     } finally {
                         getSEM().release();
                     }
                 }
             } else {
-                
-                SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern, 
-                        getWriter(), false, getMaxLength(), getMinLength(), 
+
+                SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
+                        getWriter(), false, getMaxLength(), getMinLength(),
                         getInputType(), getAdditionalSequence());
-                
+
                 if (isSearchReverse()) {
-                    SequenceAnalizer.sequenceResearch(getDnaElement(), 
-                            currentPattern, getWriter(), true, getMaxLength(), 
-                            getMinLength(), getInputType(), 
+                    SequenceAnalizer.sequenceResearch(getDnaElement(),
+                            currentPattern, getWriter(), true, getMaxLength(),
+                            getMinLength(), getInputType(),
                             getAdditionalSequence());
                 }
-                
+
             }
         }
 
@@ -312,10 +315,10 @@ public class LoopMatcherThread implements Runnable {
     public void setWriter(CSVWriter writer) {
         this.writer = writer;
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public static Semaphore getMUTEX() {
         return MUTEX;
@@ -355,7 +358,7 @@ public class LoopMatcherThread implements Runnable {
     public static void setStarted(boolean aStarted) {
         started = aStarted;
     }
-    
+
     /**
      *
      * @param latch

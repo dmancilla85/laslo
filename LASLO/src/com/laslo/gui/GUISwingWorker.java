@@ -18,10 +18,15 @@
 package com.laslo.gui;
 
 import com.laslo.core.LoopMatcher;
+import com.tools.io.GenBankID;
+import java.io.File;
+import static java.lang.System.err;
 import static java.lang.System.out;
+import java.util.LinkedHashMap;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import org.biojava.nbio.core.sequence.DNASequence;
 
 /**
  *
@@ -30,46 +35,76 @@ import javax.swing.SwingWorker;
 class GUISwingWorker extends
         SwingWorker<Integer, Void> {
 
-    private JTextArea textArea;
-    private JButton button;
-    private LoopMatcher loop;
     private final GUIFrame frame;
     private boolean ok;
     private int progress;
 
     /**
-     * 
+     *
      * @param textArea
      * @param button
-     * @param loop 
+     * @param loop
      */
-    public GUISwingWorker(JTextArea textArea, JButton button,
-            LoopMatcher loop, GUIFrame frame) {
-        this.textArea = textArea;
-        this.loop = loop;
-        this.button = button;
+    public GUISwingWorker(GUIFrame frame) {
         this.ok = true;
         this.progress = 0;
         this.frame = frame;
     }
 
     /**
-     * 
+     *
      */
     @Override
     protected Integer doInBackground() throws Exception {
+
+        LinkedHashMap<String, DNASequence> dnaFile;
+        String pathIn;
+        File[] listOfFiles;
+        dnaFile = new LinkedHashMap<>();
+
         LoopMatcher lm = this.getLoop();
+        
+        if (frame.getTab1().getSelectedIndex() == 1) {
+
+            try {
+                out.print(frame.getCurrentBundle().getString("DOWNLOAD_NCBI"));
+                dnaFile = GenBankID.downLoadSequenceForId(frame.getGeneList());
+
+            } catch (Exception ex) {
+                err.printf(frame.getCurrentBundle().getString("ERROR"),
+                        ex.getLocalizedMessage());
+                frame.setIsRunning(false);
+                this.cancel(true);
+            }
+
+            // call the file as the first ncbi id
+            pathIn = GenBankID.makeFile(frame.getPathOut(), dnaFile,
+                    frame.getGeneList().get(0).trim());
+            out.print(frame.getCurrentBundle().getString("NCBI_DONE"));
+
+            if (pathIn == null) {
+                err.println(frame.getCurrentBundle().getString("NCBI_FATAL"));
+                frame.setIsRunning(false);
+                this.cancel(true);
+            }
+
+            listOfFiles = new File[1];
+            listOfFiles[0] = new File(pathIn);
+            lm.setFileList(listOfFiles);
+
+        }
+        
         this.setOk(lm.startReadingFiles());
         return 1;
     }
 
     /**
-     * 
+     *
      */
     @Override
     protected void done() {
         out.flush();
-        MessageBox.show(frame.getCurrentBundle().getString("END_MSG"), 
+        MessageBox.show(frame.getCurrentBundle().getString("END_MSG"),
                 frame.getCurrentBundle().getString("END_TITLE"));
         frame.setIsRunning(false);
     }
@@ -78,21 +113,21 @@ class GUISwingWorker extends
      * @return the button
      */
     public JButton getButton() {
-        return button;
+        return frame.getJBtnStart();
     }
 
     /**
      * @return the loop
      */
     public LoopMatcher getLoop() {
-        return loop;
+        return frame.getLoopMatcher();
     }
 
     /**
      * @return the textArea
      */
     public JTextArea getTextArea() {
-        return textArea;
+        return frame.getTxtConsole();
     }
 
     /**
@@ -103,43 +138,22 @@ class GUISwingWorker extends
     }
 
     /**
-     * @param button the button to set
-     */
-    public void setButton(JButton button) {
-        this.button = button;
-    }
-
-    /**
-     * @param loop the loop to set
-     */
-    public void setLoop(LoopMatcher loop) {
-        this.loop = loop;
-    }
-
-    /**
      * @param ok the ok to set
      */
     public void setOk(boolean ok) {
         this.ok = ok;
     }
 
-    public void setTaskProgress(int progress){
-        if(progress < 0) {
+    public void setTaskProgress(int progress) {
+        if (progress < 0) {
             this.progress = 0;
         } else {
             this.progress = progress;
         }
     }
-    
-    public int getTaskProgress(){
+
+    public int getTaskProgress() {
         return this.progress;
     }
-    
-    /**
-     * @param textArea the textArea to set
-     */
-    public void setTextArea(JTextArea textArea) {
-        this.textArea = textArea;
-    }
-    
+
 }

@@ -24,8 +24,7 @@ import static java.lang.System.err;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import org.biojava.nbio.core.sequence.DNASequence;
 import org.biojava.nbio.core.sequence.io.GenbankReaderHelper;
 import org.biojava.nbio.core.sequence.io.GenbankWriterHelper;
@@ -43,10 +42,8 @@ public class GenBankID extends SourceFile {
     private String synonym;
     private String proxyConf;
     private static String PROXY_FILE = "proxy";
-    private final static String 
-            E_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"; 
-    
-    
+    private final static String E_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?";
+
     private static String HEADER
             = "Gen" + getROW_DELIMITER()
             + "GeneSynonym" + getROW_DELIMITER()
@@ -67,13 +64,13 @@ public class GenBankID extends SourceFile {
     }
 
     /**
-     * 
+     *
      * @param synonym
      * @param description
      * @param cdsStart
-     * @param cdsEnd 
+     * @param cdsEnd
      */
-    public GenBankID(String synonym, String description, int cdsStart, 
+    public GenBankID(String synonym, String description, int cdsStart,
             int cdsEnd) {
         this.description = description;
         this.cdsStart = cdsStart;
@@ -84,29 +81,40 @@ public class GenBankID extends SourceFile {
 
     /**
      * Save GenBank downloaded file.
+     *
      * @param path
      * @param dnaFile
+     * @param name
      * @return Path of the new file
      */
     public static String makeFile(String path,
-            LinkedHashMap<String, DNASequence> dnaFile) {
-        File file = new File(path + "\\sequence.gb");
+            LinkedHashMap<String, DNASequence> dnaFile, String name) {
+        String absolutePath = path + "\\" + name + ".gb";
+        File file = new File(absolutePath);
+
+        if (dnaFile == null) {
+            return null;
+        }
 
         try {
             GenbankWriterHelper.writeNucleotideSequence(file,
                     dnaFile.values());
         } catch (Exception ex) {
-            Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
+            err.println("DNAFile size: " + dnaFile.size());
+            err.println("ERROR: " + ex.getMessage() + ". "
+                    + ex.getLocalizedMessage());
+            return null;
         }
 
-        return path + "\\sequence.gb";
+        return absolutePath;
     }
 
     /**
-     * Added an additional option to configurate the proxy settings:
-     * Must exist an file "proxy" containing the following parameters:
-     * * proxy.site, port.number
-     * @return 
+     * Added an additional option to configurate the proxy settings: Must exist
+     * an file "proxy" containing the following parameters: * proxy.site,
+     * port.number
+     *
+     * @return
      */
     @SuppressWarnings("NestedAssignment")
     public static String getProxyConfiguration() {
@@ -133,20 +141,7 @@ public class GenBankID extends SourceFile {
         return proxy;
     }
 
-    /**
-     * Download a NCBI sequence by ID
-     * @param genBankId
-     * @return
-     * @throws Exception 
-     */
-    public static LinkedHashMap<String, DNASequence>
-            downLoadSequenceForId(String genBankId) throws Exception {
-                
-        LinkedHashMap<String, DNASequence> dnaFile;
-        String request;
-        URL ncbiGenbank;
-        request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text", 
-                genBankId);
+    public static boolean connectToProxy() {
 
         try {
             String proxyConn = getProxyConfiguration();
@@ -164,26 +159,62 @@ public class GenBankID extends SourceFile {
                     System.setProperty("http.proxyPassword", proxyParm[3].trim());
                 }
             }
+        } catch (Exception ex) {
+            err.println("ERROR: " + ex.getMessage());
+            return false;
+        }
 
-            // Request to NCBI e-fetch
-            ncbiGenbank = new URL(E_FETCH + request);
+        return true;
+    }
 
-            dnaFile = GenbankReaderHelper
-                    .readGenbankDNASequence(ncbiGenbank.openStream());
-            
-        } catch (MalformedURLException ex) {
-            err.println("ERROR: Malformed URL Exception. Cause: "
-                    + ex.getCause().getLocalizedMessage());
-            dnaFile = null;
-        } catch (IOException ex) {
+    /**
+     * Download a NCBI sequence by ID
+     *
+     * @param genBankId
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("SleepWhileInLoop")
+    public static LinkedHashMap<String, DNASequence>
+            downLoadSequenceForId(List<String> genBankId) throws Exception {
 
-            if (ex.getLocalizedMessage().contains("400")) {
-                err.println("ERROR: " + genBankId + " code not found.");
-            } else {
-                err.println("ERROR: IO Exception. Cause: "
-                        + ex.getLocalizedMessage());
+        LinkedHashMap<String, DNASequence> dnaFile;
+        LinkedHashMap<String, DNASequence> tmp = null;
+        String request;
+        URL ncbiGenbank;
+
+        dnaFile = new LinkedHashMap<>();
+
+        connectToProxy();
+
+        for (String transcriptoId : genBankId) {
+            try {
+                request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text",
+                        transcriptoId);
+
+                // Request to NCBI e-fetch
+                ncbiGenbank = new URL(E_FETCH + request);
+                tmp = GenbankReaderHelper.readGenbankDNASequence(
+                        ncbiGenbank.openStream());
+
+            } catch (MalformedURLException ex) {
+                err.println("ERROR: Malformed URL Exception. Cause: "
+                        + ex.getCause().getMessage());
+                return null;
+            } catch (IOException ex) {
+
+                if (ex.getLocalizedMessage().contains("400")) {
+                    err.println("ERROR: " + transcriptoId + " code not found.");
+                } else {
+                    err.println("ERROR: IO Exception (" + transcriptoId
+                            + "). " + ex.getMessage());
+                }
             }
-            dnaFile = null;
+
+            if (tmp != null && tmp.size() > 0) {
+                dnaFile.putAll(tmp);
+            }
+            Thread.sleep(350);
         }
 
         return dnaFile;
@@ -195,57 +226,57 @@ public class GenBankID extends SourceFile {
      */
     public static void main(String[] args) {
 
-        try {
+        /*try {
             LinkedHashMap<String, DNASequence> downLoadSequenceForId;
             downLoadSequenceForId = downLoadSequenceForId("NM_001275794.1,NM_005690");
         } catch (Exception ex) {
             Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getSynonym() {
         return synonym;
     }
 
     /**
-     * 
-     * @param synonym 
+     *
+     * @param synonym
      */
     public void setSynonym(String synonym) {
         this.synonym = synonym.replace(';', ',');
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * 
-     * @param description 
+     *
+     * @param description
      */
     public void setDescription(String description) {
         this.description = description.replace(';', ',');
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getLocation() {
         return location;
     }
 
     /**
-     * 
-     * @param pos 
+     *
+     * @param pos
      */
     public void setLocation(int pos) {
         if (this.getCdsEnd() != 0) {
@@ -260,24 +291,24 @@ public class GenBankID extends SourceFile {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public int getCdsStart() {
         return cdsStart;
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public int getCdsEnd() {
         return cdsEnd;
     }
 
     /**
-     * 
-     * @param cds 
+     *
+     * @param cds
      */
     public void setCDS(String cds) {
 
@@ -294,16 +325,16 @@ public class GenBankID extends SourceFile {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public static String getHeader() {
         return GenBankID.getHEADER();
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toRowCSV() {
