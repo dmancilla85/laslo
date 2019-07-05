@@ -106,7 +106,9 @@ class GUISwingWorker extends
         out.flush();
         MessageBox.show(frame.getCurrentBundle().getString("END_MSG"),
                 frame.getCurrentBundle().getString("END_TITLE"));
+        frame.getProgressBar().setValue(100);
         frame.setIsRunning(false);
+        System.gc();
     }
 
     /**

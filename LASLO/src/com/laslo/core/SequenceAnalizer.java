@@ -72,12 +72,12 @@ public class SequenceAnalizer {
             int loopLength, int loopPos, String seq) {
 
         boolean ret;
-        boolean begin = true;
+        boolean begin = true, cut = true;
         String extremoIzq;
         String hairpin_;
+        int posPar = 0, posDot, posNotPar;
         String extremoDer;
         int stemLength = (hairpin.length() - loopLength) / 2;
-        int newLength = stemLength;
         hairpin_ = "";
 
         // Pasos
@@ -103,51 +103,73 @@ public class SequenceAnalizer {
             extremoIzq = hairpin.substring(0, stemLength);
 
             try {
-                for (int i = 0; i < stemLength; i++) {
-                    if (extremoIzq.charAt(i) == '.'
-                            || extremoIzq.charAt(i) == ')') {
-                        if (begin) {
-                            newLength--;
-                            begin = true;
-                        } else if (extremoIzq.charAt(i) == ')') {
-                            ret = false;
-                        }
-                    } else {
-                        begin = false;
+
+                char aux;
+                cut = false;
+
+                for (int i = extremoIzq.length() - 1; i >= 0; i--) {
+                    aux = extremoIzq.charAt(i);
+
+                    if (aux == '.' && !cut) {
+                        posDot = i;
                     }
+
+                    if (aux == ')' && !cut) {
+                        cut = true;
+                        posNotPar = i - 1;
+                    }
+
+                    if (aux == '(' && !cut) {
+                        posPar = i;
+                    }
+
                 }
 
-                hairpin_ = hairpin.substring(stemLength - newLength,
-                        hairpin.length() - (stemLength - newLength));
+                extremoIzq = extremoIzq.substring(posPar);
 
-                stemLength = newLength;
+                hairpin_ = hairpin.substring(posPar);
 
+                //stemLength = newLength;
                 // 2.b 	Si encuentra un . o un ( en el ext derecho, remover base 
                 //		(stemLength-1)
                 // Repetir 2.b hasta que complete el recorrido. 	
-                extremoDer = hairpin_.substring(stemLength + loopLength,
+                extremoDer = hairpin_.substring(extremoIzq.length() + loopLength,
                         hairpin_.length());
 
-                begin = true;
+                int cLeft = StringUtils.countMatches(extremoIzq, "(");
+                int cRight = 0;
+                cut = false;
+                for (int i = 0; i < extremoDer.length(); i++) {
+                    aux = extremoDer.charAt(i);
 
-                for (int i = stemLength - 1; i >= 0; i--) {
-                    if (extremoDer.charAt(i) == '.'
-                            || extremoDer.charAt(i) == '(') {
-                        if (begin) {
-                            newLength--;
-                            begin = true;
-                        } else if (extremoDer.charAt(i) == '(') {
-                            ret = false;
-                            //newLength--;
-                        }
-                    } else {
-                        begin = false;
+                    if (cRight == cLeft) {
+                        cut = true;
                     }
+
+                    if (aux == '.' && !cut) {
+                        posDot = i;
+                    }
+
+                    if (aux == '(' && !cut) {
+                        cut = true;
+                        posNotPar = i - 1;
+                    }
+
+                    if (aux == ')' && !cut) {
+                        posPar = i;
+                        cRight++;
+                    }
+
                 }
 
-                hairpin_ = hairpin_.substring(0, stemLength + loopLength);
-                extremoDer = extremoDer.substring(0, newLength - 1);
-                hairpin_ += extremoDer;
+                extremoDer = extremoDer.substring(0, posPar + 1);
+
+                if (posPar + 1 < minLength) {
+                    return "";
+                } else {
+                    hairpin_ = hairpin_.substring(0, extremoIzq.length()
+                            + loopLength + posPar + 1);
+                }
 
                 int auxR = StringUtils.countMatches(hairpin_, ")");
                 int auxL = StringUtils.countMatches(hairpin_, "(");
@@ -172,11 +194,6 @@ public class SequenceAnalizer {
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
             }
-        }
-
-        if (ret) {
-            ret = StringUtils.countMatches(hairpin_, "(") >= minLength
-                    && StringUtils.countMatches(hairpin_, ")") >= minLength;
         }
 
         // Si la longitud es menor a la esperada, rechazar.
@@ -301,6 +318,16 @@ public class SequenceAnalizer {
             }
 
             try {  // 1. extract the full stem-loop sequence
+                // check left border length
+                if (loopPos - length < 0 && loopPos > minLength) {
+                    length = loopPos;
+                }
+
+                // check right border length
+                if ((loopPos + loopLength + length) >= sequenceLength) {
+                    length = sequenceLength - loopPos - loopLength;
+                }
+
                 if ((loopPos - length) > 0
                         && (loopPos + loopLength + length) < sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
@@ -364,9 +391,10 @@ public class SequenceAnalizer {
             if (isValidHairpin) {
                 int extIzq = hairpinModel.lastIndexOf("(") + 1; //NOI18N
                 int extDer = hairpinModel.length() - extIzq - loopLength;
-                rnaSeq = rnaSequence.substring(loopPos - extIzq, loopPos
+
+                posAux = loopPos - extIzq;
+                rnaSeq = rnaSequence.substring(posAux, loopPos
                         + loopLength + extDer);
-                posAux = rnaSequence.indexOf(rnaSeq);
 
                 // Fill the fields
                 try {
@@ -387,12 +415,13 @@ public class SequenceAnalizer {
 
                 slr.setRnaHairpinSequence(rnaSeq);
                 slr.setLoop(rnaLoop);
-                slr.setStartsAt(loopPos - extIzq);
+                slr.setStartsAt(posAux);
                 slr.setStructure(hairpinModel);
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                //err.println(slr.getId_fasta().toRowCSV());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
 
@@ -402,7 +431,7 @@ public class SequenceAnalizer {
                     slr.setLoopPattern(reverseIt(stemLoop));
                 }
 
-                slr.setEndsAt(loopFinder.end() + extDer);
+                slr.setEndsAt(loopPos + loopLength + extDer);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "")
                         .length()) / (float) rnaSequence.length());
@@ -530,7 +559,7 @@ public class SequenceAnalizer {
                             .toArray()[0]).getQualifiers();
 
                     if (!qual.isEmpty()) {
-                        
+
                         try {
                             gene = ((Qualifier) ((List) (qual.get("gene")))
                                     .get(0)).getValue();
@@ -551,7 +580,7 @@ public class SequenceAnalizer {
                         } catch (Exception e) {
                             note = "null";
                         }
-                        
+
                         id = fastaSeq.getAccession().getID();
                         cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
                                 .toArray()[0]).getSource();
@@ -568,8 +597,19 @@ public class SequenceAnalizer {
             }
 
             try {  // 1. extract the full stem-loop sequence
+
+                // check left border length
+                if (loopPos - length < 0 && loopPos > minLength) {
+                    length = loopPos;
+                }
+
+                // check right border length
+                if ((loopPos + loopLength + length) >= sequenceLength) {
+                    length = sequenceLength - loopPos - loopLength;
+                }
+
                 if ((loopPos - length) > 0
-                        && (loopPos + loopLength + length) < sequenceLength) {
+                        && (loopPos + loopLength + length) <= sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
 
@@ -616,7 +656,7 @@ public class SequenceAnalizer {
 
             // extract output variables from the sequence
             if (isValidHairpin) {
-                int extIzq = hairpinModel.lastIndexOf("(") + 1; //NOI18N
+                int extIzq = hairpinModel.lastIndexOf("(") + 1;
                 int extDer = hairpinModel.length() - extIzq - loopLength;
                 rnaSeq = rnaSequence.substring(loopPos - extIzq, loopPos
                         + loopLength + extDer);
@@ -1020,6 +1060,54 @@ public class SequenceAnalizer {
             }
         }
         return ret;
+    }
+
+    /**
+     *
+     * @param chain
+     * @param value
+     * @param counts
+     * @return
+     */
+    public static int getN_leftPosition(String chain, char value, int counts) {
+        int pos = -1;
+        int counter = 0;
+
+        for (int i = chain.length() - 1; i >= 0; i--) {
+            if (chain.charAt(i) == value) {
+                counter++;
+            }
+
+            if (counter == counts) {
+                pos = i;
+            }
+        }
+
+        return pos;
+    }
+
+    /**
+     *
+     * @param chain
+     * @param value
+     * @param counts
+     * @return
+     */
+    public static int getN_rightPosition(String chain, char value, int counts) {
+        int pos = -1;
+        int counter = 0;
+
+        for (int i = 0; i < chain.length(); i++) {
+            if (chain.charAt(i) == value) {
+                counter++;
+            }
+
+            if (counter == counts) {
+                pos = i;
+            }
+        }
+
+        return pos;
     }
 
 }

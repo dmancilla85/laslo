@@ -52,6 +52,7 @@ import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.DIRECTORIES_ONLY;
 import static javax.swing.JFileChooser.FILES_AND_DIRECTORIES;
 import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
@@ -1194,31 +1195,6 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jTAConsole.setText("");
 
-        /*if (jTabInput.getSelectedIndex() == 1) {
-
-            try {
-                dnaFile = GenBankID.downLoadSequenceForId(geneList);
-
-            } catch (Exception ex) {
-                err.println("ERROR: " + ex.getLocalizedMessage());
-                setIsRunning(false);
-                return;
-            }
-
-            // call the file as the first ncbi id
-            pathIn = GenBankID.makeFile(pathOut, dnaFile,
-                    geneList.get(0).trim());
-
-            if (pathIn == null) {
-                err.println("Error fatal: Fallo al obtener secuencias de NCBI.");
-                setIsRunning(false);
-                return;
-            }
-
-            this.listOfFiles = new File[1];
-            this.listOfFiles[0] = new File(pathIn);
-
-        }*/
         // Start process
         loopMatcher.setBundle(bundle);
         loopMatcher.setLoopPatterns(loopList);
@@ -1252,19 +1228,43 @@ public class GUIFrame extends javax.swing.JFrame {
         return Collections.unmodifiableList(this.geneList);
     }
 
+    /**
+     * 
+     * @param newGeneList 
+     */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     public void setGeneList(ArrayList<String> newGeneList) {
         this.geneList = newGeneList;
     }
 
+    /**
+     * 
+     * @return 
+     */
+    public JProgressBar getProgressBar(){
+        return this.jProgressBar1;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
     public JTextArea getTxtConsole() {
         return this.jTAConsole;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public JButton getJBtnStart() {
         return this.jBtnStart;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public LoopMatcher getLoopMatcher() {
         return this.loopMatcher;
     }

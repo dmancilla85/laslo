@@ -516,7 +516,7 @@ public class LoopMatcher {
         CSVWriter writer;
         boolean genbank;
         String fileName, fileOut;
-        final int MAX_HILOS = 25;
+        final int MAX_HILOS = 30;
         int totalSecuencias;
         int nHilos = MAX_HILOS;
         int i;
@@ -621,7 +621,7 @@ public class LoopMatcher {
                 jpBar.setValue(progress);
                 
                 if (i++ < nHilos) {
-                    out.println("Seq: " + count + " - Thread latch #" + i);
+                    //out.println("Seq: " + count + " - Thread latch #" + i);
                     thread.setLatch(latch);
                     pool.execute(thread);
                 } else {
@@ -679,8 +679,6 @@ public class LoopMatcher {
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
         } 
-        
-        jpBar.setValue(100);
     }
 
     /**

@@ -35,7 +35,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 
+ *
  * @author David A. Mancilla
  */
 class PosComparator implements Comparator<Integer> {
@@ -48,6 +48,7 @@ class PosComparator implements Comparator<Integer> {
 
 /**
  * Main class for stem-loops
+ *
  * @author David A. Mancilla
  * @version 1.0
  * @since 2016-12-13
@@ -290,7 +291,6 @@ public class StemLoop {
         return header
                 + "LoopPattern" + SourceFile.getROW_DELIMITER()
                 + "TerminalPair" + SourceFile.getROW_DELIMITER()
-                + "Sense" + SourceFile.getROW_DELIMITER()
                 + "N-2" + SourceFile.getROW_DELIMITER()
                 + "N-1" + SourceFile.getROW_DELIMITER()
                 + "N2" + SourceFile.getROW_DELIMITER()
@@ -321,8 +321,10 @@ public class StemLoop {
                 + "PurinePercentPairs" + SourceFile.getROW_DELIMITER()
                 + "RnaFoldMFE" + SourceFile.getROW_DELIMITER()
                 + "RelativePosition" + SourceFile.getROW_DELIMITER()
+                + "Sense" + SourceFile.getROW_DELIMITER()
                 + "AdditionalSeqMatches" + SourceFile.getROW_DELIMITER()
-                + "AdditionalSeqPositions" + SourceFile.getROW_DELIMITER();
+                + "AdditionalSeqPositions" + SourceFile.getROW_DELIMITER()
+                ;
     }
 
     /**
@@ -658,7 +660,7 @@ public class StemLoop {
     }
 
     /**
-     * 
+     *
      */
     public void checkPairments() {
 
@@ -682,8 +684,8 @@ public class StemLoop {
             firstIzq = this.getViennaStructure().lastIndexOf('(');
             int firstDer = this.getViennaStructure().indexOf(')');
 
-            for (int i = firstIzq; i >= 0 && firstDer < 
-                    getViennaStructure().length(); i--) {
+            for (int i = firstIzq; i >= 0 && firstDer
+                    < getViennaStructure().length(); i--) {
                 if (getViennaStructure().charAt(i) == '(') {
                     while (getViennaStructure().charAt(firstDer) != ')') {
                         firstDer++;
@@ -697,13 +699,13 @@ public class StemLoop {
                             woobleCount++;
                         } else {
                             if ((seq.charAt(i) == 'U' && seq.charAt(firstDer) == 'A')
-                                    || (seq.charAt(i) == 'A' 
+                                    || (seq.charAt(i) == 'A'
                                     && seq.charAt(firstDer) == 'U')) {
                                 AU++;
                             }
 
                             if ((seq.charAt(i) == 'C' && seq.charAt(firstDer) == 'G')
-                                    || (seq.charAt(i) == 'G' 
+                                    || (seq.charAt(i) == 'G'
                                     && seq.charAt(firstDer) == 'C')) {
                                 CG++;
                             }
@@ -724,7 +726,7 @@ public class StemLoop {
     }
 
     /**
-     * 
+     *
      */
     public void checkInternalLoops() {
         this.setInternalLoops(0);
@@ -737,7 +739,7 @@ public class StemLoop {
         len = auxStruct.length();
         aux = auxStruct.indexOf(")");
         auxI = auxStruct.lastIndexOf("(");
-        
+
         for (int i = 0; (auxI - i) >= 0 && (aux + i) < len; i++) {
 
             if (auxStruct.charAt(auxI - i) == 'a'
@@ -757,17 +759,17 @@ public class StemLoop {
      * @param startPosLoop
      */
     public void setNLoop(int startPosLoop) {
-        char n2 = ' ', 
-                n5 = ' ', 
-                n6 = ' ', 
+        char n2 = ' ',
+                n5 = ' ',
+                n6 = ' ',
                 n7 = ' ',
                 n8 = ' ';
-        char precedes = ' ', 
+        char precedes = ' ',
                 precedes2 = ' ';
-        int matchFirst, 
+        int matchFirst,
                 matchLast,
                 startPos;
-        
+
         startPos = startPosLoop;
 
         if (isReversed()) {
@@ -783,40 +785,46 @@ public class StemLoop {
             }
         }
 
-        if (this.getRnaHairpinSequence() != null) {
+        try {
+            if (this.getRnaHairpinSequence() != null) {
 
-            n2 = this.getRnaHairpinSequence().charAt(startPos + 1);
-            precedes = this.getRnaHairpinSequence().charAt(startPos - 1);
-            precedes2 = this.getRnaHairpinSequence().charAt(startPos - 2);
+                n2 = this.getRnaHairpinSequence().charAt(startPos + 1);
+                precedes = this.getRnaHairpinSequence().charAt(startPos - 1);
+                precedes2 = this.getRnaHairpinSequence().charAt(startPos - 2);
 
-            if (this.getLoop().length() > 4) {
-                n5 = this.getRnaHairpinSequence().charAt(startPos + 4);
+                if (this.getLoop().length() > 4) {
+                    n5 = this.getRnaHairpinSequence().charAt(startPos + 4);
 
-                if (this.getLoop().length() > 5) {
-                    n6 = this.getRnaHairpinSequence().charAt(startPos + 5);
+                    if (this.getLoop().length() > 5) {
+                        n6 = this.getRnaHairpinSequence().charAt(startPos + 5);
 
-                    if (this.getLoop().length() > 6) {
-                        n7 = this.getRnaHairpinSequence().charAt(startPos + 6);
+                        if (this.getLoop().length() > 6) {
+                            n7 = this.getRnaHairpinSequence().charAt(startPos + 6);
 
-                        if (this.getLoop().length() > 7) {
-                            n8 = this.getRnaHairpinSequence().charAt(startPos + 7);
+                            if (this.getLoop().length() > 7) {
+                                n8 = this.getRnaHairpinSequence().charAt(startPos + 7);
+                            }
+
                         }
-
                     }
                 }
             }
-        }
 
-        this.setN2Loop(n2);
-        this.setN5Loop(n5);
-        this.setN6Loop(n6);
-        this.setN7Loop(n7);
-        this.setN8Loop(n8);
-        this.setPredecessorLoop(precedes);
-        this.setPredecessor2Loop(precedes2);
+            this.setN2Loop(n2);
+            this.setN5Loop(n5);
+            this.setN6Loop(n6);
+            this.setN7Loop(n7);
+            this.setN8Loop(n8);
+            this.setPredecessorLoop(precedes);
+            this.setPredecessor2Loop(precedes2);
 
-        if (isReversed()) {
-            this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
+            if (isReversed()) {
+                this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
+            }
+        } catch (Exception ex) {
+            err.println("\nERROR: " + ex.getMessage());
+            err.println(this.getId_fasta().toRowCSV());
+            err.println(this);
         }
     }
 
@@ -847,7 +855,7 @@ public class StemLoop {
         aux = getRnaHairpinSequence();
 
         if (aux != null) {
-            count = aux.length() - aux.replace("A", "").length(); 
+            count = aux.length() - aux.replace("A", "").length();
             count += aux.length() - aux.replace("G", "").length();
 
             myPercent_AG = count / (float) aux.length();
@@ -966,10 +974,9 @@ public class StemLoop {
         this.percU_sequence = percU_sequence;
     }
 
-    
     /**
-     * 
-     * @param locations 
+     *
+     * @param locations
      */
     public void setAdditionalSeqLocations(List<Integer> locations) {
         this.additionalSeqLocations = locations;
@@ -1042,14 +1049,26 @@ public class StemLoop {
      *
      * @return
      */
+    @Override
+    public String toString() {
+        return "{" + this.id_fasta.getGeneID() + "; "
+                + this.startsAt + "; "
+                + this.endsAt + "; "
+                + this.loop + "; "
+                + this.rnaHairpinSequence + "; "
+                + this.viennaStructure + "}";
+    }
+
+    /**
+     *
+     * @return
+     */
     public String toRowCSV() {
 
         return this.getId_fasta().toRowCSV()
                 + this.getLoopPattern() + SourceFile.getROW_DELIMITER()
-                + this.getTerminalPair() + SourceFile.getROW_DELIMITER()
-                + this.isReverse() + SourceFile.getROW_DELIMITER()
+                + this.getTerminalPair() + SourceFile.getROW_DELIMITER()     
                 + this.getPredecessor2Loop() + SourceFile.getROW_DELIMITER() //n-2
-        
                 + this.getPredecessorLoop() + SourceFile.getROW_DELIMITER()
                 + this.getN2Loop() + SourceFile.getROW_DELIMITER()
                 + this.getN5Loop() + SourceFile.getROW_DELIMITER()
@@ -1062,7 +1081,7 @@ public class StemLoop {
                 + this.getAdditional3Seq() + SourceFile.getROW_DELIMITER()
                 + this.getHairpinStructure() + SourceFile.getROW_DELIMITER()
                 + this.getStructure() + SourceFile.getROW_DELIMITER()
-                + this.getPairments() + SourceFile.getROW_DELIMITER() /* para que me de apareamientos */ 
+                + this.getPairments() + SourceFile.getROW_DELIMITER() /* para que me de apareamientos */
                 + this.getGUPairs() + SourceFile.getROW_DELIMITER()
                 + this.getMismatches() + SourceFile.getROW_DELIMITER()
                 + this.getInternalLoops() + SourceFile.getROW_DELIMITER()
@@ -1079,6 +1098,7 @@ public class StemLoop {
                 + getFormattedNumber(this.getPercent_AG()) + SourceFile.getROW_DELIMITER()
                 + getFormattedNumber(this.getMfe(), 5) + SourceFile.getROW_DELIMITER()
                 + getFormattedNumber(this.getRelativePos()) + SourceFile.getROW_DELIMITER()
+                + this.isReverse() + SourceFile.getROW_DELIMITER()
                 + this.getAdditionalSequenceCount() + SourceFile.getROW_DELIMITER()
                 + this.getAdditionalSequenceLocations() + SourceFile.getROW_DELIMITER();
     }

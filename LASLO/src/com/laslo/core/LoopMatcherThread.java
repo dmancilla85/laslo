@@ -24,7 +24,6 @@ import java.util.Iterator;
 import static com.laslo.core.SequenceAnalizer.*;
 import com.tools.OSValidator;
 import static java.lang.System.err;
-import static java.lang.System.out;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -83,13 +82,9 @@ public class LoopMatcherThread implements Runnable {
 
         if (!started) {
 
-            countThreads = OSValidator.getNumberOfCPUCores() - 1;
+            countThreads = OSValidator.getNumberOfCPUCores() + 4;
 
-            /*if (countThreads > 1) {
-                countThreads -= 1;
-            }*/
-
- /*out.println(java.text.MessageFormat.format(bundle
+			/*out.println(java.text.MessageFormat.format(bundle
                     .getString("USING_N_CORES"), new Object[] {countThreads}));*/
             SEM = new Semaphore(countThreads);
             started = true;
