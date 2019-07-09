@@ -81,8 +81,8 @@ public class LoopMatcherThread implements Runnable {
         this.bundle = bundle;
 
         if (!started) {
-
-            countThreads = OSValidator.getNumberOfCPUCores() + 4;
+            // 2 * n + 1
+            countThreads = 2 * OSValidator.getNumberOfCPUCores() + 1;
 
 			/*out.println(java.text.MessageFormat.format(bundle
                     .getString("USING_N_CORES"), new Object[] {countThreads}));*/

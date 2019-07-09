@@ -599,7 +599,7 @@ public class SequenceAnalizer {
             try {  // 1. extract the full stem-loop sequence
 
                 // check left border length
-                if (loopPos - length < 0 && loopPos > minLength) {
+                if (loopPos - length < 0 && loopPos  > minLength) {
                     length = loopPos;
                 }
 
@@ -608,7 +608,7 @@ public class SequenceAnalizer {
                     length = sequenceLength - loopPos - loopLength;
                 }
 
-                if ((loopPos - length) > 0
+                if ((loopPos - length) > 0 && length >= minLength
                         && (loopPos + loopLength + length) <= sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
                             loopPos + loopLength + length);
