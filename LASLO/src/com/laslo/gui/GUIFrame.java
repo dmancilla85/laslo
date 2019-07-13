@@ -72,7 +72,7 @@ public class GUIFrame extends javax.swing.JFrame {
     public GUIFrame() throws IOException {
         loopMatcher = new LoopMatcher();
         isRunning = false;
-        this.locale = new Locale("es", "AR");
+        this.locale = new Locale("en", "US");
         this.bundle = getBundle("resources/Bundle", locale);
         initComponents();
         this.jRBen_EN.setSelected(true);
@@ -176,7 +176,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
+        //java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
