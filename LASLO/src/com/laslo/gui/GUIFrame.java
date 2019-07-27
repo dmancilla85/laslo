@@ -36,6 +36,8 @@ import static java.lang.System.setOut;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Collections;
@@ -99,6 +101,11 @@ public class GUIFrame extends javax.swing.JFrame {
         PrintStream ps = new PrintStream(taos);
         setOut(ps);
         setErr(ps);
+        
+        if(!checkExternalFiles()){
+            MessageBox.show("Missing external executables, check the EXT folder.","ERROR");
+            System.exit(0b1);
+        }
     }
 
     /**
@@ -1299,5 +1306,12 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     public String getPathOut() {
         return this.pathOut;
+    }
+    
+    public final boolean checkExternalFiles(){
+        File f1 = new File("./ext/RNAfold.exe");
+        File f2 = new File("./ext/ushuffle.exe");
+        
+        return f1.exists() && f2.exists();
     }
 }
