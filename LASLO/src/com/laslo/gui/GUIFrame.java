@@ -36,8 +36,6 @@ import static java.lang.System.setOut;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Collections;
@@ -82,7 +80,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
-        //this.fromLocalPath = true;
+        this.jsTemperature.setValue(37);
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLblWoobles.setVisible(false);
@@ -127,6 +125,8 @@ public class GUIFrame extends javax.swing.JFrame {
         jLblDestiny = new javax.swing.JLabel();
         jTFPathOut = new javax.swing.JTextField();
         jButtonOut = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jsTemperature = new javax.swing.JSpinner();
         jPanOptions = new javax.swing.JPanel();
         jLblStemBetween = new javax.swing.JLabel();
         jSpinMinLength = new javax.swing.JSpinner();
@@ -183,7 +183,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        //java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -239,6 +239,16 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jLabel1.setText(bundle.getString("TEMPERATURE")); // NOI18N
+
+        jsTemperature.setPreferredSize(new java.awt.Dimension(45, 22));
+        jsTemperature.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jsTemperatureStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanOutputLayout = new javax.swing.GroupLayout(jPanOutput);
         jPanOutput.setLayout(jPanOutputLayout);
         jPanOutputLayout.setHorizontalGroup(
@@ -251,11 +261,16 @@ public class GUIFrame extends javax.swing.JFrame {
                             .addComponent(jcbMakeRandoms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jcbExtended, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
                         .addGap(6, 6, 6)
-                        .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanOutputLayout.createSequentialGroup()
+                                .addComponent(jftNumberOfRandoms, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10)
+                                .addComponent(jLblNKlet, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jsTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanOutputLayout.createSequentialGroup()
                         .addComponent(jLblDestiny)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -283,7 +298,10 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jLblNKlet)
                     .addComponent(jftkLet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcbExtended)
+                .addGroup(jPanOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jcbExtended)
+                    .addComponent(jLabel1)
+                    .addComponent(jsTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -889,6 +907,21 @@ public class GUIFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jProgressBar1PropertyChange
 
+    private void jsTemperatureStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jsTemperatureStateChanged
+        // TODO add your handling code here:
+        Integer myValue = (Integer)this.jsTemperature.getValue();
+        
+        if( myValue < 0){
+            this.jsTemperature.setValue(0);
+            return;
+        }
+        
+         if(myValue > 99){
+            this.jsTemperature.setValue(99);
+        }
+        
+    }//GEN-LAST:event_jsTemperatureStateChanged
+
     /**
      * @param args the command line arguments
      */
@@ -921,6 +954,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JButton jBtnStop;
     private javax.swing.JButton jButtonIn;
     private javax.swing.JButton jButtonOut;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -966,6 +1000,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jftkLet;
     private javax.swing.JLabel jlSingleSequence;
     private javax.swing.JRadioButton jrbNcbi;
+    private javax.swing.JSpinner jsTemperature;
     // End of variables declaration//GEN-END:variables
 
     private Locale locale;
@@ -1166,6 +1201,7 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         int max, min, wooble, mismatch, randoms, klet;
+        double temperature = (double) this.jsTemperature.getValue();
         pathOut = this.jTFPathOut.getText();
         pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
@@ -1218,6 +1254,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopMatcher.setNumberOfRandoms(randoms);
         loopMatcher.setkLetRandoms(klet);
         loopMatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
+        loopMatcher.setTemperature(temperature);
 
         // Add progress bar
         loopMatcher.setProgressBar(jProgressBar1);

@@ -224,7 +224,7 @@ public class SequenceAnalizer {
     public static synchronized int sequenceResearch(DNASequence fastaSeq,
             String stemLoopPattern, CSVWriter writer, boolean invert,
             int maxLength, int minLength, InputSequence inputType,
-            String additionalSeq) {
+            String additionalSeq, double temperature) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -351,7 +351,7 @@ public class SequenceAnalizer {
                         try { // ..is it useful??..
                             LoopMatcherThread.getSEM().acquire();
                             // call RNAfold aplication
-                            fold = new RNAfold(rnaSeq);
+                            fold = new RNAfold(rnaSeq, temperature);
 
                         } catch (InterruptedException ex) {
                             err.printf(getBundle().getString("ERROR_CLASE"),
@@ -421,7 +421,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                    slr.setMfe(new RNAfold(rnaSeq, temperature).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         err.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
@@ -513,7 +513,7 @@ public class SequenceAnalizer {
     public static int sequenceExtendedResearch(DNASequence fastaSeq,
             String viennaStructure, String stemLoopPattern, CSVWriter writer,
             boolean invert, int maxLength, int minLength,
-            InputSequence inputType, String additionalSeq) {
+            InputSequence inputType, String additionalSeq, double temperature) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -695,7 +695,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                    slr.setMfe(new RNAfold(rnaSeq, temperature).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         err.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());

@@ -73,6 +73,7 @@ public class LoopMatcher {
     private String additionalSequence;
     private boolean searchReverse;
     private int progress;
+    private double temperature;
     private JProgressBar jpBar;
 
     /**
@@ -112,6 +113,7 @@ public class LoopMatcher {
         this.bundle = ResourceBundle.getBundle("resources/Bundle", locale);
         SequenceAnalizer.setBundle(bundle);
         this.searchReverse = searchReverse;
+        this.temperature = 25.00;
     }
 
     /**
@@ -172,6 +174,8 @@ public class LoopMatcher {
         return kLetRandoms;
     }
 
+    
+    
     /**
      * 
      * @param kLetRandoms 
@@ -615,7 +619,7 @@ public class LoopMatcher {
                         isExtendedMode(), getAdditionalSequence(), 
                         getMaxLength(), getMinLength(), element, 
                         getInputType(), patternItr, writer, isSearchReverse(),
-                        bundle);
+                        bundle, temperature);
 
                 this.progress = (int)round(count/(double)totalSecuencias * 100);
                 jpBar.setValue(progress);
@@ -740,5 +744,13 @@ public class LoopMatcher {
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     public void setFileList(File[] fileList) {
         this.fileList = fileList;
+    }
+
+    public double getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
     }
 }

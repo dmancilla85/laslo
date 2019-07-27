@@ -27,8 +27,6 @@ import static java.lang.System.err;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
 
 /**
@@ -37,20 +35,21 @@ import org.biojava.nbio.core.sequence.DNASequence;
  */
 public class LoopMatcherThread implements Runnable {
 
-    private boolean extendedMode;
-    private boolean searchReverse;
-    private String additionalSequence;
-    private int maxLength;
-    private int minLength;
-    private InputSequence inputType;
+    private final boolean extendedMode;
+    private final boolean searchReverse;
+    private final String additionalSequence;
+    private final int maxLength;
+    private final int minLength;
+    private final InputSequence inputType;
     private Iterator<String> patternItr;
-    private CSVWriter writer;
-    private DNASequence dnaElement;
+    private final CSVWriter writer;
+    private final DNASequence dnaElement;
     private static Semaphore MUTEX = new Semaphore(1);
     private static Semaphore SEM;
     private static boolean started = false;
     private CountDownLatch latch;
-    private ResourceBundle bundle;
+    private final ResourceBundle bundle;
+    private final double temperature;
 
     /**
      *
@@ -64,11 +63,13 @@ public class LoopMatcherThread implements Runnable {
      * @param writer
      * @param searchReverse
      * @param bundle
+     * @param temperature
      */
     public LoopMatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
-            CSVWriter writer, boolean searchReverse, ResourceBundle bundle) {
+            CSVWriter writer, boolean searchReverse, ResourceBundle bundle,
+            double temperature) {
 
         final int countThreads;
         this.extendedMode = extendedMode;
@@ -81,12 +82,13 @@ public class LoopMatcherThread implements Runnable {
         this.writer = writer;
         this.searchReverse = searchReverse;
         this.bundle = bundle;
+        this.temperature = temperature;
 
         if (!started) {
             // 2 * n + 1
             countThreads = 2 * OSValidator.getNumberOfCPUCores() + 1;
 
-			/*out.println(java.text.MessageFormat.format(bundle
+            /*out.println(java.text.MessageFormat.format(bundle
                     .getString("USING_N_CORES"), new Object[] {countThreads}));*/
             SEM = new Semaphore(countThreads);
             started = true;
@@ -102,14 +104,6 @@ public class LoopMatcherThread implements Runnable {
 
     /**
      *
-     * @param bundle
-     */
-    public void setBundle(ResourceBundle bundle) {
-        this.bundle = bundle;
-    }
-
-    /**
-     *
      */
     @Override
     public void run() {
@@ -120,16 +114,16 @@ public class LoopMatcherThread implements Runnable {
         if (isExtendedMode()) {
             try {
                 fold = new RNAfold(getDnaElement().getRNASequence()
-                        .getSequenceAsString());
+                        .getSequenceAsString(), temperature);
             } catch (Exception ex) {
-                if(ex.getMessage().length() > 0){
+                if (ex.getMessage().length() > 0) {
                     err.println(this.dnaElement.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
                 } else {
                     err.println(this.dnaElement.getAccession() + " - RNAFold unknown error.");
-                }   
+                }
             }
-            
-            if(fold.gotError()){
+
+            if (fold.gotError()) {
                 getLatch().countDown();
                 return;
             }
@@ -148,7 +142,7 @@ public class LoopMatcherThread implements Runnable {
                             fold.getStructure(),
                             currentPattern, getWriter(), false, getMaxLength(),
                             getMinLength(), getInputType(),
-                            getAdditionalSequence());
+                            getAdditionalSequence(), temperature);
                 } catch (InterruptedException ex) {
                     err.println(java.text.MessageFormat.format(
                             getBundle()
@@ -164,7 +158,7 @@ public class LoopMatcherThread implements Runnable {
                                 fold.getStructure(),
                                 currentPattern, getWriter(), true, getMaxLength(),
                                 getMinLength(), getInputType(),
-                                getAdditionalSequence());
+                                getAdditionalSequence(), temperature);
 
                     } catch (InterruptedException ex) {
                         err.println(java.text.MessageFormat.format(
@@ -178,13 +172,13 @@ public class LoopMatcherThread implements Runnable {
 
                 SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
                         getWriter(), false, getMaxLength(), getMinLength(),
-                        getInputType(), getAdditionalSequence());
+                        getInputType(), getAdditionalSequence(), temperature);
 
                 if (isSearchReverse()) {
                     SequenceAnalizer.sequenceResearch(getDnaElement(),
                             currentPattern, getWriter(), true, getMaxLength(),
                             getMinLength(), getInputType(),
-                            getAdditionalSequence());
+                            getAdditionalSequence(), temperature);
                 }
 
             }
@@ -264,66 +258,10 @@ public class LoopMatcherThread implements Runnable {
     }
 
     /**
-     * @param additionalSequence the additionalSequence to set
-     */
-    public void setAdditionalSequence(String additionalSequence) {
-        this.additionalSequence = additionalSequence;
-    }
-
-    /**
-     * @param dnaElement the dnaElement to set
-     */
-    public void setDnaElement(DNASequence dnaElement) {
-        this.dnaElement = dnaElement;
-    }
-
-    /**
-     * @param extendedMode the extendedMode to set
-     */
-    public void setExtendedMode(boolean extendedMode) {
-        this.extendedMode = extendedMode;
-    }
-
-    /**
-     * @param inputType the inputType to set
-     */
-    public void setInputType(InputSequence inputType) {
-        this.inputType = inputType;
-    }
-
-    /**
-     * @param maxLength the maxLength to set
-     */
-    public void setMaxLength(int maxLength) {
-        this.maxLength = maxLength;
-    }
-
-    /**
-     * @param minLength the minLength to set
-     */
-    public void setMinLength(int minLength) {
-        this.minLength = minLength;
-    }
-
-    /**
      * @param patternItr the patternItr to set
      */
     public void setPatternItr(Iterator<String> patternItr) {
         this.patternItr = patternItr;
-    }
-
-    /**
-     * @param searchReverse the searchReverse to set
-     */
-    public void setSearchReverse(boolean searchReverse) {
-        this.searchReverse = searchReverse;
-    }
-
-    /**
-     * @param writer the writer to set
-     */
-    public void setWriter(CSVWriter writer) {
-        this.writer = writer;
     }
 
     /**
