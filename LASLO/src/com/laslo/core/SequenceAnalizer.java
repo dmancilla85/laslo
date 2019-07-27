@@ -420,7 +420,15 @@ public class SequenceAnalizer {
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.checkInternalLoops();
-                slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                try {
+                    slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                } catch (Exception ex) {
+                    if (ex.getMessage().length() > 0) {
+                        err.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                    } else {
+                        err.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
+                    }
+                }
                 //err.println(slr.getId_fasta().toRowCSV());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
@@ -599,7 +607,7 @@ public class SequenceAnalizer {
             try {  // 1. extract the full stem-loop sequence
 
                 // check left border length
-                if (loopPos - length < 0 && loopPos  > minLength) {
+                if (loopPos - length < 0 && loopPos > minLength) {
                     length = loopPos;
                 }
 
@@ -686,7 +694,15 @@ public class SequenceAnalizer {
                 slr.setSequenceLength(sequenceLength);
                 slr.checkPairments();
                 slr.checkInternalLoops();
-                slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                try {
+                    slr.setMfe(new RNAfold(rnaSeq).getMfe());
+                } catch (Exception ex) {
+                    if (ex.getMessage().length() > 0) {
+                        err.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                    } else {
+                        err.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
+                    }
+                }
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
 

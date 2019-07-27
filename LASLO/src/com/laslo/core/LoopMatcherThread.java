@@ -27,6 +27,8 @@ import static java.lang.System.err;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
 
 /**
@@ -116,8 +118,21 @@ public class LoopMatcherThread implements Runnable {
 
         // sólo para modo dos
         if (isExtendedMode()) {
-            fold = new RNAfold(getDnaElement().getRNASequence()
-                    .getSequenceAsString());
+            try {
+                fold = new RNAfold(getDnaElement().getRNASequence()
+                        .getSequenceAsString());
+            } catch (Exception ex) {
+                if(ex.getMessage().length() > 0){
+                    err.println(this.dnaElement.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                } else {
+                    err.println(this.dnaElement.getAccession() + " - RNAFold unknown error.");
+                }   
+            }
+            
+            if(fold.gotError()){
+                getLatch().countDown();
+                return;
+            }
         }
         // III. Loop level
         while (getPatternItr().hasNext()) {
