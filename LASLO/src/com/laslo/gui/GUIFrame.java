@@ -1201,7 +1201,7 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         int max, min, wooble, mismatch, randoms, klet;
-        double temperature = (double) this.jsTemperature.getValue();
+        double temperature = (Integer)this.jsTemperature.getValue();
         pathOut = this.jTFPathOut.getText();
         pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
