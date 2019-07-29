@@ -7,6 +7,7 @@ It implements RNAfold to predict the structure of the sequence, and UShuffle to 
 # Requirements
 JAVA Runtime 8 - Latest update. https://www.java.com/en/download/
 It's highly recommended to have a multicore processor to process large sequences.
+This version only runs in a Windows x64 SO, because of the external executables. 
 
 # Instructions 
 
