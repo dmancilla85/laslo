@@ -80,7 +80,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
-        this.jsTemperature.setValue(37);
+        this.jsTemperature.setValue(25);
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLblWoobles.setVisible(false);

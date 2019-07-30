@@ -47,7 +47,7 @@ public class RNAfold {
     public RNAfold() {
         this.mfe = 0.0;
         this.structure = "";
-        this.temperature = 37.00;
+        this.temperature = 25.00;
         this.avoidLonelyPairs = true;
         this.exc = null;
     }
