@@ -411,6 +411,7 @@ public class LoopMatcher {
             err.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {e.getMessage()}));
+            err.println("*Method: writeCSV*");
         }
     }
 
@@ -468,10 +469,12 @@ public class LoopMatcher {
                         err.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+                        err.println("*Method: startReadingFiles*");
                     } catch (Exception ex) {
                         err.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+                        err.println("*Method: startReadingFiles*");
                     }
                     UShuffle.makeShuffleSequences(getPathOut(), currentFile.getName(),
                             dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
@@ -678,10 +681,12 @@ public class LoopMatcher {
             err.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+            err.println("*Method: callProcessThreads*");
         } catch (Exception ex) {
             err.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
+            err.println("*Method: callProcessThreads*");
         } 
     }
 

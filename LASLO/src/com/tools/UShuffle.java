@@ -197,6 +197,7 @@ public class UShuffle {
 
             } catch (IOException | InterruptedException ex) {
                 err.println("Error: " + ex.getMessage());
+                err.println("*Method: makeShuffleSequences*");
             }
         }
 

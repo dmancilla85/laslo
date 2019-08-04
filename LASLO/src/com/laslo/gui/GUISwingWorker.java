@@ -73,6 +73,7 @@ class GUISwingWorker extends
             } catch (Exception ex) {
                 err.printf(frame.getCurrentBundle().getString("ERROR"),
                         ex.getLocalizedMessage());
+                err.println("*Method: doInBackground*downloadSequence");
                 frame.setIsRunning(false);
                 this.cancel(true);
             }

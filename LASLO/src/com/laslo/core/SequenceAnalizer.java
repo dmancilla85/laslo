@@ -193,6 +193,7 @@ public class SequenceAnalizer {
                 err.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
+                 err.println("*Method: IsValidHairpin*");
             }
         }
 
@@ -385,6 +386,7 @@ public class SequenceAnalizer {
                 err.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
+                 err.println("*Method: sequenceResearch*");
             }
 
             // extract output variables from the sequence
@@ -480,6 +482,7 @@ public class SequenceAnalizer {
                 err.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                 err.println("*Method: sequenceResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -660,6 +663,7 @@ public class SequenceAnalizer {
                 err.println(java.text.MessageFormat.format(
                         getBundle().getString("ERROR_EX"),
                         new Object[]{e.getMessage()}));
+                err.println("*Method: sequenceExtendedResearch*");
             }
 
             // extract output variables from the sequence
@@ -752,6 +756,7 @@ public class SequenceAnalizer {
             } catch (InterruptedException ex) {
                 err.println(java.text.MessageFormat.format(
                         getBundle().getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                err.println("*Method: sequenceExtendedResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }

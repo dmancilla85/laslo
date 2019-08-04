@@ -103,6 +103,7 @@ public class GenBankID extends SourceFile {
             err.println("DNAFile size: " + dnaFile.size());
             err.println("ERROR: " + ex.getMessage() + ". "
                     + ex.getLocalizedMessage());
+            err.println("*Method: GenBank-makeFile*");
             return null;
         }
 
@@ -136,6 +137,7 @@ public class GenBankID extends SourceFile {
 
         } catch (IOException e) {
             err.println("ERROR: " + e.getLocalizedMessage());
+            err.println("*Method: GenBank-getProxyConfiguration*");
         }
 
         return proxy;
@@ -161,6 +163,7 @@ public class GenBankID extends SourceFile {
             }
         } catch (Exception ex) {
             err.println("ERROR: " + ex.getMessage());
+            err.println("*Method: GenBank-connectToProxy*");
             return false;
         }
 
