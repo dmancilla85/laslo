@@ -366,7 +366,6 @@ public class GUIFrame extends javax.swing.JFrame {
         jTALoopPatterns.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
         jTALoopPatterns.setRows(3);
         jTALoopPatterns.setTabSize(2);
-        jTALoopPatterns.setText("CNGG, CNGGN, CNGGNN, CNGGNNN, CNGGNNNN");
         jTALoopPatterns.setToolTipText(bundle.getString("ENTER_LOOP_TOOLTIP")); // NOI18N
         jTALoopPatterns.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane1.setViewportView(jTALoopPatterns);
@@ -1048,6 +1047,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jBtnStart.setEnabled(!value);
         this.jLblError.setText("");
         this.jBtnStop.setEnabled(value);
+        this.jTabInput.setEnabled(!value);
     }
 
     /**
