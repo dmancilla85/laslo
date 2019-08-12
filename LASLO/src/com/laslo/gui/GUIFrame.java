@@ -75,8 +75,8 @@ public class GUIFrame extends javax.swing.JFrame {
         this.locale = new Locale("en", "US");
         this.bundle = getBundle("resources/Bundle", locale);
         initComponents();
-        this.jRBen_EN.setSelected(true);
-        this.jRBes_AR.setSelected(false);
+        //this.jRBen_EN.setSelected(true);
+        //this.jRBes_AR.setSelected(false);
         this.jLblError.setText("");
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
@@ -163,8 +163,6 @@ public class GUIFrame extends javax.swing.JFrame {
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
-        jRBen_EN = new javax.swing.JRadioButtonMenuItem();
-        jRBes_AR = new javax.swing.JRadioButtonMenuItem();
         jMIAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -183,7 +181,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle",locale); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -655,24 +653,6 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jMenuHelp.setText(bundle.getString("HELP")); // NOI18N
 
-        jRBen_EN.setSelected(true);
-        jRBen_EN.setText("English");
-        jRBen_EN.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRBen_ENActionPerformed(evt);
-            }
-        });
-        jMenuHelp.add(jRBen_EN);
-
-        jRBes_AR.setSelected(true);
-        jRBes_AR.setText("Spanish");
-        jRBes_AR.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRBes_ARActionPerformed(evt);
-            }
-        });
-        jMenuHelp.add(jRBes_AR);
-
         jMIAbout.setText(bundle.getString("ABOUT")); // NOI18N
         jMIAbout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -855,15 +835,9 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jftkLet.setEnabled(val);
     }//GEN-LAST:event_jcbMakeRandomsActionPerformed
 
-    private void jRBes_ARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBes_ARActionPerformed
-        // TODO add your handling code here:
-        this.jRBen_EN.setSelected(false);
-        this.locale = new Locale("es", "ES");
-    }//GEN-LAST:event_jRBes_ARActionPerformed
-
     private void jRBen_ENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
         // TODO add your handling code here:
-        jRBes_AR.setSelected(false);
+        //jRBes_AR.setSelected(false);
         this.locale = new Locale("en", "US");
     }//GEN-LAST:event_jRBen_USActionPerformed
 
@@ -976,8 +950,6 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanOptions;
     private javax.swing.JPanel jPanOutput;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JRadioButtonMenuItem jRBen_EN;
-    private javax.swing.JRadioButtonMenuItem jRBes_AR;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
