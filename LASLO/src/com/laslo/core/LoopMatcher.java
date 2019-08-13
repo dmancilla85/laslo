@@ -483,7 +483,14 @@ public class LoopMatcher {
             out.print(getBundle().getString("DONE"));
 
             File folder;
-            folder = new File(getPathIn() + UShuffle.getRandomDir());
+            String path1 = getPathIn();
+            
+            if(path1 == null){
+                // Is a NCBI file
+                path1 = getPathOut();
+            }
+            
+            folder = new File(path1 + UShuffle.getRandomDir());
             File[] randomFiles;
             randomFiles = folder.listFiles();
             setFileList(unionFiles(getFileList(), randomFiles));
