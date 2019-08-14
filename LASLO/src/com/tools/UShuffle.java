@@ -27,6 +27,7 @@ import static java.lang.System.out;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
@@ -166,10 +167,13 @@ public class UShuffle {
                         if (sequence.length() > 30000) {
                             sequence = sequence.substring(0, 30000);
                         }
-
+                        
+                        Random gen = new Random( java.lang.System.currentTimeMillis() );
+                        
                         Process pr
                                 = new ProcessBuilder(COMMAND_SHUFFLE, "-s", sequence,
-                                        "-k", Integer.toString(k)).start();
+                                        "-k", Integer.toString(k),
+                                        "-seed", String.valueOf(gen.nextInt(99999))).start();
 
                         try (InputStream in = pr.getInputStream()) {
                             int c;
