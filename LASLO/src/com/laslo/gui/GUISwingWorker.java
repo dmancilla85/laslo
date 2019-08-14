@@ -60,7 +60,6 @@ class GUISwingWorker extends
         LinkedHashMap<String, DNASequence> dnaFile;
         String pathIn;
         File[] listOfFiles;
-        dnaFile = new LinkedHashMap<>();
 
         LoopMatcher lm = this.getLoop();
         
@@ -76,6 +75,13 @@ class GUISwingWorker extends
                 err.println("*Method: doInBackground*downloadSequence");
                 frame.setIsRunning(false);
                 this.cancel(true);
+                return 0;
+            }
+            
+            if(dnaFile == null){
+                frame.setIsRunning(false);
+                this.cancel(true);
+                return 0;
             }
 
             // call the file as the first ncbi id
@@ -87,6 +93,7 @@ class GUISwingWorker extends
                 err.println(frame.getCurrentBundle().getString("NCBI_FATAL"));
                 frame.setIsRunning(false);
                 this.cancel(true);
+                return 0;
             }
 
             listOfFiles = new File[1];
