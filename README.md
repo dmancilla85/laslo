@@ -1,4 +1,4 @@
-# LASLO v1.0 - README
+# LASLO v1.01 - README
 
 # Introduction
 Multi-threaded application that searches for hairpin structures in cDNA / mRNA sequences (FASTA or GenBank) with specific consensus sequences in the loop.
@@ -9,7 +9,15 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/
 It's highly recommended to have a multicore processor to process large sequences.
 This version only runs in a Windows x64 SO, because of the external executables. 
 
-# Instructions 
+# Latest release
+* Fixed problem with generation of multiple shuffled sequences
+
+# Instructions
+* Full fold mode
+If you select the 'full fold' mode, the entire sequence will be processed with the RNAFold and then, the application will look for stem-loops containing the loop patterns ingresed.
+If you do not select the full fold mode, only one section of the entire sequence will be folded. This section will contain the pattern sought in the center and at the ends, two frames with the same or less number of bases as the maximum length indicated for the stem.
+* Shuffled Sequences
+If you check this option, you must indicate the number of shuffled sequences to generate, the k-let value, which is the number of bases to shuffle together. By default, the k-let value is 2, so the shuffled sequence should conserve the stacking energy.
 
 # Credits and Acknowledgments
 
