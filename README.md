@@ -46,7 +46,8 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 
 > **Output table**		
 >> ***Note 1. The first columns may vary, it depends on the anotations in the FASTA files.***
->> ***Actually is able to parse Ensembl, FlyBase, GenBank and BIOMart headers. Each of these formats have different initial columns.***	
+>> ***Actually is able to parse Ensembl, FlyBase, GenBank and BIOMart headers. Each of these formats have different initial columns.***
+
 >>	**LoopPattern** (nominal): The pattern matched by the current loop.
 
 >>	**Sense**: (+) sense or (-) nonsense. Useful if the "Search in anti-sense" is checked.
@@ -109,9 +110,13 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 >>	**GU_PercentPairs**​	(double​): Percent of GU pairments in the stem-loop.
 
 >>	**PurinePercentStem** (double​): Percent of A/G bases inside the stem-loop.
+
 >>	**RnaFoldMFE** (double): Minimun free energy obtained from RNAFold for the sequence (kcal/mol).
+
 >>	**RelativePosition** (double): Start position of the stem-loop measured as StartsAt/SequenceLength.
+
 >>	**AdditionalSeqMatches** (integer)​: Count of matches for the additional sequence (If it applies).
+
 >>	**AdditionalSeqPosition**​ (list): List of start positions of the additional sequence coincidences.
 
 ## Credits and Acknowledgments
