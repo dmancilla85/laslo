@@ -147,7 +147,7 @@ public class LoopMatcherThread implements Runnable {
                         err.println(java.text.MessageFormat.format(
                                 getBundle()
                                         .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                        err.println("*Method: LoopMatcherThread-Run-1*");
+                        //err.println("*Method: LoopMatcherThread-Run-1*");
                     } finally {
                         getSEM().release();
                     }
@@ -165,7 +165,7 @@ public class LoopMatcherThread implements Runnable {
                             err.println(java.text.MessageFormat.format(
                                     getBundle()
                                             .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                             err.println("*Method: LoopMatcherThread-Run-2*");
+                             //err.println("*Method: LoopMatcherThread-Run-2*");
                         } finally {
                             getSEM().release();
                         }
@@ -186,11 +186,22 @@ public class LoopMatcherThread implements Runnable {
                 }
             }
         } catch (Exception ex) {
+            
+            String msg = "#";
+            
+            if(ex.getLocalizedMessage() != null){
+                msg += ex.getLocalizedMessage() + " - ";
+            }
+            if(ex.getMessage() != null){
+                msg += ex.getMessage() + " - ";
+            }
+            
             err.println(java.text.MessageFormat.format(
                     getBundle()
-                            .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                            .getString("ERROR_EX"), new Object[]{msg}));
             err.println("Exception: " + ex.toString());
-             err.println("*Method: LoopMatcherThread-Run-3*");
+            
+             //err.println("*Method: LoopMatcherThread-Run-3*");
         } finally {
             getLatch().countDown();
         }

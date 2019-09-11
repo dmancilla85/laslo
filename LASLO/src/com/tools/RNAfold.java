@@ -18,6 +18,7 @@
 package com.tools;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -69,12 +70,13 @@ public class RNAfold {
      *
      * @param sequence
      * @param temperature
-     * @throws java.lang.Exception
      */
-    public RNAfold(String sequence, double temperature) throws Exception{
+    public RNAfold(String sequence, double temperature) {
         String command = COMMAND_RNAFOLD; // + RNAFOLD_ARGS;
 
-        InputStreamReader isr;
+        InputStreamReader isr = null;
+        Process child = null;
+        OutputStream out = null;
         BufferedReader br;
         String line;
         String lpCmd = "--noLP";
@@ -88,39 +90,47 @@ public class RNAfold {
             lpCmd = "";
         }
 
-        //try {
-            Process child
-                    = new ProcessBuilder(command, "-d2", lpCmd, "--noPS", lpTemp)
+        try {
+            child = new ProcessBuilder(command, "-d2", lpCmd, "--noPS", lpTemp)
                     .start();
 
-            OutputStream out = child.getOutputStream();
+            out = child.getOutputStream();
             out.write(sequence.getBytes());
             out.write(13);
             out.write('@');
             out.write(13);
             out.close();
 
-            /*try (*/InputStream in = child.getInputStream()/*) {*/;
+            /*try (*/
+            InputStream in = child.getInputStream()/*) {*/;
 
-                isr = new InputStreamReader(in);
-                br = new BufferedReader(isr);
-                br.readLine();
-                br.readLine();
-                line = br.readLine();
-                this.structure = line.trim()
-                        .substring(0, sequence.length());
+            isr = new InputStreamReader(in);
+            br = new BufferedReader(isr);
+            br.readLine();
+            br.readLine();
+            line = br.readLine();
+            this.structure = line.trim()
+                    .substring(0, sequence.length());
 
-                Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)");
-                Matcher matcher = regex.matcher(line);
-                if (matcher.find()) {
-                    this.mfe = new Double(matcher.group(1));
-                    this.mfe *= (-1);
-                }
-            //}
+            Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)");
+            Matcher matcher = regex.matcher(line);
+            if (matcher.find()) {
+                this.mfe = new Double(matcher.group(1));
+                this.mfe *= (-1);
+            }
 
-            child.destroy();
             isr.close();
             out.close();
+            child.destroy();
+
+        } catch (IOException ex) {
+            Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("SeqLength: " + sequence.length());
+        } finally {
+            child = null;
+            out = null;
+            isr = null;
+        }
         /*} catch (Exception ex) {
             err.println("RNAFold error: " + ex.getLocalizedMessage());
             this.exc = ex;
@@ -130,9 +140,8 @@ public class RNAfold {
     /**
      *
      * @param sequence
-     * @throws java.lang.Exception
      */
-    public RNAfold(String sequence) throws Exception{
+    public RNAfold(String sequence) {
         this(sequence, 25.00);
     }
 
@@ -152,10 +161,10 @@ public class RNAfold {
         this.temperature = temperature;
     }
 
-    public boolean gotError(){
+    public boolean gotError() {
         return exc != null;
     }
-    
+
     /**
      *
      * @return
@@ -226,7 +235,7 @@ public class RNAfold {
         } catch (Exception ex) {
             Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
 }
