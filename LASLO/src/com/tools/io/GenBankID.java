@@ -212,6 +212,7 @@ public class GenBankID extends SourceFile {
                     err.println("ERROR: IO Exception (" + transcriptoId
                             + "). " + ex.getMessage());
                 }
+                return null;
             }
 
             if (tmp != null && tmp.size() > 0) {
