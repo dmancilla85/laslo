@@ -32,10 +32,10 @@ import java.util.regex.Pattern;
  *
  * @author David A. Mancilla
  */
-public class RNAfold {
+public class RNAFold {
 
-    private final static String COMMAND_RNAFOLD = "./ext/RNAfold.exe";
-    //private final static String RNAFOLD_ARGS = " -d2 --noLP --noPS";
+    private final static String COMMAND_RNAFold = "./ext/RNAFold.exe";
+    //private final static String RNAFold_ARGS = " -d2 --noLP --noPS";
     private String structure;
     private double mfe;
     private Double temperature;
@@ -45,7 +45,7 @@ public class RNAfold {
     /**
      *
      */
-    public RNAfold() {
+    public RNAFold() {
         this.mfe = 0.0;
         this.structure = "";
         this.temperature = 25.00;
@@ -58,7 +58,7 @@ public class RNAfold {
      * @param temp
      * @param avoidLonelyPairs
      */
-    public RNAfold(double temp, boolean avoidLonelyPairs) {
+    public RNAFold(double temp, boolean avoidLonelyPairs) {
         this.mfe = 0.0;
         this.structure = "";
         this.temperature = temp;
@@ -71,8 +71,8 @@ public class RNAfold {
      * @param sequence
      * @param temperature
      */
-    public RNAfold(String sequence, double temperature, boolean avoidLonelyPairs) {
-        String command = COMMAND_RNAFOLD; // + RNAFOLD_ARGS;
+    public RNAFold(String sequence, double temperature, boolean avoidLonelyPairs) {
+        String command = COMMAND_RNAFold; // + RNAFold_ARGS;
 
         InputStreamReader isr = null;
         Process child = null;
@@ -127,7 +127,7 @@ public class RNAfold {
 
         } catch (IOException ex) {
             out.println("--Error executing RNAFold--");
-            //Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(RNAFold.class.getName()).log(Level.SEVERE, null, ex);
             out.println("SeqLength: " + sequence.length());
         } finally {
             child = null;
@@ -140,7 +140,7 @@ public class RNAfold {
      *
      * @param sequence
      */
-    public RNAfold(String sequence) {
+    public RNAFold(String sequence) {
         this(sequence, 25.00, true);
     }
 
@@ -201,7 +201,7 @@ public class RNAfold {
      *
      */
     public String toString() {
-        return "RnaFoldInterface{" + "structure=" + structure + ", mfe=" + mfe + '}';
+        return "RNAFoldInterface{" + "structure=" + structure + ", mfe=" + mfe + '}';
     }
 
     /**
@@ -227,12 +227,12 @@ public class RNAfold {
     public static void main(String[] args) {
 
         String sequence = "UAGAGAUCUCUAUGUAUUUCCC";
-        RNAfold test;
+        RNAFold test;
         try {
-            test = new RNAfold(sequence);
+            test = new RNAFold(sequence);
             out.println(test);
         } catch (Exception ex) {
-            Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RNAFold.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
