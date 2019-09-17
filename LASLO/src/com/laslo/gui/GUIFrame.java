@@ -186,7 +186,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
+        //java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -938,7 +938,11 @@ public class GUIFrame extends javax.swing.JFrame {
         if (this.jCBMI_English.isSelected()) {
             this.setDisplayLanguage("en", "US");
             this.jCBMI_Spanish.setSelected(false);
+        } else {
+            this.setDisplayLanguage("es", "AR");
+            this.jCBMI_Spanish.setSelected(true);
         }
+
     }//GEN-LAST:event_jCBMI_EnglishActionPerformed
 
     private void jCBMI_SpanishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMI_SpanishActionPerformed
@@ -947,7 +951,11 @@ public class GUIFrame extends javax.swing.JFrame {
         if (this.jCBMI_Spanish.isSelected()) {
             this.setDisplayLanguage("es", "AR");
             this.jCBMI_English.setSelected(false);
-        }
+        } else {
+            this.setDisplayLanguage("en", "US");
+            this.jCBMI_English.setSelected(true);
+
+        }//
     }//GEN-LAST:event_jCBMI_SpanishActionPerformed
 
     private void jcbAvoidLonePairsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAvoidLonePairsActionPerformed
