@@ -8,9 +8,15 @@ Multi-threaded application that searches for hairpin structures in cDNA / mRNA s
 
 JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences. This version only runs in a Windows x64 SO, because of the external executables.
 
-## Latest release
+## Latest releases
+- 1.10 17/9/19 : 
+	- Added Language menu options - (English and spanish)
+	- Added "Avoid lonely pairs option"
+	- Fixed problems with large FASTA files ( > 50MB )
+  - 
 
-- 25/8. Fixed problem with generation of multiple shuffled sequences.
+- 1.01 25/8/19 : 
+	- Fixed problem with generation of multiple shuffled sequences.
 
 ## Instructions
 
@@ -29,7 +35,10 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 >> If you select the 'full fold' mode, the entire sequence will be processed with the RNAFold and then, the application will look for stem-loops matching the loop patterns ingresed. If you do not select the full fold mode, only one section of the entire sequence will be folded with each matching loop. This section will contain the pattern sought in the center and at the ends, two frames with the same or less number of bases as the maximum length indicated for the stem.
 >
 >> **Temperature**
->> Sets the folding temperature to RNAfold. By default 25ºC.
+>> Sets the folding temperature (in ºC) to RNAfold. By default 37ºC.
+>
+>> **Avoid lonely pairs**
+>> Produce structures without lonely pairs (helices of length 1). ([RNAFold parameter](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html))
 >
 >> **Stem length**
 >> Determines the range desired of the stem length. 
