@@ -18,6 +18,7 @@
 package com.laslo.core;
 
 import com.opencsv.CSVWriter;
+import com.tools.RNAFoldConfiguration;
 import com.tools.UShuffle;
 import com.tools.io.FASTACorrector;
 import com.tools.io.InputSequence;
@@ -73,7 +74,7 @@ public class LoopMatcher {
     private String additionalSequence;
     private boolean searchReverse;
     private int progress;
-    private double temperature;
+    private int temperature;
     private boolean avoidLonelyPairs;
     private JProgressBar jpBar;
 
@@ -114,7 +115,7 @@ public class LoopMatcher {
         this.bundle = ResourceBundle.getBundle("resources/Bundle", locale);
         SequenceAnalizer.setBundle(bundle);
         this.searchReverse = searchReverse;
-        this.temperature = 25.00;
+        this.temperature = RNAFoldConfiguration.DEFAULT_TEMP;
     }
 
     /**
@@ -778,7 +779,7 @@ public class LoopMatcher {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(int temperature) {
         this.temperature = temperature;
     }
 }

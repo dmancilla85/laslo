@@ -28,60 +28,10 @@ import com.tools.io.GenBankID;
 import static java.lang.System.out;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
-
-/**
- *
- * @author David A. Mancilla
- */
-class PosComparator implements Comparator<Integer> {
-
-    @Override
-    public int compare(Integer a, Integer b) {
-        return a > b ? -1 : (a < b ? 1 : 0);
-    }
-}
-
-/**
- * 
- * @author David A. Mancilla
- */
-class VariableBase {
-   private Character base;
-   private Integer position;
-
-    /**
-     * @return the base
-     */
-    public Character getBase() {
-        return base;
-    }
-
-    /**
-     * @return the position
-     */
-    public Integer getPosition() {
-        return position;
-    }
-
-    /**
-     * @param base the base to set
-     */
-    public void setBase(Character base) {
-        this.base = base;
-    }
-
-    /**
-     * @param position the position to set
-     */
-    public void setPosition(Integer position) {
-        this.position = position;
-    }
-}
 
 /**
  * Main class for stem-loops
@@ -125,6 +75,7 @@ public class StemLoop {
     private boolean reversed;
     private double mfe;
     private List<Integer> additionalSeqLocations;
+    private List<BaseVariable> patternVariables;
 
     /**
      *
@@ -236,6 +187,7 @@ public class StemLoop {
         this.additional5Seq = "";
         this.additional3Seq = "";
         this.additionalSeqLocations = new ArrayList<>();
+        this.patternVariables = new ArrayList<>();
     }
 
     /**
@@ -276,6 +228,18 @@ public class StemLoop {
      */
     public void setLoopPattern(String pattern) {
         this.loopPattern = pattern;
+        char aux;
+        
+        this.patternVariables.clear();
+        
+        for (int i = 0; i < pattern.length(); i++) {
+            aux = pattern.charAt(i);
+            if( aux =='N' || aux == 'K' || aux =='M' || aux =='W'
+                    || aux =='B' || aux == 'D' || aux =='R' || aux =='H'
+                    || aux =='S' || aux == 'Y' || aux =='V'){
+                this.patternVariables.add(new BaseVariable(aux, i));
+            }
+        }
     }
 
     /**
@@ -686,10 +650,21 @@ public class StemLoop {
 
     /**
      *
-     * @param loopPattern
+     * @param loop
      */
-    public void setLoop(String loopPattern) {
-        this.loop = loopPattern;
+    public void setLoop(String loop) {
+        char aux;
+        this.loop = loop;
+        
+        for(int i=0; i < loop.length(); i++){
+            for(BaseVariable baseV : patternVariables){
+                if(baseV.getPosition()==i){
+                    baseV.setValue(loop.charAt(i));
+                    out.println(baseV); //test
+                }
+            }
+        }
+        
     }
 
     public void setLocation(int pos) {

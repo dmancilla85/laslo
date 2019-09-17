@@ -18,7 +18,7 @@
 package com.laslo.core;
 
 import com.opencsv.CSVWriter;
-import com.tools.RNAfold;
+import com.tools.RNAFold;
 import com.tools.io.InputSequence;
 import java.util.Iterator;
 import static com.laslo.core.SequenceAnalizer.*;
@@ -49,7 +49,7 @@ public class LoopMatcherThread implements Runnable {
     private static boolean started = false;
     private CountDownLatch latch;
     private final ResourceBundle bundle;
-    private final double temperature;
+    private final int temperature;
     private final boolean avoidLonelyPairs;
 
     /**
@@ -71,7 +71,7 @@ public class LoopMatcherThread implements Runnable {
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse, ResourceBundle bundle,
-            double temperature, boolean avoidLonelyPairs) {
+            int temperature, boolean avoidLonelyPairs) {
 
         final int countThreads;
         this.extendedMode = extendedMode;
@@ -110,19 +110,22 @@ public class LoopMatcherThread implements Runnable {
      */
     @Override
     public void run() {
-        //try {
+
         boolean gotError = false;
-        RNAfold fold = new RNAfold();
+        RNAFold fold = new RNAFold();
         String sequence = getDnaElement().getRNASequence()
                 .getSequenceAsString();
+        String idSeq = getDnaElement().getAccession().getID() + " - "
+                + getDnaElement().getAccession().getIdentifier();
 
         // sólo para modo dos
         if (isExtendedMode()) {
             try {
-                fold = new RNAfold(sequence, temperature, avoidLonelyPairs);
+                fold = new RNAFold(sequence, temperature, avoidLonelyPairs);
             } catch (Exception ex) {
                 gotError = true;
-                out.println("Error Sequence Length: " + sequence.length());
+                out.println("[" + idSeq + "] Error. Sequence Length: "
+                        + sequence.length());
 
                 if (ex.getMessage() != null) {
                     if (ex.getMessage().length() > 0) {
@@ -134,10 +137,8 @@ public class LoopMatcherThread implements Runnable {
             }
 
             if (fold.gotError()) {
-                out.println("**Fold got error**");
+                out.println("**RNAFold error**");
                 gotError = true;
-                //getLatch().countDown();
-                //return;
             }
         }
         // III. Loop level
@@ -154,7 +155,7 @@ public class LoopMatcherThread implements Runnable {
                             fold.getStructure(),
                             currentPattern, getWriter(), false, getMaxLength(),
                             getMinLength(), getInputType(),
-                            getAdditionalSequence(), temperature, 
+                            getAdditionalSequence(), temperature,
                             avoidLonelyPairs);
                 } catch (InterruptedException ex) {
                     String msg = "#";
@@ -219,26 +220,8 @@ public class LoopMatcherThread implements Runnable {
 
             }
         }
-        /*} catch (Exception ex) {
-            
-            String msg = "#";
-            
-            if(ex.getLocalizedMessage() != null){
-                msg += ex.getLocalizedMessage() + " - ";
-            }
-            if(ex.getMessage() != null){
-                msg += ex.getMessage() + " - ";
-            }
-            
-            out.println(java.text.MessageFormat.format(
-                    getBundle()
-                            .getString("ERROR_EX"), new Object[]{msg}));
-            out.println("Exception: " + ex.toString());
-            
-             //out.println("*Method: LoopMatcherThread-Run-3*");
-        } finally {*/
+
         getLatch().countDown();
-        //}
     }
 
     /**

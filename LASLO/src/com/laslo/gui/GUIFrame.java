@@ -18,6 +18,7 @@
 package com.laslo.gui;
 
 import com.laslo.core.LoopMatcher;
+import com.tools.RNAFoldConfiguration;
 import com.tools.io.GenBankID;
 import com.tools.io.InputSequence;
 import static com.tools.io.InputSequence.BIOMART;
@@ -80,7 +81,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
-        this.jsTemperature.setValue(25);
+        this.jsTemperature.setValue(RNAFoldConfiguration.DEFAULT_TEMP);
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLblWoobles.setVisible(false);
@@ -1287,7 +1288,7 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         int max, min, wooble, mismatch, randoms, klet;
-        double temperature = (Integer) this.jsTemperature.getValue();
+        int temperature = (Integer) this.jsTemperature.getValue();
         boolean avoidLonePairs = this.jcbAvoidLonePairs.isSelected();
         pathOut = this.jTFPathOut.getText();
         pathIn = this.jTFPathIn.getText();

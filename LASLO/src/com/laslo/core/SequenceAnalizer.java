@@ -18,7 +18,7 @@
 package com.laslo.core;
 
 import com.opencsv.CSVWriter;
-import com.tools.RNAfold;
+import com.tools.RNAFold;
 import com.tools.io.InputSequence;
 import static java.lang.System.out;
 import java.util.ArrayList;
@@ -227,7 +227,7 @@ public class SequenceAnalizer {
     public static synchronized int sequenceResearch(DNASequence fastaSeq,
             String stemLoopPattern, CSVWriter writer, boolean invert,
             int maxLength, int minLength, InputSequence inputType,
-            String additionalSeq, double temperature, boolean avoidLonelyPairs) {
+            String additionalSeq, int temperature, boolean avoidLonelyPairs) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -258,8 +258,8 @@ public class SequenceAnalizer {
             stemLoop = stemLoopPattern;
         }
 
-        // Initialize empty RNAfold interface
-        RNAfold fold = new RNAfold();
+        // Initialize empty RNAFold interface
+        RNAFold fold = new RNAFold();
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoop);
@@ -353,8 +353,8 @@ public class SequenceAnalizer {
 
                         try { // ..is it useful??..
                             LoopMatcherThread.getSEM().acquire();
-                            // call RNAfold aplication
-                            fold = new RNAfold(rnaSeq, temperature, avoidLonelyPairs);
+                            // call RNAFold aplication
+                            fold = new RNAFold(rnaSeq, temperature, avoidLonelyPairs);
 
                         } catch (InterruptedException ex) {
                             out.printf(getBundle().getString("ERROR_CLASE"),
@@ -425,7 +425,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAfold(rnaSeq, temperature, avoidLonelyPairs).getMfe());
+                    slr.setMfe(new RNAFold(rnaSeq, temperature, avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
@@ -520,7 +520,7 @@ public class SequenceAnalizer {
     public static int sequenceExtendedResearch(DNASequence fastaSeq,
             String viennaStructure, String stemLoopPattern, CSVWriter writer,
             boolean invert, int maxLength, int minLength,
-            InputSequence inputType, String additionalSeq, double temperature,
+            InputSequence inputType, String additionalSeq, int temperature,
             boolean avoidLonelyPairs) {
 
         List<StemLoop> slrList = new ArrayList<>();
@@ -704,7 +704,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAfold(rnaSeq, temperature,avoidLonelyPairs).getMfe());
+                    slr.setMfe(new RNAFold(rnaSeq, temperature,avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
@@ -858,11 +858,24 @@ public class SequenceAnalizer {
 
     /**
      * Compare two bases to determine if are complementary (RNA) Uses the IUPAC
-     * nucleic acid codes: * A --> adenosine * M --> A C (amino) * C -->
-     * cytidine * S --> G C (strong) * G --> guanine * W --> A T (weak) * T -->
-     * thymidine * B --> G T C * U --> uridine * D --> G A T * R --> G A
-     * (purine) * H --> A C T * Y --> T C (pyrimidine) * V --> G C A * K --> G T
-     * (keto) * N --> A G C T (any) * - gap of indeterminate length
+     * nucleic acid codes: 
+     * A --> adenosine 
+     * M --> A C (amino) 
+     * C --> cytidine 
+     * S --> G C (strong) 
+     * G --> guanine 
+     * W --> A T (weak) 
+     * T --> thymidine 
+     * B --> G T C 
+     * U --> uridine 
+     * D --> G A T 
+     * R --> G A  (purine) 
+     * H --> A C T 
+     * Y --> T C (pyrimidine) 
+     * V --> G C A 
+     * K --> G T  (keto) 
+     * N --> A G C T (any) 
+     * - gap of indeterminate length
      *
      * @param base1
      * @param base2
