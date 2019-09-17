@@ -193,7 +193,7 @@ public class SequenceAnalizer {
                 out.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
-                 out.println("*Method: IsValidHairpin*");
+                out.println("*Method: IsValidHairpin*");
             }
         }
 
@@ -388,7 +388,7 @@ public class SequenceAnalizer {
                 out.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
-                 out.println("*Method: sequenceResearch*");
+                out.println("*Method: sequenceResearch*");
             }
 
             // extract output variables from the sequence
@@ -418,6 +418,13 @@ public class SequenceAnalizer {
                 }
 
                 slr.setRnaHairpinSequence(rnaSeq);
+
+                if (!invert) {
+                    slr.setLoopPattern(stemLoop);
+                } else {
+                    slr.setLoopPattern(reverseIt(stemLoop));
+                }
+
                 slr.setLoop(rnaLoop);
                 slr.setStartsAt(posAux);
                 slr.setStructure(hairpinModel);
@@ -436,13 +443,6 @@ public class SequenceAnalizer {
                 //out.println(slr.getId_fasta().toRowCSV());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
-
-                if (!invert) {
-                    slr.setLoopPattern(stemLoop);
-                } else {
-                    slr.setLoopPattern(reverseIt(stemLoop));
-                }
-
                 slr.setEndsAt(loopPos + loopLength + extDer);
                 slr.setPercA_sequence(
                         (rnaSequence.length() - rnaSequence.replace("A", "")
@@ -484,7 +484,7 @@ public class SequenceAnalizer {
                 out.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                 out.println("*Method: sequenceResearch*MUTEX");
+                out.println("*Method: sequenceResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -696,6 +696,12 @@ public class SequenceAnalizer {
                     slr.setLocation(loopPos - extIzq);
                 }
 
+                if (!invert) {
+                    slr.setLoopPattern(stemLoop);
+                } else {
+                    slr.setLoopPattern(reverseIt(stemLoop));
+                }
+
                 slr.setRnaHairpinSequence(rnaSeq);
                 slr.setLoop(rnaLoop);
                 slr.setStartsAt(loopPos - extIzq);
@@ -704,7 +710,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAFold(rnaSeq, temperature,avoidLonelyPairs).getMfe());
+                    slr.setMfe(new RNAFold(rnaSeq, temperature, avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
@@ -714,12 +720,6 @@ public class SequenceAnalizer {
                 }
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
-
-                if (!invert) {
-                    slr.setLoopPattern(stemLoop);
-                } else {
-                    slr.setLoopPattern(reverseIt(stemLoop));
-                }
 
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
@@ -858,24 +858,11 @@ public class SequenceAnalizer {
 
     /**
      * Compare two bases to determine if are complementary (RNA) Uses the IUPAC
-     * nucleic acid codes: 
-     * A --> adenosine 
-     * M --> A C (amino) 
-     * C --> cytidine 
-     * S --> G C (strong) 
-     * G --> guanine 
-     * W --> A T (weak) 
-     * T --> thymidine 
-     * B --> G T C 
-     * U --> uridine 
-     * D --> G A T 
-     * R --> G A  (purine) 
-     * H --> A C T 
-     * Y --> T C (pyrimidine) 
-     * V --> G C A 
-     * K --> G T  (keto) 
-     * N --> A G C T (any) 
-     * - gap of indeterminate length
+     * nucleic acid codes: A --> adenosine M --> A C (amino) C --> cytidine S
+     * --> G C (strong) G --> guanine W --> A T (weak) T --> thymidine B --> G T
+     * C U --> uridine D --> G A T R --> G A (purine) H --> A C T Y --> T C
+     * (pyrimidine) V --> G C A K --> G T (keto) N --> A G C T (any) - gap of
+     * indeterminate length
      *
      * @param base1
      * @param base2

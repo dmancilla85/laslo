@@ -75,7 +75,7 @@ public class StemLoop {
     private boolean reversed;
     private double mfe;
     private List<Integer> additionalSeqLocations;
-    private List<BaseVariable> patternVariables;
+    private final List<BaseVariable> patternVariables;
 
     /**
      *
