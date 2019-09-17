@@ -20,7 +20,6 @@ package com.laslo.gui;
 import com.laslo.core.LoopMatcher;
 import com.tools.io.GenBankID;
 import java.io.File;
-import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.LinkedHashMap;
 import javax.swing.JButton;
@@ -70,9 +69,9 @@ class GUISwingWorker extends
                 dnaFile = GenBankID.downLoadSequenceForId(frame.getGeneList());
 
             } catch (Exception ex) {
-                err.printf(frame.getCurrentBundle().getString("ERROR"),
+                out.printf(frame.getCurrentBundle().getString("ERROR"),
                         ex.getLocalizedMessage());
-                err.println("*Method: doInBackground*downloadSequence");
+                out.println("*Method: doInBackground*downloadSequence");
                 frame.setIsRunning(false);
                 this.cancel(true);
                 return 0;
@@ -90,7 +89,7 @@ class GUISwingWorker extends
             out.print(frame.getCurrentBundle().getString("NCBI_DONE"));
 
             if (pathIn == null) {
-                err.println(frame.getCurrentBundle().getString("NCBI_FATAL"));
+                out.println(frame.getCurrentBundle().getString("NCBI_FATAL"));
                 frame.setIsRunning(false);
                 this.cancel(true);
                 return 0;

@@ -20,7 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import static java.lang.System.err;
+import static java.lang.System.out;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -100,10 +100,10 @@ public class GenBankID extends SourceFile {
             GenbankWriterHelper.writeNucleotideSequence(file,
                     dnaFile.values());
         } catch (Exception ex) {
-            err.println("DNAFile size: " + dnaFile.size());
-            err.println("ERROR: " + ex.getMessage() + ". "
+            out.println("DNAFile size: " + dnaFile.size());
+            out.println("ERROR: " + ex.getMessage() + ". "
                     + ex.getLocalizedMessage());
-            err.println("*Method: GenBank-makeFile*");
+            out.println("*Method: GenBank-makeFile*");
             return null;
         }
 
@@ -136,8 +136,8 @@ public class GenBankID extends SourceFile {
             }
 
         } catch (IOException e) {
-            err.println("ERROR: " + e.getLocalizedMessage());
-            err.println("*Method: GenBank-getProxyConfiguration*");
+            out.println("ERROR: " + e.getLocalizedMessage());
+            out.println("*Method: GenBank-getProxyConfiguration*");
         }
 
         return proxy;
@@ -162,8 +162,8 @@ public class GenBankID extends SourceFile {
                 }
             }
         } catch (Exception ex) {
-            err.println("ERROR: " + ex.getMessage());
-            err.println("*Method: GenBank-connectToProxy*");
+            out.println("ERROR: " + ex.getMessage());
+            out.println("*Method: GenBank-connectToProxy*");
             return false;
         }
 
@@ -201,15 +201,15 @@ public class GenBankID extends SourceFile {
                         ncbiGenbank.openStream());
 
             } catch (MalformedURLException ex) {
-                err.println("ERROR: Malformed URL Exception. Cause: "
+                out.println("ERROR: Malformed URL Exception. Cause: "
                         + ex.getCause().getMessage());
                 return null;
             } catch (IOException ex) {
 
                 if (ex.getLocalizedMessage().contains("400")) {
-                    err.println("ERROR: " + transcriptoId + " code not found.");
+                    out.println("ERROR: " + transcriptoId + " code not found.");
                 } else {
-                    err.println("ERROR: IO Exception (" + transcriptoId
+                    out.println("ERROR: IO Exception (" + transcriptoId
                             + "). " + ex.getMessage());
                 }
                 return null;

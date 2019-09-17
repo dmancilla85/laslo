@@ -25,7 +25,7 @@ import com.tools.io.SourceFile;
 import com.tools.io.FlyBaseFastaID;
 import com.tools.io.EnsemblFastaID;
 import com.tools.io.GenBankID;
-import static java.lang.System.err;
+import static java.lang.System.out;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +43,43 @@ class PosComparator implements Comparator<Integer> {
     @Override
     public int compare(Integer a, Integer b) {
         return a > b ? -1 : (a < b ? 1 : 0);
+    }
+}
+
+/**
+ * 
+ * @author David A. Mancilla
+ */
+class VariableBase {
+   private Character base;
+   private Integer position;
+
+    /**
+     * @return the base
+     */
+    public Character getBase() {
+        return base;
+    }
+
+    /**
+     * @return the position
+     */
+    public Integer getPosition() {
+        return position;
+    }
+
+    /**
+     * @param base the base to set
+     */
+    public void setBase(Character base) {
+        this.base = base;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }
 
@@ -717,7 +754,7 @@ public class StemLoop {
             }
 
         } catch (Exception e) {
-            err.println("checkPairments-ERROR: " + e.getMessage());
+            out.println("checkPairments-ERROR: " + e.getMessage());
         }
         this.setHairpinStructure(aux.toString());
         this.setPercent_AU(AU / (double) (AU + CG + woobleCount));
@@ -822,9 +859,9 @@ public class StemLoop {
                 this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
             }
         } catch (Exception ex) {
-            err.println("\nERROR: " + ex.getMessage());
-            err.println(this.getId_fasta().toRowCSV());
-            err.println(this);
+            out.println("\nERROR: " + ex.getMessage());
+            out.println(this.getId_fasta().toRowCSV());
+            out.println(this);
         }
     }
 

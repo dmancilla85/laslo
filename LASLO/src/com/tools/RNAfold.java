@@ -71,12 +71,12 @@ public class RNAfold {
      * @param sequence
      * @param temperature
      */
-    public RNAfold(String sequence, double temperature) {
+    public RNAfold(String sequence, double temperature, boolean avoidLonelyPairs) {
         String command = COMMAND_RNAFOLD; // + RNAFOLD_ARGS;
 
         InputStreamReader isr = null;
         Process child = null;
-        OutputStream out = null;
+        OutputStream outstr = null;
         BufferedReader br;
         String line;
         String lpCmd = "--noLP";
@@ -86,6 +86,8 @@ public class RNAfold {
 
         lpTemp += this.temperature;
 
+        this.avoidLonelyPairs = avoidLonelyPairs;
+
         if (!this.avoidLonelyPairs) {
             lpCmd = "";
         }
@@ -94,12 +96,12 @@ public class RNAfold {
             child = new ProcessBuilder(command, "-d2", lpCmd, "--noPS", lpTemp)
                     .start();
 
-            out = child.getOutputStream();
-            out.write(sequence.getBytes());
-            out.write(13);
-            out.write('@');
-            out.write(13);
-            out.close();
+            outstr = child.getOutputStream();
+            outstr.write(sequence.getBytes());
+            outstr.write(13);
+            outstr.write('@');
+            outstr.write(13);
+            outstr.close();
 
             /*try (*/
             InputStream in = child.getInputStream()/*) {*/;
@@ -120,21 +122,18 @@ public class RNAfold {
             }
 
             isr.close();
-            out.close();
+            outstr.close();
             child.destroy();
 
         } catch (IOException ex) {
-            Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
-            System.err.println("SeqLength: " + sequence.length());
+            out.println("--Error executing RNAFold--");
+            //Logger.getLogger(RNAfold.class.getName()).log(Level.SEVERE, null, ex);
+            out.println("SeqLength: " + sequence.length());
         } finally {
             child = null;
-            out = null;
+            outstr = null;
             isr = null;
         }
-        /*} catch (Exception ex) {
-            err.println("RNAFold error: " + ex.getLocalizedMessage());
-            this.exc = ex;
-        }*/
     }
 
     /**
@@ -142,7 +141,7 @@ public class RNAfold {
      * @param sequence
      */
     public RNAfold(String sequence) {
-        this(sequence, 25.00);
+        this(sequence, 25.00, true);
     }
 
     /**

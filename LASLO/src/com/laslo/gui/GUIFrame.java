@@ -75,8 +75,8 @@ public class GUIFrame extends javax.swing.JFrame {
         this.locale = new Locale("en", "US");
         this.bundle = getBundle("resources/Bundle", locale);
         initComponents();
-        //this.jRBen_EN.setSelected(true);
-        //this.jRBes_AR.setSelected(false);
+        this.jCBMI_English.setSelected(true);
+        this.jCBMI_Spanish.setSelected(false);
         this.jLblError.setText("");
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
@@ -84,6 +84,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jSpinMismatch.setVisible(false);
         this.jSpinWooble.setVisible(false);
         this.jLblWoobles.setVisible(false);
+        this.jcbAvoidLonePairs.setSelected(true);
         this.jLblMismatchs.setVisible(false);
         this.jcbSearchInverse.setSelected(false);
         this.jcbExtended.setSelected(false);
@@ -99,9 +100,9 @@ public class GUIFrame extends javax.swing.JFrame {
         PrintStream ps = new PrintStream(taos);
         setOut(ps);
         setErr(ps);
-        
-        if(!checkExternalFiles()){
-            MessageBox.show("Missing external executables, check the EXT folder.","ERROR");
+
+        if (!checkExternalFiles()) {
+            MessageBox.show("Missing external executables, check the EXT folder.", "ERROR");
             System.exit(0b1);
         }
     }
@@ -127,6 +128,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jButtonOut = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jsTemperature = new javax.swing.JSpinner();
+        jcbAvoidLonePairs = new javax.swing.JCheckBox();
         jPanOptions = new javax.swing.JPanel();
         jLblStemBetween = new javax.swing.JLabel();
         jSpinMinLength = new javax.swing.JSpinner();
@@ -163,12 +165,15 @@ public class GUIFrame extends javax.swing.JFrame {
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
+        jMenuLanguage = new javax.swing.JMenu();
+        jCBMI_English = new javax.swing.JCheckBoxMenuItem();
+        jCBMI_Spanish = new javax.swing.JCheckBoxMenuItem();
         jMIAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("LASLO");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        setIconImage(new ImageIcon(getClass().getResource("/resources/noun_655767_cc.png")).getImage());
+        setIconImage(new ImageIcon(getClass().getResource("/resources/noun_DNA_1088243.png")).getImage());
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(533, 437));
         setResizable(false);
@@ -181,7 +186,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle",locale); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -247,6 +252,15 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
+        jcbAvoidLonePairs.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        jcbAvoidLonePairs.setSelected(true);
+        jcbAvoidLonePairs.setText(bundle.getString("AVOID_PAIRS")); // NOI18N
+        jcbAvoidLonePairs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbAvoidLonePairsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanOutputLayout = new javax.swing.GroupLayout(jPanOutput);
         jPanOutput.setLayout(jPanOutputLayout);
         jPanOutputLayout.setHorizontalGroup(
@@ -257,7 +271,8 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addGroup(jPanOutputLayout.createSequentialGroup()
                         .addGroup(jPanOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jcbMakeRandoms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jcbExtended, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
+                            .addComponent(jcbExtended, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                            .addComponent(jcbAvoidLonePairs, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
                         .addGap(6, 6, 6)
                         .addGroup(jPanOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLblNRand, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -300,6 +315,8 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addComponent(jcbExtended)
                     .addComponent(jLabel1)
                     .addComponent(jsTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jcbAvoidLonePairs)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -482,7 +499,7 @@ public class GUIFrame extends javax.swing.JFrame {
 
         jLblError.setFont(new java.awt.Font("Calibri", 2, 14)); // NOI18N
         jLblError.setForeground(new java.awt.Color(255, 0, 0));
-        jLblError.setText(bundle.getString("ERROR")); // NOI18N
+        jLblError.setText("ERROR"); // NOI18N
 
         jBtnStop.setText(bundle.getString("STOP_BTN")); // NOI18N
         jBtnStop.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -652,6 +669,27 @@ public class GUIFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenuFile);
 
         jMenuHelp.setText(bundle.getString("HELP")); // NOI18N
+
+        jMenuLanguage.setText("Language");
+
+        jCBMI_English.setSelected(true);
+        jCBMI_English.setText("English");
+        jCBMI_English.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBMI_EnglishActionPerformed(evt);
+            }
+        });
+        jMenuLanguage.add(jCBMI_English);
+
+        jCBMI_Spanish.setText("Español");
+        jCBMI_Spanish.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBMI_SpanishActionPerformed(evt);
+            }
+        });
+        jMenuLanguage.add(jCBMI_Spanish);
+
+        jMenuHelp.add(jMenuLanguage);
 
         jMIAbout.setText(bundle.getString("ABOUT")); // NOI18N
         jMIAbout.addActionListener(new java.awt.event.ActionListener() {
@@ -882,18 +920,39 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jsTemperatureStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jsTemperatureStateChanged
         // TODO add your handling code here:
-        Integer myValue = (Integer)this.jsTemperature.getValue();
-        
-        if( myValue < 0){
+        Integer myValue = (Integer) this.jsTemperature.getValue();
+
+        if (myValue < 0) {
             this.jsTemperature.setValue(0);
             return;
         }
-        
-         if(myValue > 99){
+
+        if (myValue > 99) {
             this.jsTemperature.setValue(99);
         }
-        
+
     }//GEN-LAST:event_jsTemperatureStateChanged
+
+    private void jCBMI_EnglishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMI_EnglishActionPerformed
+        // TODO add your handling code here
+        if (this.jCBMI_English.isSelected()) {
+            this.setDisplayLanguage("en", "US");
+            this.jCBMI_Spanish.setSelected(false);
+        }
+    }//GEN-LAST:event_jCBMI_EnglishActionPerformed
+
+    private void jCBMI_SpanishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMI_SpanishActionPerformed
+
+        // TODO add your handling code here
+        if (this.jCBMI_Spanish.isSelected()) {
+            this.setDisplayLanguage("es", "AR");
+            this.jCBMI_English.setSelected(false);
+        }
+    }//GEN-LAST:event_jCBMI_SpanishActionPerformed
+
+    private void jcbAvoidLonePairsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbAvoidLonePairsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jcbAvoidLonePairsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -927,6 +986,8 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JButton jBtnStop;
     private javax.swing.JButton jButtonIn;
     private javax.swing.JButton jButtonOut;
+    private javax.swing.JCheckBoxMenuItem jCBMI_English;
+    private javax.swing.JCheckBoxMenuItem jCBMI_Spanish;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
@@ -944,6 +1005,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
+    private javax.swing.JMenu jMenuLanguage;
     private javax.swing.JPanel jPanConsole;
     private javax.swing.JPanel jPanFile;
     private javax.swing.JPanel jPanOnline;
@@ -963,6 +1025,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTFPathIn;
     private javax.swing.JTextField jTFPathOut;
     private javax.swing.JTabbedPane jTabInput;
+    private javax.swing.JCheckBox jcbAvoidLonePairs;
     private javax.swing.JCheckBox jcbExtended;
     private javax.swing.JCheckBox jcbMakeRandoms;
     private javax.swing.JCheckBox jcbSearchInverse;
@@ -975,7 +1038,7 @@ public class GUIFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private Locale locale;
-    private final ResourceBundle bundle;
+    private ResourceBundle bundle;
     private final LoopMatcher loopMatcher;
     private File[] listOfFiles;
     private boolean isRunning;
@@ -1020,6 +1083,49 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jLblError.setText("");
         this.jBtnStop.setEnabled(value);
         this.jTabInput.setEnabled(!value);
+    }
+
+    /**
+     *
+     * @param lang
+     * @param country
+     */
+    private void setDisplayLanguage(String lang, String country) {
+
+        this.locale = new Locale(lang, country);
+        this.bundle = getBundle("resources/Bundle", locale);
+        jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
+        jcbExtended.setText(bundle.getString("EXTENDED_MODE_CHECK")); // NOI18N
+        jLblNRand.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N
+        jLblNKlet.setText(bundle.getString("RANDOM_K")); // NOI18N
+        jLblDestiny.setText(bundle.getString("DESTINATION")); // NOI18N
+        jTFPathOut.setToolTipText(bundle.getString("DESTINATION_TOOLTIP")); // NOI18N
+        jLabel1.setText(bundle.getString("TEMPERATURE")); // NOI18N
+        jLblStemBetween.setText(bundle.getString("STEM_LENGTH_BETWEEN")); // NOI18N
+        jLblWoobles.setText(bundle.getString("WOOBLE_ALLOWED_TO")); // NOI18N
+        jLblMismatchs.setText(bundle.getString("MISMATCHS_ALLOWED_TO")); // NOI18N
+        jLblInput.setText(bundle.getString("ENTER_THE_LOOPS")); // NOI18N
+        jcbSearchInverse.setText(bundle.getString("INVERSE_PATTERN")); // NOI18N
+        jTALoopPatterns.setToolTipText(bundle.getString("ENTER_LOOP_TOOLTIP")); // NOI18N
+        jftAdditionalSeq.setToolTipText(bundle.getString("ADDITION_SEQ_TOOLTIP"));
+        jlSingleSequence.setText(bundle.getString("ADDITIONAL_SEQ")); // NOI18N
+        jBtnStart.setText(bundle.getString("START")); // NOI18N
+        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OUTPUT_TITLE"))); // NOI18N
+        jTAConsole.getAccessibleContext().setAccessibleName(bundle.getString("MONITOR")); // NOI18N
+        //jLblError.setText(bundle.getString("ERROR")); // NOI18N
+        jBtnStop.setText(bundle.getString("STOP_BTN")); // NOI18N
+        jLabel4.setText(bundle.getString("PATH")); // NOI18N
+        jTFPathIn.setToolTipText(bundle.getString("PATH_TOOLTIP")); // NOI18N
+        jLabel7.setText(bundle.getString("DESCRIPTION")); // NOI18N
+        jTabInput.addTab(bundle.getString("TAB_FILE"), jPanFile); // NOI18N
+        jrbNcbi.setText("NCBI");
+        jLabel8.setText(bundle.getString("NCBI_DESC")); // NOI18N
+        jTabInput.addTab(bundle.getString("TAB_WEB"), jPanOnline); // NOI18N
+        jMenuFile.setText(bundle.getString("FILE")); // NOI18N
+        jMIExit.setText(bundle.getString("EXIT")); // NOI18N
+        jMenuHelp.setText(bundle.getString("HELP")); // NOI18N
+        jMIAbout.setText(bundle.getString("ABOUT")); // NOI18N
+
     }
 
     /**
@@ -1173,7 +1279,8 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         int max, min, wooble, mismatch, randoms, klet;
-        double temperature = (Integer)this.jsTemperature.getValue();
+        double temperature = (Integer) this.jsTemperature.getValue();
+        boolean avoidLonePairs = this.jcbAvoidLonePairs.isSelected();
         pathOut = this.jTFPathOut.getText();
         pathIn = this.jTFPathIn.getText();
         String[] loops = this.jTALoopPatterns.getText().split(",");
@@ -1227,6 +1334,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopMatcher.setkLetRandoms(klet);
         loopMatcher.setSearchReverse(this.jcbSearchInverse.isSelected());
         loopMatcher.setTemperature(temperature);
+        loopMatcher.setAvoidLonelyPairs(avoidLonePairs);
 
         // Add progress bar
         loopMatcher.setProgressBar(jProgressBar1);
@@ -1245,8 +1353,8 @@ public class GUIFrame extends javax.swing.JFrame {
     }
 
     /**
-     * 
-     * @param newGeneList 
+     *
+     * @param newGeneList
      */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     public void setGeneList(ArrayList<String> newGeneList) {
@@ -1254,32 +1362,32 @@ public class GUIFrame extends javax.swing.JFrame {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
-    public JProgressBar getProgressBar(){
+    public JProgressBar getProgressBar() {
         return this.jProgressBar1;
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public JTextArea getTxtConsole() {
         return this.jTAConsole;
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public JButton getJBtnStart() {
         return this.jBtnStart;
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public LoopMatcher getLoopMatcher() {
         return this.loopMatcher;
@@ -1316,11 +1424,11 @@ public class GUIFrame extends javax.swing.JFrame {
     public String getPathOut() {
         return this.pathOut;
     }
-    
-    public final boolean checkExternalFiles(){
+
+    public final boolean checkExternalFiles() {
         File f1 = new File("./ext/RNAfold.exe");
         File f2 = new File("./ext/ushuffle.exe");
-        
+
         return f1.exists() && f2.exists();
     }
 }

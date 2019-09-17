@@ -20,7 +20,7 @@ package com.laslo.core;
 import com.opencsv.CSVWriter;
 import com.tools.RNAfold;
 import com.tools.io.InputSequence;
-import static java.lang.System.err;
+import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -190,10 +190,10 @@ public class SequenceAnalizer {
                 hairpin_ = hairpin_.substring(0, k + 1);
 
             } catch (IndexOutOfBoundsException e) {
-                err.println(java.text.MessageFormat.format(
+                out.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
-                 err.println("*Method: IsValidHairpin*");
+                 out.println("*Method: IsValidHairpin*");
             }
         }
 
@@ -211,6 +211,8 @@ public class SequenceAnalizer {
      * Note: Check if mutEx are working well.
      * </p>
      *
+     * @param temperature
+     * @param avoidLonelyPairs
      * @note Check when fail with Genbank tags
      * @param fastaSeq
      * @param stemLoopPattern
@@ -225,7 +227,7 @@ public class SequenceAnalizer {
     public static synchronized int sequenceResearch(DNASequence fastaSeq,
             String stemLoopPattern, CSVWriter writer, boolean invert,
             int maxLength, int minLength, InputSequence inputType,
-            String additionalSeq, double temperature) {
+            String additionalSeq, double temperature, boolean avoidLonelyPairs) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -352,10 +354,10 @@ public class SequenceAnalizer {
                         try { // ..is it useful??..
                             LoopMatcherThread.getSEM().acquire();
                             // call RNAfold aplication
-                            fold = new RNAfold(rnaSeq, temperature);
+                            fold = new RNAfold(rnaSeq, temperature, avoidLonelyPairs);
 
                         } catch (InterruptedException ex) {
-                            err.printf(getBundle().getString("ERROR_CLASE"),
+                            out.printf(getBundle().getString("ERROR_CLASE"),
                                     SequenceAnalizer.class.getClass(),
                                     ex.getMessage());
                         } finally {
@@ -365,7 +367,7 @@ public class SequenceAnalizer {
                         hairpinModel = fold.getStructure();
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            err.printf(getBundle().getString("ERRORNOTMATCHING"),
+                            out.printf(getBundle().getString("ERRORNOTMATCHING"),
                                     rnaSeq, hairpinModel);
                         }
                         // check minimum free energy, must be < 0
@@ -383,10 +385,10 @@ public class SequenceAnalizer {
                 }
 
             } catch (Exception e) {
-                err.println(java.text.MessageFormat.format(
+                out.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{e.getMessage()}));
-                 err.println("*Method: sequenceResearch*");
+                 out.println("*Method: sequenceResearch*");
             }
 
             // extract output variables from the sequence
@@ -423,15 +425,15 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAfold(rnaSeq, temperature).getMfe());
+                    slr.setMfe(new RNAfold(rnaSeq, temperature, avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
-                        err.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                        out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
                     } else {
-                        err.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
+                        out.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
                     }
                 }
-                //err.println(slr.getId_fasta().toRowCSV());
+                //out.println(slr.getId_fasta().toRowCSV());
                 slr.setNLoop(extIzq);
                 slr.setPercent_AG();
 
@@ -479,10 +481,10 @@ public class SequenceAnalizer {
                 LoopMatcherThread.getMUTEX().acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                err.println(java.text.MessageFormat.format(
+                out.println(java.text.MessageFormat.format(
                         getBundle()
                                 .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                 err.println("*Method: sequenceResearch*MUTEX");
+                 out.println("*Method: sequenceResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }
@@ -511,12 +513,15 @@ public class SequenceAnalizer {
      * @param minLength
      * @param inputType
      * @param additionalSeq
+     * @param temperature
+     * @param avoidLonelyPairs
      * @return
      */
     public static int sequenceExtendedResearch(DNASequence fastaSeq,
             String viennaStructure, String stemLoopPattern, CSVWriter writer,
             boolean invert, int maxLength, int minLength,
-            InputSequence inputType, String additionalSeq, double temperature) {
+            InputSequence inputType, String additionalSeq, double temperature,
+            boolean avoidLonelyPairs) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -644,7 +649,7 @@ public class SequenceAnalizer {
                                         loopPos + loopLength + length);
 
                         if (rnaSeq.length() != hairpinModel.length()) {
-                            err.printf(getBundle().getString("ERRORNOTMATCHING"),
+                            out.printf(getBundle().getString("ERRORNOTMATCHING"),
                                     rnaSeq, hairpinModel);
                         }
 
@@ -660,10 +665,10 @@ public class SequenceAnalizer {
                 }
 
             } catch (Exception e) {
-                err.println(java.text.MessageFormat.format(
+                out.println(java.text.MessageFormat.format(
                         getBundle().getString("ERROR_EX"),
                         new Object[]{e.getMessage()}));
-                err.println("*Method: sequenceExtendedResearch*");
+                out.println("*Method: sequenceExtendedResearch*");
             }
 
             // extract output variables from the sequence
@@ -699,12 +704,12 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAfold(rnaSeq, temperature).getMfe());
+                    slr.setMfe(new RNAfold(rnaSeq, temperature,avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
-                        err.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                        out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
                     } else {
-                        err.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
+                        out.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
                     }
                 }
                 slr.setNLoop(extIzq);
@@ -754,9 +759,9 @@ public class SequenceAnalizer {
                 LoopMatcherThread.getMUTEX().acquire();
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
-                err.println(java.text.MessageFormat.format(
+                out.println(java.text.MessageFormat.format(
                         getBundle().getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                err.println("*Method: sequenceExtendedResearch*MUTEX");
+                out.println("*Method: sequenceExtendedResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
             }

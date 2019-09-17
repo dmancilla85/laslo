@@ -23,7 +23,7 @@ import com.tools.io.InputSequence;
 import java.util.Iterator;
 import static com.laslo.core.SequenceAnalizer.*;
 import com.tools.OSValidator;
-import static java.lang.System.err;
+import static java.lang.System.out;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -50,6 +50,7 @@ public class LoopMatcherThread implements Runnable {
     private CountDownLatch latch;
     private final ResourceBundle bundle;
     private final double temperature;
+    private final boolean avoidLonelyPairs;
 
     /**
      *
@@ -64,12 +65,13 @@ public class LoopMatcherThread implements Runnable {
      * @param searchReverse
      * @param bundle
      * @param temperature
+     * @param avoidLonelyPairs
      */
     public LoopMatcherThread(boolean extendedMode, String additionalSequence,
             int maxLength, int minLength, DNASequence dnaElement,
             InputSequence inputType, Iterator<String> patternItr,
             CSVWriter writer, boolean searchReverse, ResourceBundle bundle,
-            double temperature) {
+            double temperature, boolean avoidLonelyPairs) {
 
         final int countThreads;
         this.extendedMode = extendedMode;
@@ -83,6 +85,7 @@ public class LoopMatcherThread implements Runnable {
         this.searchReverse = searchReverse;
         this.bundle = bundle;
         this.temperature = temperature;
+        this.avoidLonelyPairs = avoidLonelyPairs;
 
         if (!started) {
             // 2 * n + 1
@@ -107,85 +110,116 @@ public class LoopMatcherThread implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            RNAfold fold = new RNAfold();
+        //try {
+        boolean gotError = false;
+        RNAfold fold = new RNAfold();
+        String sequence = getDnaElement().getRNASequence()
+                .getSequenceAsString();
 
-            // sólo para modo dos
-            if (isExtendedMode()) {
-                try {
-                    fold = new RNAfold(getDnaElement().getRNASequence()
-                            .getSequenceAsString(), temperature);
-                } catch (Exception ex) {
+        // sólo para modo dos
+        if (isExtendedMode()) {
+            try {
+                fold = new RNAfold(sequence, temperature, avoidLonelyPairs);
+            } catch (Exception ex) {
+                gotError = true;
+                out.println("Error Sequence Length: " + sequence.length());
+
+                if (ex.getMessage() != null) {
                     if (ex.getMessage().length() > 0) {
-                        err.println(this.dnaElement.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                        out.println(this.dnaElement.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
                     } else {
-                        err.println(this.dnaElement.getAccession() + " - RNAFold unknown error.");
+                        out.println(this.dnaElement.getAccession() + " - RNAFold unknown error.");
                     }
                 }
-
-                if (fold.gotError()) {
-                    getLatch().countDown();
-                    return;
-                }
             }
-            // III. Loop level
-            while (getPatternItr().hasNext()) {
 
-                String currentPattern = getPatternItr().next().trim().toUpperCase();
+            if (fold.gotError()) {
+                out.println("**Fold got error**");
+                gotError = true;
+                //getLatch().countDown();
+                //return;
+            }
+        }
+        // III. Loop level
+        while (getPatternItr().hasNext() && !gotError) {
 
-                // 1. Stem research
-                if (isExtendedMode()) {
+            String currentPattern = getPatternItr().next().trim().toUpperCase();
 
+            // 1. Stem research
+            if (isExtendedMode()) {
+
+                try {
+                    getSEM().acquire();
+                    sequenceExtendedResearch(getDnaElement(),
+                            fold.getStructure(),
+                            currentPattern, getWriter(), false, getMaxLength(),
+                            getMinLength(), getInputType(),
+                            getAdditionalSequence(), temperature, 
+                            avoidLonelyPairs);
+                } catch (InterruptedException ex) {
+                    String msg = "#";
+
+                    if (ex.getLocalizedMessage() != null) {
+                        msg += ex.getLocalizedMessage() + " - ";
+                    }
+                    if (ex.getMessage() != null) {
+                        msg += ex.getMessage() + " - ";
+                    }
+
+                    out.println(java.text.MessageFormat.format(
+                            getBundle()
+                                    .getString("ERROR_EX"), new Object[]{msg}));
+                    out.println("1-Exception: " + ex.toString());
+                } finally {
+                    getSEM().release();
+                }
+
+                if (isSearchReverse()) {
                     try {
                         getSEM().acquire();
                         sequenceExtendedResearch(getDnaElement(),
                                 fold.getStructure(),
-                                currentPattern, getWriter(), false, getMaxLength(),
+                                currentPattern, getWriter(), true, getMaxLength(),
                                 getMinLength(), getInputType(),
-                                getAdditionalSequence(), temperature);
+                                getAdditionalSequence(), temperature,
+                                avoidLonelyPairs);
+
                     } catch (InterruptedException ex) {
-                        err.println(java.text.MessageFormat.format(
+                        String msg = "#";
+
+                        if (ex.getLocalizedMessage() != null) {
+                            msg += ex.getLocalizedMessage() + " - ";
+                        }
+                        if (ex.getMessage() != null) {
+                            msg += ex.getMessage() + " - ";
+                        }
+
+                        out.println(java.text.MessageFormat.format(
                                 getBundle()
-                                        .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                        //err.println("*Method: LoopMatcherThread-Run-1*");
+                                        .getString("ERROR_EX"), new Object[]{msg}));
+                        out.println("2-Exception: " + ex.toString());
                     } finally {
                         getSEM().release();
                     }
-
-                    if (isSearchReverse()) {
-                        try {
-                            getSEM().acquire();
-                            sequenceExtendedResearch(getDnaElement(),
-                                    fold.getStructure(),
-                                    currentPattern, getWriter(), true, getMaxLength(),
-                                    getMinLength(), getInputType(),
-                                    getAdditionalSequence(), temperature);
-
-                        } catch (InterruptedException ex) {
-                            err.println(java.text.MessageFormat.format(
-                                    getBundle()
-                                            .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
-                             //err.println("*Method: LoopMatcherThread-Run-2*");
-                        } finally {
-                            getSEM().release();
-                        }
-                    }
-                } else {
-
-                    SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
-                            getWriter(), false, getMaxLength(), getMinLength(),
-                            getInputType(), getAdditionalSequence(), temperature);
-
-                    if (isSearchReverse()) {
-                        SequenceAnalizer.sequenceResearch(getDnaElement(),
-                                currentPattern, getWriter(), true, getMaxLength(),
-                                getMinLength(), getInputType(),
-                                getAdditionalSequence(), temperature);
-                    }
-
                 }
+            } else {
+
+                SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
+                        getWriter(), false, getMaxLength(), getMinLength(),
+                        getInputType(), getAdditionalSequence(), temperature,
+                        avoidLonelyPairs);
+
+                if (isSearchReverse()) {
+                    SequenceAnalizer.sequenceResearch(getDnaElement(),
+                            currentPattern, getWriter(), true, getMaxLength(),
+                            getMinLength(), getInputType(),
+                            getAdditionalSequence(), temperature,
+                            avoidLonelyPairs);
+                }
+
             }
-        } catch (Exception ex) {
+        }
+        /*} catch (Exception ex) {
             
             String msg = "#";
             
@@ -196,15 +230,15 @@ public class LoopMatcherThread implements Runnable {
                 msg += ex.getMessage() + " - ";
             }
             
-            err.println(java.text.MessageFormat.format(
+            out.println(java.text.MessageFormat.format(
                     getBundle()
                             .getString("ERROR_EX"), new Object[]{msg}));
-            err.println("Exception: " + ex.toString());
+            out.println("Exception: " + ex.toString());
             
-             //err.println("*Method: LoopMatcherThread-Run-3*");
-        } finally {
-            getLatch().countDown();
-        }
+             //out.println("*Method: LoopMatcherThread-Run-3*");
+        } finally {*/
+        getLatch().countDown();
+        //}
     }
 
     /**

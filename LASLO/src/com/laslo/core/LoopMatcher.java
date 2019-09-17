@@ -74,6 +74,7 @@ public class LoopMatcher {
     private boolean searchReverse;
     private int progress;
     private double temperature;
+    private boolean avoidLonelyPairs;
     private JProgressBar jpBar;
 
     /**
@@ -174,6 +175,21 @@ public class LoopMatcher {
         return kLetRandoms;
     }
 
+    /**
+     * 
+     * @param avoidLonelyPairs 
+     */
+    public void setAvoidLonelyPairs(boolean avoidLonelyPairs){
+        this.avoidLonelyPairs = avoidLonelyPairs;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public boolean getAvoidLonelyPairs(){
+        return this.avoidLonelyPairs;
+    }
     
     
     /**
@@ -408,10 +424,10 @@ public class LoopMatcher {
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            err.println(java.text.MessageFormat.format(
+            out.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {e.getMessage()}));
-            err.println("*Method: writeCSV*");
+            out.println("*Method: writeCSV*");
         }
     }
 
@@ -466,15 +482,15 @@ public class LoopMatcher {
                         }
 
                     } catch (IOException ex) {
-                        err.println(java.text.MessageFormat.format(
+                        out.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
-                        err.println("*Method: startReadingFiles*");
+                        out.println("*Method: startReadingFiles*");
                     } catch (Exception ex) {
-                        err.println(java.text.MessageFormat.format(
+                        out.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
-                        err.println("*Method: startReadingFiles*");
+                        out.println("*Method: startReadingFiles*");
                     }
                     UShuffle.makeShuffleSequences(getPathOut(), currentFile.getName(),
                             dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
@@ -530,7 +546,7 @@ public class LoopMatcher {
         CSVWriter writer;
         boolean genbank;
         String fileName, fileOut;
-        final int MAX_HILOS = 30;
+        final int MAX_HILOS = 15;
         int totalSecuencias;
         int nHilos = MAX_HILOS;
         int i;
@@ -560,7 +576,7 @@ public class LoopMatcher {
                     (new File(fileOut)).delete();
 
                 } catch (Exception io) {
-                    err.println(io.getMessage());
+                    out.println(io.getMessage());
                     err.flush();
                     return;
                 }
@@ -578,14 +594,14 @@ public class LoopMatcher {
             }
 
             if (fasta.isEmpty()) {
-                err.println(getBundle().getString("INVALID_FILE_FORMAT"));
-                err.println(getBundle().getString("TRYING_TO_FIX"));
+                out.println(getBundle().getString("INVALID_FILE_FORMAT"));
+                out.println(getBundle().getString("TRYING_TO_FIX"));
                 boolean formatFile = FASTACorrector
                         .formatFile(getActualFile().getAbsolutePath());
                 if (formatFile) {
                     fasta = readFastaDNASequence(getActualFile(), false);
                 } else {
-                    err.println(getBundle().getString("CANT_PROCESS"));
+                    out.println(getBundle().getString("CANT_PROCESS"));
                     return;
                 }
             }
@@ -629,7 +645,7 @@ public class LoopMatcher {
                         isExtendedMode(), getAdditionalSequence(), 
                         getMaxLength(), getMinLength(), element, 
                         getInputType(), patternItr, writer, isSearchReverse(),
-                        bundle, temperature);
+                        bundle, temperature, avoidLonelyPairs);
 
                 this.progress = (int)round(count/(double)totalSecuencias * 100);
                 jpBar.setValue(progress);
@@ -684,16 +700,16 @@ public class LoopMatcher {
                     (fin.getTimeInMillis() - ini.getTimeInMillis()) / (double)1000);
 
         } catch (FileNotFoundException ex) {
-            err.println(getBundle().getString("CANT_OPEN_FILE"));
-            err.println(java.text.MessageFormat.format(
+            out.println(getBundle().getString("CANT_OPEN_FILE"));
+            out.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
-            err.println("*Method: callProcessThreads*");
+            out.println("*Method: callProcessThreads*");
         } catch (Exception ex) {
-            err.println(java.text.MessageFormat.format(
+            out.println(java.text.MessageFormat.format(
                             getBundle()
                                     .getString("ERROR_EX"), new Object[] {ex.getMessage()}));
-            err.println("*Method: callProcessThreads*");
+            out.println("*Method: callProcessThreads*");
         } 
     }
 

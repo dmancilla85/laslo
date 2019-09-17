@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -104,7 +103,7 @@ public class UShuffle {
 
         if (!mkdirs) {
             if (!new File(path + RANDOM_PATH).exists()) {
-                err.println("<Error: Failed to create new 'shuffled' path.>");
+                out.println("<Error: Failed to create new 'shuffled' path.>");
             }
         }
 
@@ -119,7 +118,7 @@ public class UShuffle {
                     delete = (new File(destiny)).delete();
 
                     if (!delete) {
-                        err.println("<Error: Failed to delete old shuffled file.>");
+                        out.println("<Error: Failed to delete old shuffled file.>");
                     }
                 }
 
@@ -200,8 +199,8 @@ public class UShuffle {
                 }
 
             } catch (IOException | InterruptedException ex) {
-                err.println("Error: " + ex.getMessage());
-                err.println("*Method: makeShuffleSequences*");
+                out.println("Error: " + ex.getMessage());
+                out.println("*Method: makeShuffleSequences*");
             }
         }
 
