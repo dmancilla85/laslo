@@ -36,7 +36,7 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 >
 >> **Loop patterns**
 >> Here you enter the loop patterns to find (using the IUPAC fasta nomenclature). If you enter a list, must be separated by comma.
->> *IUPAC nucleotide codes: https://www.bioinformatics.org/sms/iupac.html*
+>> *[IUPAC nucleotide codes](https://www.bioinformatics.org/sms/iupac.html)*
 >
 >> **Search in anti-sense too**
 >> Find the pattern ingresed in both senses.
@@ -129,9 +129,9 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 
 4. OpenCSV 4.1 - A Simple CSV Parser for Java under a commercial-friendly Apache 2.0 license https://sourceforge.net/projects/opencsv/
 
-5. Icon [Folder](https://thenounproject.com/icon/53223/) by [Melissa Holterman](https://thenounproject.com/swiffermuis/) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+5. Icon [Folder](https://thenounproject.com/icon/53223/) by [Melissa Holterman from the Noun Project](https://thenounproject.com/swiffermuis/) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
-6. Icon [DNA](https://thenounproject.com/search/?q=dna&i=1088243) by [Creative Stall](https://thenounproject.com/creativestall/) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+6. Icon [DNA](https://thenounproject.com/search/?q=dna&i=1088243) by [Creative Stall from the Noun Project](https://thenounproject.com/creativestall/) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 ## License
 
