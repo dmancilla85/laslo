@@ -59,25 +59,12 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 
 >>	**LoopPattern** (nominal): The pattern matched by the current loop.
 
->>	**Sense**: (+) sense or (-) nonsense. Useful if the "Search in anti-sense" is checked.
-
 >>	**TerminalPair** (nominal):​ Loop closing pairs. In 5' to 3' order.
 
 >>	**N-2** (char): Precursor nucleotide to the 5 'loop predecessor. (Loop start 5' minus two nucleotide).
 
 >>	**N-1** (char)​: Predecesor nucleotide of the loop in 5'.
 
->>	**N2** (char)​: Nucleotide in the 2nd position of the loop.
-
->>	**N5** (char): Nucleotide in the 5th position of the loop.
-
->>	**N6** (char): Nucleotide in the 6th position of the loop.
-
->>	**N7** (char)​: Nucleotide in the 7th position of the loop.
-
->>	**N8** (char)​: Nucleotide in the 8th position of the loop.
-
->> 	***Note 2: Originally intended for patterns like CNGGNNNN. It will be generalized soon for al N variables.***
 >>	**Loop** (string): Loop sequence.
 
 >>	**StemLoopSequence** (string) Stem-loop full sequence.
@@ -124,9 +111,15 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 
 >>	**RelativePosition** (double): Start position of the stem-loop measured as StartsAt/SequenceLength.
 
+>>	**Sense**: (+) sense or (-) nonsense. Useful if the "Search in anti-sense" is checked.
+
+>>	**N variables table** (chars)​: Nucleotide in the ith-position of the pattern (i <= max. pattern length).
+
 >>	**AdditionalSeqMatches** (integer)​: Count of matches for the additional sequence (If it applies).
 
 >>	**AdditionalSeqPosition**​ (list): List of start positions of the additional sequence coincidences.
+
+>>	**fornaVisualization**​ (link): Link to structure visualization in forna.
 
 ## Credits and Acknowledgments
 
@@ -141,6 +134,8 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 5. Icon [Folder](https://thenounproject.com/icon/53223/) by [Melissa Holterman from the Noun Project](https://thenounproject.com/swiffermuis/) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 6. Icon [DNA](https://thenounproject.com/search/?q=dna&i=1088243) by [Creative Stall from the Noun Project](https://thenounproject.com/creativestall/) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+
+7. Kerpedjiev P, Hammer S, Hofacker IL (2015). Forna (force-directed RNA): Simple and effective online RNA secondary structure diagrams. Bioinformatics 31(20):3377-9. (http://rna.tbi.univie.ac.at/forna/)
 
 ## License
 
