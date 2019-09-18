@@ -13,6 +13,7 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 	- Added Language menu options - (English and spanish)
 	- Added "Avoid lonely pairs option"
 	- Fixed problems with large FASTA files ( > 50MB )
+	- Added forna structure visualization link
   - 
 
 - 1.01 25/8/19 : 
