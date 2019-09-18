@@ -18,7 +18,7 @@
 package com.laslo.core;
 
 import com.opencsv.CSVWriter;
-import com.tools.RNAFold;
+import com.tools.RNAFoldInterface;
 import com.tools.io.InputSequence;
 import java.util.Iterator;
 import static com.laslo.core.SequenceAnalizer.*;
@@ -112,7 +112,7 @@ public class LoopMatcherThread implements Runnable {
     public void run() {
 
         boolean gotError = false;
-        RNAFold fold = new RNAFold();
+        RNAFoldInterface fold = new RNAFoldInterface();
         String sequence = getDnaElement().getRNASequence()
                 .getSequenceAsString();
         String idSeq = getDnaElement().getAccession().getID() + " - "
@@ -121,7 +121,7 @@ public class LoopMatcherThread implements Runnable {
         // sólo para modo dos
         if (isExtendedMode()) {
             try {
-                fold = new RNAFold(sequence, temperature, avoidLonelyPairs);
+                fold = new RNAFoldInterface(sequence, temperature, avoidLonelyPairs);
             } catch (Exception ex) {
                 gotError = true;
                 out.println("[" + idSeq + "] Error. Sequence Length: "

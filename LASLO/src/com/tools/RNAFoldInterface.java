@@ -32,23 +32,23 @@ import java.util.regex.Pattern;
  *
  * @author David A. Mancilla
  */
-public class RNAFold {
+public class RNAFoldInterface {
 
-    private final static String COMMAND_RNAFold = "./ext/RNAFold.exe";
+    private final static String COMMAND_RNAFOLD = "./ext/RNAFold.exe";
     //private final static String RNAFold_ARGS = " -d2 --noLP --noPS";
     private String structure;
     private double mfe;
-    private Double temperature;
+    private int temperature;
     private boolean avoidLonelyPairs;
     private Exception exc;
 
     /**
      *
      */
-    public RNAFold() {
+    public RNAFoldInterface() {
         this.mfe = 0.0;
         this.structure = "";
-        this.temperature = 25.00;
+        this.temperature = RNAFoldConfiguration.DEFAULT_TEMP;
         this.avoidLonelyPairs = true;
         this.exc = null;
     }
@@ -58,7 +58,7 @@ public class RNAFold {
      * @param temp
      * @param avoidLonelyPairs
      */
-    public RNAFold(double temp, boolean avoidLonelyPairs) {
+    public RNAFoldInterface(int temp, boolean avoidLonelyPairs) {
         this.mfe = 0.0;
         this.structure = "";
         this.temperature = temp;
@@ -70,13 +70,14 @@ public class RNAFold {
      *
      * @param sequence
      * @param temperature
+     * @param avoidLonelyPairs
      */
-    public RNAFold(String sequence, double temperature, boolean avoidLonelyPairs) {
-        String command = COMMAND_RNAFold; // + RNAFold_ARGS;
+    public RNAFoldInterface(String sequence, int temperature, boolean avoidLonelyPairs) {
+        String command = COMMAND_RNAFOLD; // + RNAFold_ARGS;
 
-        InputStreamReader isr = null;
-        Process child = null;
-        OutputStream outstr = null;
+        InputStreamReader isr;
+        Process child;
+        OutputStream outstr;
         BufferedReader br;
         String line;
         String lpCmd = "--noLP";
@@ -127,7 +128,7 @@ public class RNAFold {
 
         } catch (IOException ex) {
             out.println("--Error executing RNAFold--");
-            //Logger.getLogger(RNAFold.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(RNAFoldInterface.class.getName()).log(Level.SEVERE, null, ex);
             out.println("SeqLength: " + sequence.length());
         } finally {
             child = null;
@@ -140,15 +141,15 @@ public class RNAFold {
      *
      * @param sequence
      */
-    public RNAFold(String sequence) {
-        this(sequence, 25.00, true);
+    public RNAFoldInterface(String sequence) {
+        this(sequence, RNAFoldConfiguration.DEFAULT_TEMP, true);
     }
 
     /**
      *
      * @return the temperature
      */
-    public Double getTemperature() {
+    public int getTemperature() {
         return temperature;
     }
 
@@ -156,7 +157,7 @@ public class RNAFold {
      *
      * @param temperature
      */
-    private void setTemperature(Double temperature) {
+    private void setTemperature(int temperature) {
         this.temperature = temperature;
     }
 
@@ -227,12 +228,12 @@ public class RNAFold {
     public static void main(String[] args) {
 
         String sequence = "UAGAGAUCUCUAUGUAUUUCCC";
-        RNAFold test;
+        RNAFoldInterface test;
         try {
-            test = new RNAFold(sequence);
+            test = new RNAFoldInterface(sequence);
             out.println(test);
         } catch (Exception ex) {
-            Logger.getLogger(RNAFold.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RNAFoldInterface.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

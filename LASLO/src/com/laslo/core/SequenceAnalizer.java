@@ -18,7 +18,7 @@
 package com.laslo.core;
 
 import com.opencsv.CSVWriter;
-import com.tools.RNAFold;
+import com.tools.RNAFoldInterface;
 import com.tools.io.InputSequence;
 import static java.lang.System.out;
 import java.util.ArrayList;
@@ -207,7 +207,7 @@ public class SequenceAnalizer {
     /**
      * Analize the sequence to find potential stem-loop structures
      * <p>
-     * <b>Implementation details: * It calls RNAFold</b>
+     * <b>Implementation details: * It calls RNAFoldInterface</b>
      * Note: Check if mutEx are working well.
      * </p>
      *
@@ -258,8 +258,8 @@ public class SequenceAnalizer {
             stemLoop = stemLoopPattern;
         }
 
-        // Initialize empty RNAFold interface
-        RNAFold fold = new RNAFold();
+        // Initialize empty RNAFoldInterface interface
+        RNAFoldInterface fold = new RNAFoldInterface();
 
         // Convert the original loop pattern to a regular expression
         String regExp = toRegularExpression(stemLoop);
@@ -353,8 +353,8 @@ public class SequenceAnalizer {
 
                         try { // ..is it useful??..
                             LoopMatcherThread.getSEM().acquire();
-                            // call RNAFold aplication
-                            fold = new RNAFold(rnaSeq, temperature, avoidLonelyPairs);
+                            // call RNAFoldInterface aplication
+                            fold = new RNAFoldInterface(rnaSeq, temperature, avoidLonelyPairs);
 
                         } catch (InterruptedException ex) {
                             out.printf(getBundle().getString("ERROR_CLASE"),
@@ -432,7 +432,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAFold(rnaSeq, temperature, avoidLonelyPairs).getMfe());
+                    slr.setMfe(new RNAFoldInterface(rnaSeq, temperature, avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
@@ -500,7 +500,7 @@ public class SequenceAnalizer {
      * Analize the sequence to find potential stem-loop structures
      * <p>
      * <b>Implementation details: * Compares with global prediction * It calls
-     * RNAFold</b>
+ RNAFoldInterface</b>
      * Note: Check if mutEx are working well.
      * </p>
      *
@@ -710,7 +710,7 @@ public class SequenceAnalizer {
                 slr.checkPairments();
                 slr.checkInternalLoops();
                 try {
-                    slr.setMfe(new RNAFold(rnaSeq, temperature, avoidLonelyPairs).getMfe());
+                    slr.setMfe(new RNAFoldInterface(rnaSeq, temperature, avoidLonelyPairs).getMfe());
                 } catch (Exception ex) {
                     if (ex.getMessage().length() > 0) {
                         out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());

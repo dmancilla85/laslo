@@ -58,11 +58,6 @@ public class StemLoop {
     private int internalLoops;
     private char predecessor2Loop;
     private char predecessorLoop;
-    private char n2Loop;
-    private char n5Loop;
-    private char n6Loop;
-    private char n7Loop;
-    private char n8Loop;
     private double percent_AG;
     private double percent_GU;
     private double percent_CG;
@@ -76,6 +71,9 @@ public class StemLoop {
     private double mfe;
     private List<Integer> additionalSeqLocations;
     private final List<BaseVariable> patternVariables;
+    private static int maxPatternLength;
+    private static boolean hasAdditionalSequence;
+    private static boolean hasTwoSenses;
 
     /**
      *
@@ -177,11 +175,6 @@ public class StemLoop {
         this.relativePos = 0.0;
         this.predecessorLoop = 0;
         this.predecessor2Loop = 0;
-        this.n2Loop = 0;
-        this.n5Loop = 0;
-        this.n6Loop = 0;
-        this.n7Loop = 0;
-        this.n8Loop = 0;
         this.mfe = (float) 0.0;
         this.viennaStructure = "";
         this.additional5Seq = "";
@@ -229,15 +222,15 @@ public class StemLoop {
     public void setLoopPattern(String pattern) {
         this.loopPattern = pattern;
         char aux;
-        
+
         this.patternVariables.clear();
-        
+
         for (int i = 0; i < pattern.length(); i++) {
             aux = pattern.charAt(i);
-            if( aux =='N' || aux == 'K' || aux =='M' || aux =='W'
-                    || aux =='B' || aux == 'D' || aux =='R' || aux =='H'
-                    || aux =='S' || aux == 'Y' || aux =='V'){
-                this.patternVariables.add(new BaseVariable(aux, i));
+            if (aux == 'N' || aux == 'K' || aux == 'M' || aux == 'W'
+                    || aux == 'B' || aux == 'D' || aux == 'R' || aux == 'H'
+                    || aux == 'S' || aux == 'Y' || aux == 'V') {
+                this.patternVariables.add(new BaseVariable('N', i));
             }
         }
     }
@@ -266,6 +259,9 @@ public class StemLoop {
     public static String getHeader(InputSequence mode) {
 
         String header = "";
+        String nVariablesTable = "";
+        String additionalSequenceCol = "";
+        String senseColumn = "";
 
         switch (mode) {
             case ENSEMBL:
@@ -289,16 +285,25 @@ public class StemLoop {
                 break;
         }
 
+        for (int i = 0; i < getMaxPatternLength(); i++) {
+            nVariablesTable += "N" + i + SourceFile.getROW_DELIMITER();
+        }
+
+        if (isHasAdditionalSequence()) {
+            additionalSequenceCol = "AdditionalSeqMatches" + SourceFile.getROW_DELIMITER()
+                    + "AdditionalSeqPositions" + SourceFile.getROW_DELIMITER();
+        }
+
+        if (isHasTwoSenses()) {
+            senseColumn = "Sense" + SourceFile.getROW_DELIMITER();
+        }
+
+        //StemLoop.COLUMN_VARS.sort(null);
         return header
                 + "LoopPattern" + SourceFile.getROW_DELIMITER()
                 + "TerminalPair" + SourceFile.getROW_DELIMITER()
                 + "N-2" + SourceFile.getROW_DELIMITER()
                 + "N-1" + SourceFile.getROW_DELIMITER()
-                + "N2" + SourceFile.getROW_DELIMITER()
-                + "N5" + SourceFile.getROW_DELIMITER()
-                + "N6" + SourceFile.getROW_DELIMITER()
-                + "N7" + SourceFile.getROW_DELIMITER()
-                + "N8" + SourceFile.getROW_DELIMITER()
                 + "Loop" + SourceFile.getROW_DELIMITER()
                 + "StemLoopSequence" + SourceFile.getROW_DELIMITER()
                 + "Additional5Seq" + SourceFile.getROW_DELIMITER()
@@ -322,10 +327,10 @@ public class StemLoop {
                 + "PurinePercentPairs" + SourceFile.getROW_DELIMITER()
                 + "RnaFoldMFE" + SourceFile.getROW_DELIMITER()
                 + "RelativePosition" + SourceFile.getROW_DELIMITER()
-                + "Sense" + SourceFile.getROW_DELIMITER()
-                + "AdditionalSeqMatches" + SourceFile.getROW_DELIMITER()
-                + "AdditionalSeqPositions" + SourceFile.getROW_DELIMITER()
-                ;
+                + senseColumn
+                + nVariablesTable
+                + additionalSequenceCol
+                + "fornaVisualization" + SourceFile.getROW_DELIMITER();
     }
 
     /**
@@ -431,46 +436,6 @@ public class StemLoop {
      */
     public InputSequence getMode() {
         return mode;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getN2Loop() {
-        return n2Loop;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getN5Loop() {
-        return n5Loop;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getN6Loop() {
-        return n6Loop;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getN7Loop() {
-        return n7Loop;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public char getN8Loop() {
-        return n8Loop;
     }
 
     /**
@@ -655,16 +620,16 @@ public class StemLoop {
     public void setLoop(String loop) {
         char aux;
         this.loop = loop;
-        
-        for(int i=0; i < loop.length(); i++){
-            for(BaseVariable baseV : patternVariables){
-                if(baseV.getPosition()==i){
+
+        for (int i = 0; i < loop.length(); i++) {
+            for (BaseVariable baseV : patternVariables) {
+                if (baseV.getPosition() == i) {
                     baseV.setValue(loop.charAt(i));
-                    out.println(baseV); //test
+                    //out.println(baseV); //test
                 }
             }
         }
-        
+
     }
 
     public void setLocation(int pos) {
@@ -771,11 +736,7 @@ public class StemLoop {
      * @param startPosLoop
      */
     public void setNLoop(int startPosLoop) {
-        char n2 = ' ',
-                n5 = ' ',
-                n6 = ' ',
-                n7 = ' ',
-                n8 = ' ';
+
         char precedes = ' ',
                 precedes2 = ' ';
         int matchFirst,
@@ -799,34 +760,10 @@ public class StemLoop {
 
         try {
             if (this.getRnaHairpinSequence() != null) {
-
-                n2 = this.getRnaHairpinSequence().charAt(startPos + 1);
                 precedes = this.getRnaHairpinSequence().charAt(startPos - 1);
                 precedes2 = this.getRnaHairpinSequence().charAt(startPos - 2);
-
-                if (this.getLoop().length() > 4) {
-                    n5 = this.getRnaHairpinSequence().charAt(startPos + 4);
-
-                    if (this.getLoop().length() > 5) {
-                        n6 = this.getRnaHairpinSequence().charAt(startPos + 5);
-
-                        if (this.getLoop().length() > 6) {
-                            n7 = this.getRnaHairpinSequence().charAt(startPos + 6);
-
-                            if (this.getLoop().length() > 7) {
-                                n8 = this.getRnaHairpinSequence().charAt(startPos + 7);
-                            }
-
-                        }
-                    }
-                }
             }
 
-            this.setN2Loop(n2);
-            this.setN5Loop(n5);
-            this.setN6Loop(n6);
-            this.setN7Loop(n7);
-            this.setN8Loop(n8);
             this.setPredecessorLoop(precedes);
             this.setPredecessor2Loop(precedes2);
 
@@ -1077,16 +1014,47 @@ public class StemLoop {
      */
     public String toRowCSV() {
 
+        String nVariablesValues = "";
+        String additionalSeqValues = "";
+        String senseValue = "";
+        String fornaSequence = 
+                "http://nibiru.tbi.univie.ac.at/forna/forna.html?id=fasta&file=>"  
+                + this.getGeneSymbol()
+                + "\\n" + this.rnaHairpinSequence 
+                + "\\n" + this.viennaStructure;
+        String aux;
+        boolean stop;
+
+        for (int i = 0; i < getMaxPatternLength(); i++) {
+            aux = "";
+            stop = false;
+            for (int j = 0; j < patternVariables.size() && !stop; j++) {
+                if (patternVariables.get(j).getPosition() == i) {
+                    aux = patternVariables.get(j).getValue().toString();
+                    stop = true;
+                    patternVariables.remove(j);
+                }
+            }
+
+            nVariablesValues += aux + SourceFile.getROW_DELIMITER();
+        }
+        
+        if(isHasAdditionalSequence()){
+            additionalSeqValues = this.getAdditionalSequenceCount() 
+                    + SourceFile.getROW_DELIMITER()
+                + this.getAdditionalSequenceLocations() 
+                    + SourceFile.getROW_DELIMITER();
+        }
+        
+        if(isHasTwoSenses()){
+            senseValue = this.isReverse() + SourceFile.getROW_DELIMITER();
+        }
+
         return this.getId_fasta().toRowCSV()
                 + this.getLoopPattern() + SourceFile.getROW_DELIMITER()
-                + this.getTerminalPair() + SourceFile.getROW_DELIMITER()     
+                + this.getTerminalPair() + SourceFile.getROW_DELIMITER()
                 + this.getPredecessor2Loop() + SourceFile.getROW_DELIMITER() //n-2
                 + this.getPredecessorLoop() + SourceFile.getROW_DELIMITER()
-                + this.getN2Loop() + SourceFile.getROW_DELIMITER()
-                + this.getN5Loop() + SourceFile.getROW_DELIMITER()
-                + this.getN6Loop() + SourceFile.getROW_DELIMITER()
-                + this.getN7Loop() + SourceFile.getROW_DELIMITER()
-                + this.getN8Loop() + SourceFile.getROW_DELIMITER()
                 + this.getLoop() + SourceFile.getROW_DELIMITER()
                 + this.getRnaHairpinSequence() + SourceFile.getROW_DELIMITER()
                 + this.getAdditional5Seq() + SourceFile.getROW_DELIMITER()
@@ -1110,9 +1078,10 @@ public class StemLoop {
                 + getFormattedNumber(this.getPercent_AG()) + SourceFile.getROW_DELIMITER()
                 + getFormattedNumber(this.getMfe(), 5) + SourceFile.getROW_DELIMITER()
                 + getFormattedNumber(this.getRelativePos()) + SourceFile.getROW_DELIMITER()
-                + this.isReverse() + SourceFile.getROW_DELIMITER()
-                + this.getAdditionalSequenceCount() + SourceFile.getROW_DELIMITER()
-                + this.getAdditionalSequenceLocations() + SourceFile.getROW_DELIMITER();
+                + senseValue
+                + nVariablesValues
+                + additionalSeqValues
+                + fornaSequence + SourceFile.getROW_DELIMITER();
     }
 
     /**
@@ -1207,41 +1176,6 @@ public class StemLoop {
     }
 
     /**
-     * @param n2Loop the n2Loop to set
-     */
-    public void setN2Loop(char n2Loop) {
-        this.n2Loop = n2Loop;
-    }
-
-    /**
-     * @param n5Loop the n5Loop to set
-     */
-    public void setN5Loop(char n5Loop) {
-        this.n5Loop = n5Loop;
-    }
-
-    /**
-     * @param n6Loop the n6Loop to set
-     */
-    public void setN6Loop(char n6Loop) {
-        this.n6Loop = n6Loop;
-    }
-
-    /**
-     * @param n7Loop the n7Loop to set
-     */
-    public void setN7Loop(char n7Loop) {
-        this.n7Loop = n7Loop;
-    }
-
-    /**
-     * @param n8Loop the n8Loop to set
-     */
-    public void setN8Loop(char n8Loop) {
-        this.n8Loop = n8Loop;
-    }
-
-    /**
      * @param percA_sequence the percA_sequence to set
      */
     public void setPercA_sequence(double percA_sequence) {
@@ -1323,6 +1257,48 @@ public class StemLoop {
      */
     public void setViennaStructure(String viennaStructure) {
         this.viennaStructure = viennaStructure;
+    }
+
+    /**
+     * @return the maxPatternLength
+     */
+    public static int getMaxPatternLength() {
+        return maxPatternLength;
+    }
+
+    /**
+     * @return the hasAdditionalSequence
+     */
+    public static boolean isHasAdditionalSequence() {
+        return hasAdditionalSequence;
+    }
+
+    /**
+     * @return the hasTwoSenses
+     */
+    public static boolean isHasTwoSenses() {
+        return hasTwoSenses;
+    }
+
+    /**
+     * @param aHasAdditionalSequence the hasAdditionalSequence to set
+     */
+    public static void setHasAdditionalSequence(boolean aHasAdditionalSequence) {
+        hasAdditionalSequence = aHasAdditionalSequence;
+    }
+
+    /**
+     * @param aHasTwoSenses the hasTwoSenses to set
+     */
+    public static void setHasTwoSenses(boolean aHasTwoSenses) {
+        hasTwoSenses = aHasTwoSenses;
+    }
+
+    /**
+     * @param aMaxPatternLength the maxPatternLength to set
+     */
+    public static void setMaxPatternLength(int aMaxPatternLength) {
+        maxPatternLength = aMaxPatternLength;
     }
 
 }

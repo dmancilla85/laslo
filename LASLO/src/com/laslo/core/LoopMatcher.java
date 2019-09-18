@@ -162,6 +162,8 @@ public class LoopMatcher {
      */
     public void setSearchReverse(boolean searchReverse) {
         this.searchReverse = searchReverse;
+        
+        StemLoop.setHasTwoSenses(searchReverse);
     }
     
     public int getProgress(){
@@ -214,7 +216,9 @@ public class LoopMatcher {
      * @param additionalSequence 
      */
     public void setAdditionalSequence(String additionalSequence) {
-        this.additionalSequence = additionalSequence;
+        this.additionalSequence = additionalSequence.trim();
+        
+        StemLoop.setHasAdditionalSequence(additionalSequence.trim().length() > 0);
     }
 
     /**
@@ -297,7 +301,17 @@ public class LoopMatcher {
      */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     public void setLoopPatterns(ArrayList<String> loopPatterns) {
+        int maxWord = 0;
+        
         this.loopPatterns = loopPatterns;
+        
+        for(int i = 0; i < loopPatterns.size(); i++){
+            if( loopPatterns.get(i).trim().length() > maxWord ){
+                maxWord = loopPatterns.get(i).trim().length();
+            }
+        }
+        
+        StemLoop.setMaxPatternLength(maxWord);
     }
 
     /**
