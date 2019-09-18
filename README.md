@@ -14,7 +14,6 @@ JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly re
 	- Added "Avoid lonely pairs option"
 	- Fixed problems with large FASTA files ( > 50MB )
 	- Added forna structure visualization link
-  - 
 
 - 1.01 25/8/19 : 
 	- Fixed problem with generation of multiple shuffled sequences.
