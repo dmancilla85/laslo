@@ -24,4 +24,5 @@ public class RNAFoldConfiguration {
     private static boolean avoidLonelyPairs;
     private static boolean avoidGUPairs;
     public final static int DEFAULT_TEMP = 37; 
+    public final static int SEQUENCE_MAX_SIZE = 20000;
 }

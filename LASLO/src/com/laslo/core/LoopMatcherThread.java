@@ -23,6 +23,7 @@ import com.tools.io.InputSequence;
 import java.util.Iterator;
 import static com.laslo.core.SequenceAnalizer.*;
 import com.tools.OSValidator;
+import com.tools.RNAFoldConfiguration;
 import static java.lang.System.out;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
@@ -116,12 +117,21 @@ public class LoopMatcherThread implements Runnable {
         String sequence = getDnaElement().getRNASequence()
                 .getSequenceAsString();
         String idSeq = getDnaElement().getAccession().getID() + " - "
-                + getDnaElement().getAccession().getIdentifier();
+                + getDnaElement().getAccession().getID();
 
         // sólo para modo dos
         if (isExtendedMode()) {
             try {
+                
+                if(sequence.length() >= RNAFoldConfiguration.SEQUENCE_MAX_SIZE){
+                    out.println(idSeq + " - Error: Provided sequence exceeds size limit of " + 
+                            RNAFoldConfiguration.SEQUENCE_MAX_SIZE+ " nt.");
+                    getLatch().countDown();
+                    return;
+                }
+                
                 fold = new RNAFoldInterface(sequence, temperature, avoidLonelyPairs);
+                
             } catch (Exception ex) {
                 gotError = true;
                 out.println("[" + idSeq + "] Error. Sequence Length: "
