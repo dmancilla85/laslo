@@ -143,6 +143,10 @@ public class GenBankID extends SourceFile {
         return proxy;
     }
 
+    /**
+     *
+     * @return
+     */
     public static boolean connectToProxy() {
 
         try {
@@ -171,6 +175,29 @@ public class GenBankID extends SourceFile {
     }
 
     /**
+     *
+     * @param host
+     * @param port
+     * @param user
+     * @param password
+     * @return
+     */
+    public static boolean connectToProxy(String host, String port, String user,
+            String password) {
+
+        try {
+            // defined a proxy connection
+            System.setProperty("http.proxyHost", host.trim());
+            System.setProperty("http.proxyPort", port.trim());
+            System.setProperty("http.proxyUser", user.trim());
+            System.setProperty("http.proxyPassword", password.trim());
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Download a NCBI sequence by ID
      *
      * @param genBankId
@@ -188,8 +215,7 @@ public class GenBankID extends SourceFile {
 
         dnaFile = new LinkedHashMap<>();
 
-        connectToProxy();
-
+        //connectToProxy();
         for (String transcriptoId : genBankId) {
             try {
                 request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text",

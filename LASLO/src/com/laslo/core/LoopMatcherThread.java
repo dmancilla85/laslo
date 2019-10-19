@@ -122,16 +122,28 @@ public class LoopMatcherThread implements Runnable {
         // sólo para modo dos
         if (isExtendedMode()) {
             try {
-                
-                if(sequence.length() >= RNAFoldConfiguration.SEQUENCE_MAX_SIZE){
-                    out.println(idSeq + " - Error: Provided sequence exceeds size limit of " + 
-                            RNAFoldConfiguration.SEQUENCE_MAX_SIZE+ " nt.");
+
+                if (sequence.length() >= RNAFoldConfiguration.SEQUENCE_MAX_SIZE) {
+                    String idAux;
+
+                    if (idSeq == null) {
+                        idAux = "*";
+                    } else {
+                        if (idSeq.length() > 15) {
+                            idAux = idSeq.substring(0, 14);
+                        } else {
+                            idAux = idSeq;
+                        }
+                    }
+
+                    out.println(idAux + " - Error: Provided sequence exceeds size limit of "
+                            + RNAFoldConfiguration.SEQUENCE_MAX_SIZE + " nt.");
                     getLatch().countDown();
                     return;
                 }
-                
+
                 fold = new RNAFoldInterface(sequence, temperature, avoidLonelyPairs);
-                
+
             } catch (Exception ex) {
                 gotError = true;
                 out.println("[" + idSeq + "] Error. Sequence Length: "

@@ -162,6 +162,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jTAGenes = new javax.swing.JTextArea();
         jrbNcbi = new javax.swing.JRadioButton();
         jLabel8 = new javax.swing.JLabel();
+        jSetProxy = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMIExit = new javax.swing.JMenuItem();
@@ -187,7 +188,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        //java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -442,7 +443,7 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addGroup(jPanOptionsLayout.createSequentialGroup()
                         .addComponent(jlSingleSequence, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jftAdditionalSeq, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jftAdditionalSeq)
                         .addContainerGap())))
         );
         jPanOptionsLayout.setVerticalGroup(
@@ -627,6 +628,13 @@ public class GUIFrame extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Calibri Light", 0, 12)); // NOI18N
         jLabel8.setText(bundle.getString("NCBI_DESC")); // NOI18N
 
+        jSetProxy.setText(bundle.getString("SETPROXY")); // NOI18N
+        jSetProxy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jSetProxyActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanOnlineLayout = new javax.swing.GroupLayout(jPanOnline);
         jPanOnline.setLayout(jPanOnlineLayout);
         jPanOnlineLayout.setHorizontalGroup(
@@ -634,12 +642,13 @@ public class GUIFrame extends javax.swing.JFrame {
             .addGroup(jPanOnlineLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
                     .addGroup(jPanOnlineLayout.createSequentialGroup()
                         .addComponent(jrbNcbi)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel8)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jSetProxy)))
                 .addContainerGap())
         );
         jPanOnlineLayout.setVerticalGroup(
@@ -648,7 +657,8 @@ public class GUIFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jrbNcbi)
-                    .addComponent(jLabel8))
+                    .addComponent(jLabel8)
+                    .addComponent(jSetProxy, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -963,6 +973,11 @@ public class GUIFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jcbAvoidLonePairsActionPerformed
 
+    private void jSetProxyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSetProxyActionPerformed
+        // TODO add your handling code here:
+        new ProxyFrame().setVisible(true);
+    }//GEN-LAST:event_jSetProxyActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1024,6 +1039,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JButton jSetProxy;
     private javax.swing.JSpinner jSpinMaxLength;
     private javax.swing.JSpinner jSpinMinLength;
     private javax.swing.JSpinner jSpinMismatch;
