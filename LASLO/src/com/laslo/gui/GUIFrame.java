@@ -188,7 +188,6 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
