@@ -1,4 +1,5 @@
 # LASLO v1.10 - README
+# New repository in https://github.com/dmancilla85/mvn-laslo
 
 ## Introduction
 
